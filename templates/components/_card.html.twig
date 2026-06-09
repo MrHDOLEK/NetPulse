@@ -1,0 +1,10 @@
+{% macro card(body, pad = true, hover = false, header = '', class = '', extra = '') %}
+    <div
+        class="rounded-[12px] border border-line bg-surface{{ hover ? ' transition-colors hover:border-line-2' : '' }}{{ class ? ' ' ~ class : '' }}"
+        {% if pad %}style="padding: var(--pad)"{% endif %}
+        {{ extra|raw }}
+    >
+        {% if header is not empty %}{{ header|raw }}{% endif %}
+        {{ body|raw }}
+    </div>
+{% endmacro %}

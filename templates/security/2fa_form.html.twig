@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" data-density="comfortable" class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Two-factor authentication · NetPulse</title>
+
+        {% set csp_nonce = app.request.attributes.get('csp_nonce') %}
+
+        <script nonce="{{ csp_nonce }}">
+            (function () {
+                try {
+                    var stored = localStorage.getItem("netpulse:dark");
+                    var dark = stored === null
+                        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                        : stored === "dark";
+                    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+                } catch (e) {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    </head>
+    <body class="grid min-h-full place-items-center bg-bg px-4 py-12 font-sans text-ink antialiased">
+        <main class="w-full max-w-sm">
+            <div class="mb-7 flex flex-col items-center gap-3 text-center">
+                {% include 'partials/_logo.html.twig' with { size: 40 } only %}
+                <div>
+                    <h1 class="text-lg font-semibold tracking-tight">Two-factor authentication</h1>
+                    <p class="mt-1 text-[13px] text-dim">Enter the 6-digit code from your authenticator app, or one of your recovery codes.</p>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-line bg-surface p-6 shadow-sm">
+                {% if authenticationError %}
+                    <div
+                        class="mb-4 rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+                        role="alert"
+                    >
+                        {{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ checkPathUrl ? checkPathUrl : path(checkPathRoute) }}" class="flex flex-col gap-4">
+                    {% if isCsrfProtectionEnabled %}
+                        <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+                    {% endif %}
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Authentication or recovery code</span>
+                        <input
+                            id="_auth_code"
+                            type="text"
+                            name="{{ authCodeParameterName }}"
+                            autocomplete="one-time-code"
+                            autofocus
+                            required
+                            placeholder="123456"
+                            class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 font-mono text-[16px] tracking-[0.3em] text-ink outline-none transition-colors placeholder:tracking-normal placeholder:text-dim focus:border-accent"
+                        >
+                        <span class="text-xs text-dim">A recovery code works once if you can't reach your authenticator.</span>
+                    </label>
+
+                    {% if displayTrustedOption %}
+                        <label class="flex items-center gap-2 text-[13px] text-dim">
+                            <input type="checkbox" name="{{ trustedParameterName }}" class="h-4 w-4 rounded border-line-2 bg-surface-2">
+                            Trust this device
+                        </label>
+                    {% endif %}
+
+                    <button
+                        type="submit"
+                        class="mt-1 inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >
+                        Verify
+                    </button>
+                </form>
+            </div>
+
+            <p class="mt-5 text-center text-[13px]">
+                <a href="{{ logoutPath }}" class="text-dim underline-offset-2 hover:text-ink hover:underline">Cancel and sign out</a>
+            </p>
+        </main>
+    </body>
+</html>

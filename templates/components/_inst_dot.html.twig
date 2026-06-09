@@ -1,0 +1,8 @@
+{% macro inst_dot(color = 'primary', class = '') %}
+    {% set tones = {
+        primary: 'bg-accent',
+        violet: 'bg-violet',
+        amber: 'bg-amber',
+    } %}
+    <span class="inline-block h-2 w-2 shrink-0 rounded-full {{ tones[color]|default(tones.primary) }}{{ class ? ' ' ~ class : '' }}"></span>
+{% endmacro %}

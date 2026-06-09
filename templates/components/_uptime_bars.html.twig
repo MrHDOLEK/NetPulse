@@ -1,0 +1,17 @@
+{% macro uptime_bars(samples = [], height = 38, class = '') %}
+    {% set recent = samples|slice(0, 60)|reverse %}
+    <div class="flex items-stretch gap-0.5{{ class ? ' ' ~ class : '' }}" style="height: {{ height }}px">
+        {% for sample in recent %}
+            {% set status = (sample.status|default('')|lower) %}
+            {% set color =
+                status in ['down', 'failed'] ? 'bg-bad'
+                : (status in ['degraded', 'unhealthy', 'warn'] ? 'bg-warn'
+                : (status in ['healthy', 'up', 'ok'] ? 'bg-good'
+                : 'bg-line')) %}
+            <span
+                class="min-w-[3px] flex-1 rounded-sm opacity-90 transition-opacity hover:opacity-100 {{ color }}"
+                title="{{ sample.title|default(status) }}"
+            ></span>
+        {% endfor %}
+    </div>
+{% endmacro %}

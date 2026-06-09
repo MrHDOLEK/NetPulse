@@ -1,0 +1,6 @@
+[NetPulse] {{ period }} digest — {{ digests|length }} connection{{ digests|length == 1 ? '' : 's' }}
+
+NetPulse {{ period }} digest for {{ digests|length }} connection{{ digests|length == 1 ? '' : 's' }}:
+{% for digest in digests %}
+- {{ digest.probeName }}/{{ digest.connectionName }}: down {{ (digest.avgDownloadBits / 1000000)|round(1) }} Mbps, up {{ (digest.avgUploadBits / 1000000)|round(1) }} Mbps, ping {{ digest.avgPingMs|round(1) }} ms, loss {{ (digest.avgPacketLossRatio * 100)|round(2) }} %, healthy {{ (digest.healthyRatio * 100)|round(1) }} % ({{ digest.testsCount }} tests, {{ digest.failuresCount }} failures)
+{% endfor %}

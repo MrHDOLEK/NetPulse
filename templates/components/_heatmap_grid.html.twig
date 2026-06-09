@@ -1,0 +1,59 @@
+{% macro heatmap_grid(cells = []) %}
+    {% set weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+    {% set cell_class = 'h-6 w-full rounded-sm outline-none ring-accent focus:ring-2' %}
+
+    <div class="overflow-x-auto">
+        <table id="heatmap-table" class="border-separate border-spacing-1 text-[11px]">
+            <thead class="text-faint">
+                <tr>
+                    <th scope="col" class="px-1 py-0.5 text-left font-medium"><span class="sr-only">Weekday</span></th>
+                    {% for hour in 0..23 %}
+                        <th scope="col" class="px-0.5 py-0.5 text-center font-medium tabular-nums">{{ '%02d'|format(hour) }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody>
+                <template x-for="row in rows" :key="row.dow">
+                    <tr>
+                        <th scope="row" class="whitespace-nowrap px-1 py-0.5 text-left font-medium text-dim" x-text="row.label"></th>
+                        <template x-for="cell in row.cells" :key="cell.hour">
+                            <td class="p-0">
+                                <div
+                                    class="{{ cell_class }}"
+                                    :style="cell.bgStyle"
+                                    :aria-label="cell.aria"
+                                    :title="cell.aria"
+                                    :data-dow="cell.dow"
+                                    :data-hour="cell.hour"
+                                    tabindex="0"
+                                ></div>
+                            </td>
+                        </template>
+                    </tr>
+                </template>
+            </tbody>
+
+            <tbody x-show="false" x-cloak>
+                {% for dow in 0..6 %}
+                    <tr>
+                        <th scope="row" class="whitespace-nowrap px-1 py-0.5 text-left font-medium text-dim">{{ weekdays[dow] }}</th>
+                        {% for cell in cells|slice(dow * 24, 24) %}
+                            <td class="p-0">
+                                <div
+                                    class="{{ cell_class }}"
+                                    style="{{ cell.bgStyle }}"
+                                    aria-label="{{ cell.aria }}"
+                                    title="{{ cell.aria }}"
+                                    data-dow="{{ cell.dow }}"
+                                    data-hour="{{ cell.hour }}"
+                                    tabindex="0"
+                                ></div>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}

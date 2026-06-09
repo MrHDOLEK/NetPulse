@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Scheduling\Domain\Entity\DueNowMarker" table="due_now_markers">
+        <id name="connectionId" type="connection_id" column="connection_id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="requestedAt" type="datetime_immutable" column="requested_at"/>
+        <field name="forcedServerId" column="forced_server_id" type="string" nullable="true"/>
+    </entity>
+</doctrine-mapping>

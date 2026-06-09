@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+
+{% block title %}Notifications · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-dim">Settings</span>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <span class="text-ink">Notifications</span>
+{% endblock %}
+
+{% block body %}
+    <meta name="csrf-settings-notifications" content="{{ csrf_token('settings-notifications') }}">
+
+    <div
+        class="mx-auto flex max-w-[680px] flex-col gap-5"
+        x-data="settingsNotifications"
+        data-email-dsn-set="{{ emailDsnSet ? '1' : '0' }}"
+        data-chat-dsn-set="{{ chatDsnSet ? '1' : '0' }}"
+        data-webhook-url-set="{{ webhookUrlSet ? '1' : '0' }}"
+        data-can-encrypt="{{ canEncrypt ? '1' : '0' }}"
+        data-settings='{{ {
+            enabled: enabled,
+            threshold: threshold,
+            emailEnabled: emailEnabled,
+            chatEnabled: chatEnabled,
+            webhookEnabled: webhookEnabled,
+            emailTo: emailTo
+        }|json_encode|e('html_attr') }}'
+    >
+        {% include 'settings/_subnav.html.twig' %}
+
+        <div>
+            <h1 class="text-[20px] font-semibold tracking-tight text-ink">Notifications</h1>
+            <p class="mt-0.5 text-[13px] text-dim">
+                Alert and recovery notifications fire when a connection crosses into (or out of) an
+                unhealthy state. Pick which generic channels to deliver on — each is configured here.
+            </p>
+        </div>
+
+        {% if not canEncrypt %}
+            <div
+                role="alert"
+                class="rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+            >
+                The encryption key is not configured, so channel secrets (DSNs / webhook URL) cannot be
+                saved. Set <span class="font-mono">SETTINGS_ENCRYPTION_KEY</span> (or
+                <span class="font-mono">TOTP_ENCRYPTION_KEY</span>) to a 64-character hex string and reload.
+            </div>
+        {% endif %}
+
+        <div
+            role="alert"
+            x-show="message"
+            x-cloak
+            x-text="message"
+            :class="alertClass"
+            class="rounded-lg border px-3 py-2.5 text-[13px]"
+        ></div>
+
+        {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent' %}
+        {% set lbl = 'text-[13px] font-medium text-dim' %}
+        {% set legend = 'mb-2 text-[11px] font-medium uppercase tracking-wide text-faint' %}
+        {% set badge = 'ml-1 inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-dim' %}
+        {% set hint = 'text-[11.5px] text-faint' %}
+
+        {% set body %}
+            <div class="flex flex-col gap-6">
+                <div>
+                    <div class="{{ legend }}">Status</div>
+                    <label class="flex items-center gap-2.5">
+                        <input type="checkbox" x-model="form.enabled" class="h-4 w-4 rounded border-line-2 bg-surface-2 text-accent focus:ring-accent">
+                        <span class="text-[13px] font-medium text-ink">Send notifications</span>
+                    </label>
+                    <label class="mt-3 flex max-w-[260px] flex-col gap-1.5">
+                        <span class="{{ lbl }}">Alert after N consecutive failures</span>
+                        <input type="number" min="1" x-model="form.threshold" class="{{ field }}">
+                        <span class="{{ hint }}">A recovery fires when a healthy result follows such a run.</span>
+                    </label>
+                </div>
+
+                <div>
+                    <div class="{{ legend }}">Email</div>
+                    <label class="flex items-center gap-2.5">
+                        <input type="checkbox" x-model="form.emailEnabled" class="h-4 w-4 rounded border-line-2 bg-surface-2 text-accent focus:ring-accent">
+                        <span class="text-[13px] font-medium text-ink">Deliver by email</span>
+                    </label>
+                    <div x-show="form.emailEnabled" x-cloak class="mt-3 grid grid-cols-1 gap-3">
+                        <label class="flex flex-col gap-1.5">
+                            <span class="{{ lbl }}">Recipients</span>
+                            <input type="text" x-model="form.emailTo" placeholder="ops@example.com, oncall@example.com" class="{{ field }}">
+                            <span class="{{ hint }}">Comma-separated addresses.</span>
+                        </label>
+                        <label class="flex flex-col gap-1.5">
+                            <span class="{{ lbl }}">
+                                Mailer DSN
+                                <span x-show="emailDsnSet" x-cloak class="{{ badge }}">•••• set</span>
+                            </span>
+                            <input type="password" x-model="form.emailDsn" autocomplete="new-password" :placeholder="emailDsnPlaceholder" class="{{ field }}">
+                            <span class="{{ hint }}">Symfony Mailer DSN, e.g. <span class="font-mono">smtp://user:pass@smtp.example:587</span>. Stored encrypted; leave blank to keep.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="{{ legend }}">Chat</div>
+                    <label class="flex items-center gap-2.5">
+                        <input type="checkbox" x-model="form.chatEnabled" class="h-4 w-4 rounded border-line-2 bg-surface-2 text-accent focus:ring-accent">
+                        <span class="text-[13px] font-medium text-ink">Deliver to a chat service</span>
+                    </label>
+                    <div x-show="form.chatEnabled" x-cloak class="mt-3 grid grid-cols-1 gap-3">
+                        <label class="flex flex-col gap-1.5">
+                            <span class="{{ lbl }}">
+                                Chatter DSN
+                                <span x-show="chatDsnSet" x-cloak class="{{ badge }}">•••• set</span>
+                            </span>
+                            <input type="password" x-model="form.chatDsn" autocomplete="new-password" :placeholder="chatDsnPlaceholder" class="{{ field }}">
+                            <span class="{{ hint }}">A Symfony Notifier chatter DSN. Stored encrypted; leave blank to keep.</span>
+                        </label>
+                        <div class="rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-[11.5px] text-dim">
+                            <div class="mb-1 font-medium text-ink">DSN formats</div>
+                            <ul class="flex flex-col gap-0.5 font-mono text-faint">
+                                <li>slack://TOKEN@default?channel=alerts</li>
+                                <li>telegram://TOKEN@default?channel=CHAT_ID</li>
+                                <li>discord://default?webhook_id=ID&amp;token=TOKEN</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="{{ legend }}">Webhook</div>
+                    <label class="flex items-center gap-2.5">
+                        <input type="checkbox" x-model="form.webhookEnabled" class="h-4 w-4 rounded border-line-2 bg-surface-2 text-accent focus:ring-accent">
+                        <span class="text-[13px] font-medium text-ink">POST a JSON payload to a URL</span>
+                    </label>
+                    <div x-show="form.webhookEnabled" x-cloak class="mt-3 grid grid-cols-1 gap-3">
+                        <label class="flex flex-col gap-1.5">
+                            <span class="{{ lbl }}">
+                                Webhook URL
+                                <span x-show="webhookUrlSet" x-cloak class="{{ badge }}">•••• set</span>
+                            </span>
+                            <input type="password" x-model="form.webhookUrl" autocomplete="new-password" :placeholder="webhookUrlPlaceholder" class="{{ field }}">
+                            <span class="{{ hint }}">Receives <span class="font-mono">{kind, severity, subject, body, context, timestamp}</span>. Stored encrypted; leave blank to keep.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 border-t border-line pt-4">
+                    <button
+                        type="button"
+                        @click="test()"
+                        :disabled="testing"
+                        x-text="testLabel"
+                        class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface active:translate-y-px"
+                    >Send test</button>
+                    <button
+                        type="button"
+                        @click="save()"
+                        :disabled="loading"
+                        x-text="saveLabel"
+                        class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >Save changes</button>
+                </div>
+                <p class="-mt-2 {{ hint }}">"Send test" uses the last <span class="font-medium">saved</span> settings — save first, then test.</p>
+            </div>
+        {% endset %}
+        {{ card.card(body) }}
+    </div>
+{% endblock %}

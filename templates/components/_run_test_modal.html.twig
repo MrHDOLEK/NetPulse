@@ -1,0 +1,116 @@
+{% macro run_test_modal() %}
+    {% set radio = 'mt-0.5 h-4 w-4 shrink-0 accent-accent' %}
+    {% set option = 'flex cursor-pointer items-start gap-2.5 rounded-lg border border-line bg-bg px-3 py-2.5 text-[12.5px] text-ink' %}
+    {% set legend = 'mb-2 text-[11px] font-medium uppercase tracking-wide text-faint' %}
+
+    <div x-cloak @keydown.escape.window="closeRunModal()">
+        <div
+            x-show="runModalOpen"
+            x-transition.opacity
+            @click="closeRunModal()"
+            class="fixed inset-0 z-40 bg-black/50"
+        ></div>
+
+        <div
+            x-show="runModalOpen"
+            x-transition.opacity
+            class="fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4"
+            @click="closeRunModal()"
+        >
+            <div
+                @click.stop
+                role="dialog"
+                aria-modal="true"
+                class="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-[12px] border border-line bg-surface shadow-[var(--shadow)]"
+            >
+                <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+                    <h3 class="text-[14px] font-semibold text-ink">Run test</h3>
+                    <button
+                        type="button"
+                        @click="closeRunModal()"
+                        class="grid h-8 w-8 place-items-center rounded-lg text-dim transition-colors hover:bg-surface-2 hover:text-ink"
+                        title="Close"
+                    >
+                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6 6 18"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto px-5 py-4">
+                    <div class="mb-4">
+                        <div class="{{ legend }}">Scope</div>
+                        <div class="flex flex-col gap-2">
+                            <label class="{{ option }}">
+                                <input type="radio" class="{{ radio }}" value="connection" x-model="runScope">
+                                <span>
+                                    <span class="font-medium">This connection</span>
+                                    <span class="mt-0.5 block text-[11.5px] text-faint">Run a test on the selected connection.</span>
+                                </span>
+                            </label>
+                            <label class="{{ option }}">
+                                <input type="radio" class="{{ radio }}" value="all" x-model="runScope">
+                                <span>
+                                    <span class="font-medium">All connections</span>
+                                    <span class="mt-0.5 block text-[11.5px] text-faint">Run a test on every enabled connection (round-robin server).</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="{{ legend }}">Server</div>
+                        <div class="flex flex-col gap-2">
+                            <label class="{{ option }}">
+                                <input type="radio" class="{{ radio }}" value="auto" x-model="runServerMode">
+                                <span>
+                                    <span class="font-medium">Round-robin (auto)</span>
+                                    <span class="mt-0.5 block text-[11.5px] text-faint">Let the scheduler pick a server from the connection's pool.</span>
+                                </span>
+                            </label>
+                            <label class="{{ option }}" :class="specificDisabled ? 'opacity-50' : ''">
+                                <input type="radio" class="{{ radio }}" value="specific" x-model="runServerMode" :disabled="specificDisabled">
+                                <span>
+                                    <span class="font-medium">Specific server</span>
+                                    <span class="mt-0.5 block text-[11.5px] text-faint">Target a specific Ookla server by id or host.</span>
+                                </span>
+                            </label>
+                            <select
+                                x-model="runServerId"
+                                x-show="runServerMode === 'specific' && !specificDisabled && ooklaServers.length > 0"
+                                x-cloak
+                                class="mt-0.5 w-full rounded-lg border border-line bg-bg px-3 py-2 text-[12.5px] text-ink focus:border-accent focus:outline-none"
+                            >
+                                <option value="">— pick a nearby server —</option>
+                                <template x-for="s in ooklaServers" :key="s.id">
+                                    <option :value="s.id" x-text="s.label"></option>
+                                </template>
+                            </select>
+                            <input
+                                type="text"
+                                x-model="runServerId"
+                                x-show="runServerMode === 'specific' && !specificDisabled"
+                                x-cloak
+                                placeholder="…or type an Ookla server id or host, e.g. 12345 or frankfurt.speedtest.net:8080"
+                                class="mt-0.5 w-full rounded-lg border border-line bg-bg px-3 py-2 text-[12.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 border-t border-line px-5 py-3.5">
+                    <button
+                        type="button"
+                        @click="closeRunModal()"
+                        class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface-hover"
+                    >Cancel</button>
+                    <button
+                        type="button"
+                        @click="submitRun()"
+                        class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong"
+                    >Run</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

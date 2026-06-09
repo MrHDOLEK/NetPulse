@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+
+{% block title %}General · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-dim">Settings</span>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <span class="text-ink">General</span>
+{% endblock %}
+
+{% block body %}
+    <meta name="csrf-settings-general" content="{{ csrf_token('settings-general') }}">
+
+    <div
+        class="mx-auto flex max-w-[640px] flex-col gap-5"
+        x-data="settingsGeneral"
+        data-settings='{{ { siteName: siteName, timezone: timezone }|json_encode|e('html_attr') }}'
+    >
+        {% include 'settings/_subnav.html.twig' %}
+
+        <div>
+            <h1 class="text-[20px] font-semibold tracking-tight text-ink">General</h1>
+            <p class="mt-0.5 text-[13px] text-dim">Basic identity and locale for this NetPulse instance.</p>
+        </div>
+
+        <div
+            role="alert"
+            x-show="message"
+            x-cloak
+            x-text="message"
+            :class="alertClass"
+            class="rounded-lg border px-3 py-2.5 text-[13px]"
+        ></div>
+
+        {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent' %}
+        {% set lbl = 'text-[13px] font-medium text-dim' %}
+
+        {% set body %}
+            <div class="flex flex-col gap-4">
+                <label class="flex flex-col gap-1.5">
+                    <span class="{{ lbl }}">Site name</span>
+                    <input type="text" x-model="form.siteName" placeholder="NetPulse" class="{{ field }}">
+                    <span class="text-[11.5px] text-faint">Shown in the browser tab and page header. Blank uses the default.</span>
+                </label>
+                <label class="flex flex-col gap-1.5">
+                    <span class="{{ lbl }}">Timezone</span>
+                    <input type="text" x-model="form.timezone" placeholder="UTC" class="{{ field }}">
+                    <span class="text-[11.5px] text-faint">IANA name, e.g. <span class="font-mono">Europe/Warsaw</span>. Blank uses the server default.</span>
+                </label>
+
+                <div class="flex items-center justify-end border-t border-line pt-4">
+                    <button
+                        type="button"
+                        @click="save()"
+                        :disabled="loading"
+                        x-text="saveLabel"
+                        class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >Save changes</button>
+                </div>
+            </div>
+        {% endset %}
+        {{ card.card(body) }}
+    </div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% macro badge(label = '', tone = 'neutral', dot = false, class = '', label_attr = '') %}
+    {% set tones = {
+        neutral: 'border-line bg-surface-2 text-dim',
+        good: 'border-[color-mix(in_oklab,var(--good)_35%,transparent)] bg-[color-mix(in_oklab,var(--good)_12%,transparent)] text-good',
+        warn: 'border-[color-mix(in_oklab,var(--warn)_35%,transparent)] bg-[color-mix(in_oklab,var(--warn)_12%,transparent)] text-warn',
+        bad: 'border-[color-mix(in_oklab,var(--bad)_35%,transparent)] bg-[color-mix(in_oklab,var(--bad)_14%,transparent)] text-bad',
+        accent: 'border-[color-mix(in_oklab,var(--accent)_35%,transparent)] bg-accent-dim text-accent',
+    } %}
+    <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[11.5px] font-medium {{ tones[tone]|default(tones.neutral) }}{{ class ? ' ' ~ class : '' }}">
+        {% if dot %}<span class="h-1.5 w-1.5 rounded-full bg-current"></span>{% endif %}
+        {% if label_attr is not empty %}<span {{ label_attr|raw }}>{{ label }}</span>{% else %}{{ label }}{% endif %}
+    </span>
+{% endmacro %}

@@ -1,0 +1,14 @@
+{% macro server_controls(window) %}
+    {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink outline-none transition-colors focus:border-accent' %}
+    {% set label = 'text-[11px] font-medium uppercase tracking-wide text-faint' %}
+
+    <div class="flex flex-wrap items-end gap-3" data-server-controls>
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Window</span>
+            <select x-model="window" class="{{ field }}">
+                <option value="30d" {{ window == '30d' ? 'selected' : '' }}>Last 30 days</option>
+                <option value="90d" {{ window == '90d' ? 'selected' : '' }}>Last 90 days</option>
+            </select>
+        </label>
+    </div>
+{% endmacro %}

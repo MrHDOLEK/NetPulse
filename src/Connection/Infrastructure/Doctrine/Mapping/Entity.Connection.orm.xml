@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Connection\Domain\Entity\Connection" table="connections">
+        <id name="id" type="connection_id" column="id"/>
+
+        <field name="probeId" type="probe_id" column="probe_id"/>
+        <field name="name" type="string" column="name" length="255"/>
+        <field name="isp" type="string" column="isp" length="255"/>
+        <field name="color" type="string" column="color" length="32" enum-type="App\Connection\Domain\Enum\ConnectionColor"/>
+        <field name="labels" type="labels" column="labels"/>
+        <field name="serverPool" type="server_pool" column="server_pool"/>
+        <field name="schedule" type="schedule" column="schedule"/>
+        <field name="enabled" type="boolean" column="enabled"/>
+        <field name="thresholds" type="thresholds" column="thresholds"/>
+        <field name="adaptivePolicy" type="adaptive_policy" column="adaptive_policy"/>
+
+        <embedded name="expected" class="App\Connection\Domain\ValueObject\ExpectedSpeed" use-column-prefix="false"/>
+
+        <indexes>
+            <index name="idx_connections_probe_id" columns="probe_id"/>
+        </indexes>
+    </entity>
+</doctrine-mapping>

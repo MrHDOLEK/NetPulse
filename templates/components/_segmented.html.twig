@@ -1,0 +1,27 @@
+{% macro segmented(name, options = [], selected = '', change = '', class = '') %}
+    <div
+        role="radiogroup"
+        class="inline-flex gap-[2px] rounded-lg border border-line bg-bg p-[3px]{{ class ? ' ' ~ class : '' }}"
+    >
+        {% for option in options %}
+            {% set value = option.value %}
+            {% set id = name ~ '-' ~ value %}
+            {% set isOn = value == selected %}
+            <label
+                for="{{ id }}"
+                class="segmented-option cursor-pointer rounded-md px-3 py-1 text-[12.5px] font-medium text-dim transition-colors hover:text-ink"
+            >
+                <input
+                    type="radio"
+                    id="{{ id }}"
+                    name="{{ name }}"
+                    value="{{ value }}"
+                    class="peer sr-only"
+                    {{ isOn ? 'checked' : '' }}
+                    {{ change|raw }}
+                >
+                {{ option.label }}
+            </label>
+        {% endfor %}
+    </div>
+{% endmacro %}

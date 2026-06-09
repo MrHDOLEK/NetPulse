@@ -1,0 +1,61 @@
+
+services:
+  netpulse:
+    build:
+      context: .
+      dockerfile: .docker/php/Dockerfile
+      target: prod
+      args:
+        APP_VERSION: ${NETPULSE_VERSION:-prod}
+    image: ghcr.io/mrhdolek/netpulse:latest
+    container_name: netpulse
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET, e.g. `openssl rand -hex 16`}
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////var/www/var/netpulse.sqlite}
+      PROMETHEUS_ALLOWED_IPS: ${PROMETHEUS_ALLOWED_IPS:-}
+    volumes:
+      - netpulse_var:/var/www/var
+    restart: unless-stopped
+
+  agent:
+    image: ghcr.io/mrhdolek/netpulse:latest
+    container_name: netpulse-agent
+    profiles: [agent]
+    depends_on:
+      - netpulse
+    entrypoint: ["php", "bin/console", "app:agent:run"]
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET, e.g. `openssl rand -hex 16`}
+      NETPULSE_API_URL: http://netpulse:8080
+      PROBE_ID: ${PROBE_ID:?Create a probe with app:probe:create and set PROBE_ID}
+      PROBE_TOKEN: ${PROBE_TOKEN:?Set the probe's PROBE_TOKEN}
+      OOKLA_BINARY: speedtest
+      AGENT_POLL_INTERVAL: ${AGENT_POLL_INTERVAL:-60}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null -H \"Authorization: Bearer $${PROBE_TOKEN}\" http://netpulse:8080/api/v1/probes/$${PROBE_ID}/health || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 150s
+    labels:
+      - autoheal=true
+    restart: unless-stopped
+
+  autoheal:
+    image: willfarrell/autoheal:1.2.0
+    container_name: netpulse-autoheal
+    profiles: [agent]
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+      AUTOHEAL_INTERVAL: 30
+      AUTOHEAL_START_PERIOD: 60
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  netpulse_var:

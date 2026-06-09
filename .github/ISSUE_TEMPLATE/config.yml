@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://mrhdolek.github.io/NetPulse/
+    about: Setup, configuration, and how NetPulse works — read this first.
+  - name: 💬 Questions & ideas
+    url: https://github.com/MrHDOLEK/NetPulse/discussions
+    about: Ask a question or discuss an idea (please don't open an issue for support).

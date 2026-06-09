@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-density="comfortable" class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign in · NetPulse</title>
+
+        {% set csp_nonce = app.request.attributes.get('csp_nonce') %}
+
+        <script nonce="{{ csp_nonce }}">
+            (function () {
+                try {
+                    var stored = localStorage.getItem("netpulse:dark");
+                    var dark = stored === null
+                        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                        : stored === "dark";
+                    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+                } catch (e) {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    </head>
+    <body class="grid min-h-full place-items-center bg-bg px-4 py-12 font-sans text-ink antialiased">
+        <main class="w-full max-w-sm">
+            <div class="mb-7 flex flex-col items-center gap-3 text-center">
+                {% include 'partials/_logo.html.twig' with { size: 40 } only %}
+                <div>
+                    <h1 class="text-lg font-semibold tracking-tight">Sign in to NetPulse</h1>
+                    <p class="mt-1 text-[13px] text-dim">Welcome back. Sign in to your instance.</p>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-line bg-surface p-6 shadow-sm">
+                {% if error %}
+                    <div
+                        class="mb-4 rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+                        role="alert"
+                    >
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                {% if providers is not empty %}
+                    <div class="mb-1 flex flex-col gap-2.5">
+                        {% for provider in providers %}
+                            <a
+                                href="{{ provider.url }}"
+                                class="group flex w-full items-center gap-3 rounded-lg border border-line-2 bg-surface-2 px-4 py-3 text-left transition-colors hover:border-line-2 hover:bg-surface"
+                            >
+                                <span class="block flex-1 text-[13.5px] font-medium text-ink">Continue with {{ provider.name }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+
+                    <div class="my-5 flex items-center gap-3">
+                        <div class="h-px flex-1 bg-line"></div>
+                        <span class="text-[11px] uppercase tracking-wider text-dim">or</span>
+                        <div class="h-px flex-1 bg-line"></div>
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('login') }}" class="flex flex-col gap-4">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Email</span>
+                        <input
+                            type="email"
+                            name="_username"
+                            value="{{ last_username }}"
+                            required
+                            autocomplete="username"
+                            autofocus
+                            placeholder="admin@netpulse.local"
+                            class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent"
+                        >
+                    </label>
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Password</span>
+                        <input
+                            type="password"
+                            name="_password"
+                            required
+                            autocomplete="current-password"
+                            class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors focus:border-accent"
+                        >
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="mt-1 inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >
+                        Sign in
+                    </button>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>

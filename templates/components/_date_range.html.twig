@@ -1,0 +1,18 @@
+{% macro date_range() %}
+    <label class="flex flex-col gap-1">
+        <span class="text-[11px] font-medium uppercase tracking-wide text-faint">From</span>
+        <input
+            type="date"
+            x-model="filters.since"
+            class="rounded-lg border border-line-2 bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink outline-none transition-colors focus:border-accent"
+        >
+    </label>
+    <label class="flex flex-col gap-1">
+        <span class="text-[11px] font-medium uppercase tracking-wide text-faint">Until</span>
+        <input
+            type="date"
+            x-model="filters.until"
+            class="rounded-lg border border-line-2 bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink outline-none transition-colors focus:border-accent"
+        >
+    </label>
+{% endmacro %}

@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+
+{% block title %}Set up two-factor · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-dim">Settings</span>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <a href="{{ path('settings_security') }}" class="text-dim hover:text-ink">Security</a>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <span class="text-ink">Set up</span>
+{% endblock %}
+
+{% block body %}
+    <div class="mx-auto flex max-w-[640px] flex-col gap-5">
+        <div>
+            <h1 class="text-[20px] font-semibold tracking-tight text-ink">Set up two-factor authentication</h1>
+            <p class="mt-0.5 text-[13px] text-dim">Scan the QR code with your authenticator app, then enter the 6-digit code it shows.</p>
+        </div>
+
+        {% set body %}
+            <div class="flex flex-col gap-5">
+                {% if error %}
+                    <div
+                        role="alert"
+                        class="rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+                    >
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <div class="flex flex-col items-start gap-5 sm:flex-row sm:gap-6">
+                    <div class="shrink-0 rounded-xl border border-line bg-white p-2">
+                        <img
+                            src="{{ qrDataUri }}"
+                            alt="Two-factor authentication QR code"
+                            width="220"
+                            height="220"
+                            class="block h-[220px] w-[220px]"
+                        >
+                    </div>
+
+                    <div class="flex flex-1 flex-col gap-3">
+                        <div>
+                            <p class="text-[13px] font-medium text-dim">Can't scan it?</p>
+                            <p class="mt-1 text-[13px] text-dim">Enter this key manually in your app:</p>
+                            <code class="mt-1.5 inline-block select-all break-all rounded-lg border border-line-2 bg-surface-2 px-3 py-2 font-mono text-[13px] tracking-wider text-ink">{{ manualKey }}</code>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" action="{{ path('settings_security_2fa_confirm') }}" class="flex flex-col gap-3 border-t border-line pt-5">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('twofa_confirm') }}">
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Verification code</span>
+                        <input
+                            type="text"
+                            name="code"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            required
+                            autofocus
+                            placeholder="123456"
+                            class="max-w-[200px] rounded-lg border border-line-2 bg-surface-2 px-3 py-2 font-mono text-[16px] tracking-[0.3em] text-ink outline-none transition-colors placeholder:tracking-normal placeholder:text-dim focus:border-accent"
+                        >
+                    </label>
+
+                    <div class="flex items-center gap-2.5">
+                        <button
+                            type="submit"
+                            class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                        >
+                            Verify &amp; enable
+                        </button>
+                        <a
+                            href="{{ path('settings_security') }}"
+                            class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3.5 py-2.5 text-[13px] font-medium text-dim transition-colors hover:text-ink active:translate-y-px"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        {% endset %}
+        {{ card.card(body) }}
+    </div>
+{% endblock %}

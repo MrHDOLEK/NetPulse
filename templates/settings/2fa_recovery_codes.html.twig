@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+
+{% block title %}Recovery codes · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-dim">Settings</span>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <a href="{{ path('settings_security') }}" class="text-dim hover:text-ink">Security</a>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <span class="text-ink">Recovery codes</span>
+{% endblock %}
+
+{% block body %}
+    <div class="mx-auto flex max-w-[640px] flex-col gap-5">
+        <div>
+            <h1 class="text-[20px] font-semibold tracking-tight text-ink">
+                {% if regenerated %}Your new recovery codes{% else %}Two-factor authentication enabled{% endif %}
+            </h1>
+            <p class="mt-0.5 text-[13px] text-dim">
+                {% if regenerated %}
+                    Your previous recovery codes no longer work. Save these new ones somewhere safe.
+                {% else %}
+                    Save these recovery codes now. Each one lets you sign in once if you lose your authenticator.
+                {% endif %}
+            </p>
+        </div>
+
+        {% set body %}
+            <div class="flex flex-col gap-4">
+                <div
+                    role="alert"
+                    class="rounded-lg border border-[color-mix(in_oklab,var(--warn,var(--accent))_45%,transparent)] bg-[color-mix(in_oklab,var(--accent)_10%,transparent)] px-3 py-2.5 text-[13px] text-ink"
+                >
+                    These codes are shown <strong>once</strong> and cannot be retrieved later. Store them in a
+                    password manager or print them. Each code works a single time.
+                </div>
+
+                <ul class="grid grid-cols-2 gap-2 font-mono text-[14px] sm:grid-cols-2">
+                    {% for code in codes %}
+                        <li class="select-all rounded-lg border border-line-2 bg-surface-2 px-3 py-2 tracking-wider text-ink">{{ code }}</li>
+                    {% endfor %}
+                </ul>
+
+                <div class="flex items-center gap-2.5 border-t border-line pt-4">
+                    <a
+                        href="{{ path('settings_security') }}"
+                        class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >
+                        I've saved my codes
+                    </a>
+                    <span class="text-[12.5px] text-dim">Tip: use your browser's print dialog to keep a paper copy.</span>
+                </div>
+            </div>
+        {% endset %}
+        {{ card.card(body) }}
+    </div>
+{% endblock %}

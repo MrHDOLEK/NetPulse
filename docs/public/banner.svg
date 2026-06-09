@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-label="NetPulse — self-hosted, metrics-first internet speed tracking">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0e13"/>
+      <stop offset="1" stop-color="#11161f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#46c8d6"/>
+      <stop offset="1" stop-color="#9b7be0"/>
+    </linearGradient>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46c8d6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#46c8d6" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="400" fill="url(#bg)"/>
+
+  <!-- faint grid -->
+  <g stroke="#1b2330" stroke-width="1">
+    <path d="M0 80 H1200 M0 160 H1200 M0 240 H1200 M0 320 H1200"/>
+    <path d="M150 0 V400 M300 0 V400 M450 0 V400 M600 0 V400 M750 0 V400 M900 0 V400 M1050 0 V400"/>
+  </g>
+
+  <!-- speed graph / pulse motif -->
+  <path d="M0 300 L120 285 L210 295 L300 250 L380 265 L470 180 L520 200 L560 120 L600 205 L700 235 L800 190 L900 215 L1010 160 L1100 185 L1200 170 L1200 400 L0 400 Z" fill="url(#area)"/>
+  <path d="M0 300 L120 285 L210 295 L300 250 L380 265 L470 180 L520 200 L560 120 L600 205 L700 235 L800 190 L900 215 L1010 160 L1100 185 L1200 170"
+        fill="none" stroke="url(#accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+  <g fill="#0b0e13" stroke="#46c8d6" stroke-width="2.5">
+    <circle cx="300" cy="250" r="5"/><circle cx="560" cy="120" r="5"/>
+    <circle cx="800" cy="190" r="5"/><circle cx="1010" cy="160" r="5"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="80" y="170" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="92" font-weight="800" letter-spacing="-2">
+    <tspan fill="#f5f7fa">Net</tspan><tspan fill="#46c8d6">Pulse</tspan>
+  </text>
+
+  <!-- tagline -->
+  <text x="84" y="218" font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="26" font-weight="500" fill="#aab3c0">
+    Self-hosted, metrics-first internet speed tracking
+  </text>
+
+  <!-- tech chips -->
+  <g font-family="'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="17" font-weight="600">
+    <g transform="translate(84,256)">
+      <rect width="150" height="34" rx="17" fill="#161d28" stroke="#283142"/>
+      <text x="75" y="22" text-anchor="middle" fill="#cdd5e0">PHP 8.4 · Symfony</text>
+    </g>
+    <g transform="translate(246,256)">
+      <rect width="118" height="34" rx="17" fill="#161d28" stroke="#283142"/>
+      <text x="59" y="22" text-anchor="middle" fill="#cdd5e0">Ookla CLI</text>
+    </g>
+    <g transform="translate(376,256)">
+      <rect width="160" height="34" rx="17" fill="#161d28" stroke="#283142"/>
+      <text x="80" y="22" text-anchor="middle" fill="#cdd5e0">Prometheus · Grafana</text>
+    </g>
+    <g transform="translate(548,256)">
+      <rect width="92" height="34" rx="17" fill="#161d28" stroke="#283142"/>
+      <text x="46" y="22" text-anchor="middle" fill="#cdd5e0">Docker</text>
+    </g>
+  </g>
+</svg>

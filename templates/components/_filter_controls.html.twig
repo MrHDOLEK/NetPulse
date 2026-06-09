@@ -1,0 +1,62 @@
+{% macro filter_controls(connections, servers = []) %}
+    {% import 'components/_date_range.html.twig' as date_range %}
+    {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink outline-none transition-colors focus:border-accent' %}
+    {% set label = 'text-[11px] font-medium uppercase tracking-wide text-faint' %}
+
+    <div class="flex flex-wrap items-end gap-3" data-history-filters>
+        {{ date_range.date_range() }}
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Connection</span>
+            <select x-model="filters.connection" class="{{ field }}">
+                <option value="">All connections</option>
+                {% for connection in connections %}
+                    <option value="{{ connection.connectionId }}">{{ connection.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Server</span>
+            <select x-model="filters.server" class="{{ field }}">
+                <option value="">All servers</option>
+                {% for server in servers %}
+                    <option value="{{ server.serverId }}">{{ server.name }}{% if server.location %} · {{ server.location }}{% endif %}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Status</span>
+            <select x-model="filters.status" class="{{ field }}">
+                <option value="">All</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+            </select>
+        </label>
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Health</span>
+            <select x-model="filters.healthy" class="{{ field }}">
+                <option value="">All</option>
+                <option value="1">Healthy</option>
+                <option value="0">Unhealthy</option>
+            </select>
+        </label>
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Trigger</span>
+            <select x-model="filters.scheduled" class="{{ field }}">
+                <option value="">All</option>
+                <option value="1">Scheduled</option>
+                <option value="0">Manual</option>
+            </select>
+        </label>
+
+        <button
+            type="button"
+            @click="clearFilters()"
+            class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-transparent px-3 py-1.5 text-[13px] font-medium text-dim transition-colors hover:border-line-2 hover:text-ink active:translate-y-px"
+        >Clear filters</button>
+    </div>
+{% endmacro %}

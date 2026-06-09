@@ -1,0 +1,9 @@
+[NetPulse] {{ probe }}/{{ connection }} is unhealthy
+
+Connection "{{ connection }}" on probe "{{ probe }}" is unhealthy: {{ reason }}.
+
+Latest measurement:
+  download:    {{ downloadBits }} bps
+  upload:      {{ uploadBits }} bps
+  ping:        {{ pingMs }} ms
+  packet loss: {{ packetLoss }} %

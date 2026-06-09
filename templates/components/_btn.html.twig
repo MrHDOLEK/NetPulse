@@ -1,0 +1,20 @@
+{% macro btn(label = '', variant = 'default', size = 'md', type = 'button', class = '', extra = '') %}
+    {% set base = 'inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg font-medium transition-colors active:translate-y-px' %}
+    {% set sizes = {
+        md: 'px-3.5 py-2 text-[13px]',
+        sm: 'px-2.5 py-1.5 text-xs',
+        icon: 'p-2',
+    } %}
+    {% set variants = {
+        default: 'border border-line-2 bg-surface-2 text-ink hover:border-line-2 hover:bg-surface-hover',
+        primary: 'border border-accent bg-accent font-semibold text-[oklch(0.2_0.02_250)] hover:bg-accent-strong',
+        outline: 'border border-line-2 bg-transparent text-dim hover:border-line-2 hover:text-ink',
+        ghost: 'bg-transparent text-dim hover:bg-surface-2 hover:text-ink',
+        danger: 'border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-transparent text-bad hover:bg-[color-mix(in_oklab,var(--bad)_12%,transparent)]',
+    } %}
+    <button
+        type="{{ type }}"
+        class="{{ base }} {{ sizes[size]|default(sizes.md) }} {{ variants[variant]|default(variants.default) }}{{ class ? ' ' ~ class : '' }}"
+        {{ extra|raw }}
+    >{{ label }}</button>
+{% endmacro %}

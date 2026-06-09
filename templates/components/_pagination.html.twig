@@ -1,0 +1,44 @@
+{% macro pagination() %}
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-[12.5px] text-dim" data-history-pagination>
+        <span x-text="rangeLabel">&nbsp;</span>
+
+        <div class="flex items-center gap-3">
+            <label class="flex items-center gap-2">
+                <span class="text-faint">Per page</span>
+                <select
+                    x-model="limit"
+                    class="rounded-lg border border-line-2 bg-surface-2 px-2 py-1 text-[12.5px] text-ink outline-none transition-colors focus:border-accent"
+                >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+            </label>
+
+            <div class="flex items-center gap-1.5">
+                <button
+                    type="button"
+                    @click="prevPage()"
+                    :disabled="onFirstPage"
+                    class="grid h-7 w-7 place-items-center rounded-lg border border-line-2 bg-surface-2 text-dim transition-colors hover:border-line-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-dim"
+                    title="Previous page"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m15 6-6 6 6 6"></path>
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    @click="nextPage()"
+                    :disabled="onLastPage"
+                    class="grid h-7 w-7 place-items-center rounded-lg border border-line-2 bg-surface-2 text-dim transition-colors hover:border-line-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-dim"
+                    title="Next page"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m9 6 6 6-6 6"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

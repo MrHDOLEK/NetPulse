@@ -1,0 +1,130 @@
+{% macro result_detail_modal() %}
+    {% set row = 'flex items-start justify-between gap-4 border-b border-line py-1.5 last:border-0' %}
+    {% set key = 'shrink-0 text-faint' %}
+    {% set val = 'min-w-0 break-words text-right text-ink' %}
+    {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink outline-none transition-colors focus:border-accent' %}
+    {% set btn = 'inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-transparent px-3 py-1.5 text-[13px] font-medium text-dim transition-colors hover:text-ink active:translate-y-px' %}
+
+    <div x-cloak @keydown.escape.window="closeDetail()">
+        <div
+            x-show="detailOpen"
+            x-transition.opacity
+            @click="closeDetail()"
+            class="fixed inset-0 z-40 bg-black/50"
+        ></div>
+
+        <div
+            x-show="detailOpen"
+            x-transition.opacity
+            class="fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4"
+            @click="closeDetail()"
+        >
+            <div
+                @click.stop
+                role="dialog"
+                aria-modal="true"
+                class="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-[12px] border border-line bg-surface shadow-[var(--shadow)]"
+            >
+                <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+                    <h3 class="text-[14px] font-semibold text-ink">Test result</h3>
+                    <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            @click="shareCurrent()"
+                            class="{{ btn }}"
+                        >Share</button>
+                        <button
+                            type="button"
+                            @click="closeDetail()"
+                            class="grid h-8 w-8 place-items-center rounded-lg text-dim transition-colors hover:bg-surface-2 hover:text-ink"
+                            title="Close"
+                        >
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M6 6l12 12M18 6 6 18"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    x-show="shareUrl"
+                    x-cloak
+                    class="flex items-center gap-2 border-b border-line bg-surface-2 px-5 py-2.5"
+                >
+                    <input
+                        type="text"
+                        readonly
+                        :value="shareUrl"
+                        class="{{ field }} min-w-0 flex-1 font-mono text-[12px]"
+                    >
+                    <button
+                        type="button"
+                        @click="copyShare()"
+                        class="{{ btn }}"
+                    >Copy</button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto px-5 py-4">
+                    <div class="flex flex-col text-[12.5px]">
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Connection</span>
+                            <span class="{{ val }}" x-text="detail.connection"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Server</span>
+                            <span class="{{ val }}" x-text="detail.serverName"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Location</span>
+                            <span class="{{ val }}" x-text="detail.serverLocation"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Status</span>
+                            <span class="{{ val }}" x-text="detail.statusLabel"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Download</span>
+                            <span class="{{ val }} font-mono tnum" x-text="detail.downloadLabel"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Upload</span>
+                            <span class="{{ val }} font-mono tnum" x-text="detail.uploadLabel"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Ping</span>
+                            <span class="{{ val }} font-mono tnum" x-text="detail.pingLabel"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Jitter</span>
+                            <span class="{{ val }} font-mono tnum" x-text="detail.jitterLabel"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Packet loss</span>
+                            <span class="{{ val }} font-mono tnum" x-text="detail.lossLabel"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Fail reason</span>
+                            <span class="{{ val }}" x-text="detail.failReason"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Completed</span>
+                            <span class="{{ val }} font-mono tnum" x-text="detail.completedAt"></span>
+                        </div>
+                        <div class="{{ row }}">
+                            <span class="{{ key }}">Result URL</span>
+                            <span class="{{ val }} font-mono" x-text="detail.resultUrl"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-faint">Raw payload</div>
+                        <pre
+                            class="max-h-56 overflow-auto rounded-lg border border-line bg-bg px-3 py-2.5 font-mono text-[11.5px] leading-relaxed text-dim"
+                            x-text="detail.rawJson"
+                        ></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

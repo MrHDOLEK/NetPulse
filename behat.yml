@@ -1,0 +1,32 @@
+default:
+    autoload:
+        '': '%paths.base%/tests/integration/Context/'
+    calls:
+        error_reporting: 16383
+    suites:
+        default:
+            paths: [ "%paths.base%/tests/integration/Feature/default" ]
+            contexts:
+                - App\Tests\Integration\Context\ApiContext
+                - App\Tests\Integration\Context\IngestFixturesContext
+                - App\Tests\Integration\Context\MetricsContext
+                - App\Tests\Integration\Context\DueFixturesContext
+        setup:
+            paths: [ "%paths.base%/tests/integration/Feature/setup" ]
+            contexts:
+                - App\Tests\Integration\Context\SetupContext
+        login:
+            paths: [ "%paths.base%/tests/integration/Feature/login" ]
+            contexts:
+                - App\Tests\Integration\Context\LoginContext
+        security:
+            paths: [ "%paths.base%/tests/integration/Feature/security" ]
+            contexts:
+                - App\Tests\Integration\Context\SecurityHeadersContext
+    extensions:
+        FriendsOfBehat\SymfonyExtension:
+            kernel:
+                environment: test
+                class: App\Kernel
+            bootstrap: tests/bootstrap.php
+        DAMA\DoctrineTestBundle\Behat\ServiceContainer\DoctrineExtension: ~

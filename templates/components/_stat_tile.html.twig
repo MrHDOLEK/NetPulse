@@ -1,0 +1,36 @@
+{% macro stat_tile(label = '', value = '', unit = '', tone = 'ink', trend = null, sub = '', icon = '', spark = '', class = '', value_attr = '') %}
+    {% set tones = {
+        ink: 'text-ink',
+        good: 'text-good',
+        warn: 'text-warn',
+        bad: 'text-bad',
+        accent: 'text-accent',
+    } %}
+    <div class="flex flex-col gap-3 rounded-[12px] border border-line bg-surface{{ class ? ' ' ~ class : '' }}" style="padding: var(--pad)">
+        <div class="flex items-center justify-between">
+            <span class="flex items-center gap-2 text-[12px] font-medium uppercase tracking-wide text-dim">
+                {% if icon is not empty %}{{ icon|raw }}{% endif %}{{ label }}
+            </span>
+            {% if trend is null %}
+                <span class="text-[11.5px] font-medium text-faint">—</span>
+            {% else %}
+                {% set up = trend >= 0 %}
+                <span class="flex items-center gap-1 text-[11.5px] font-medium tnum {{ up ? 'text-good' : 'text-bad' }}">
+                    <svg class="h-3 w-3{{ up ? '' : ' -scale-y-100' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 17 9 11l4 4 8-8"></path><path d="M16 7h5v5"></path>
+                    </svg>
+                    {{ trend|abs|number_format(1) }}%
+                </span>
+            {% endif %}
+        </div>
+        <div class="flex items-end gap-1.5">
+            <span class="font-mono text-[30px] font-semibold leading-none tnum {{ tones[tone]|default(tones.ink) }}"{{ value_attr ? ' ' ~ value_attr|raw }}>{{ value }}</span>
+            {% if unit is not empty %}<span class="mb-0.5 font-mono text-[13px] text-dim">{{ unit }}</span>{% endif %}
+        </div>
+        {% if spark is not empty %}
+            {{ spark|raw }}
+        {% elseif sub is not empty %}
+            <span class="text-[12px] text-faint">{{ sub }}</span>
+        {% endif %}
+    </div>
+{% endmacro %}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Scheduling\Domain\Entity\RunState" table="run_states">
+        <id name="connectionId" type="connection_id" column="connection_id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="phase" type="string" length="16" column="phase" enum-type="App\Scheduling\Domain\ValueObject\RunPhase"/>
+        <field name="updatedAt" type="datetime_immutable" column="updated_at"/>
+    </entity>
+</doctrine-mapping>

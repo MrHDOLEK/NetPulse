@@ -1,0 +1,39 @@
+/.env.local
+/.env.local.php
+/.env.*.local
+
+/var/
+
+.idea
+.build
+.DS_Store
+.composer
+
+.env
+/vendor
+/var/*
+
+/docker/volumes/
+/public/bundles/
+
+.phpunit.result.cache
+.deptrac.cache
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+AGENTS.md
+CLAUDE.md
+.claude
+project/*
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> vitepress docs site ###
+/docs/node_modules/
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
+###< vitepress docs site ###

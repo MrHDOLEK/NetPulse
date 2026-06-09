@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Auth\Domain\Entity\User\User" table="users">
+        <id name="id" type="user_id" column="id"/>
+
+        <field name="email" type="email" column="email" length="255"/>
+        <field name="password" type="password" column="password" length="255"/>
+        <field name="roles" type="user_role_collection" column="roles"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+
+        <field name="totpSecret" type="totp_secret" column="totp_secret" length="255" nullable="true"/>
+        <field name="recoveryCodes" type="json" column="recovery_codes" nullable="true"/>
+
+        <unique-constraints>
+            <unique-constraint name="uniq_users_email" columns="email"/>
+        </unique-constraints>
+    </entity>
+</doctrine-mapping>

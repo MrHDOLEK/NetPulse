@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" data-density="comfortable" class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Set up NetPulse</title>
+
+        {% set csp_nonce = app.request.attributes.get('csp_nonce') %}
+
+        <script nonce="{{ csp_nonce }}">
+            (function () {
+                try {
+                    var stored = localStorage.getItem("netpulse:dark");
+                    var dark = stored === null
+                        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                        : stored === "dark";
+                    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+                } catch (e) {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    </head>
+    <body class="grid min-h-full place-items-center bg-bg px-4 py-12 font-sans text-ink antialiased">
+        <main class="w-full max-w-sm">
+            <div class="mb-7 flex flex-col items-center gap-3 text-center">
+                {% include 'partials/_logo.html.twig' with { size: 40 } only %}
+                <div>
+                    <h1 class="text-lg font-semibold tracking-tight">Welcome to NetPulse</h1>
+                    <p class="mt-1 text-[13px] text-dim">Create the administrator account to get started.</p>
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-line bg-surface p-6 shadow-sm">
+                {% if error is defined and error %}
+                    <div
+                        class="mb-4 rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+                        role="alert"
+                    >
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="/setup" class="flex flex-col gap-4">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('setup') }}">
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Email</span>
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ email|default('') }}"
+                            required
+                            autocomplete="username"
+                            autofocus
+                            class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors focus:border-accent"
+                        >
+                    </label>
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Password</span>
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            minlength="12"
+                            autocomplete="new-password"
+                            class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors focus:border-accent"
+                        >
+                        <span class="text-xs text-dim">At least 12 characters.</span>
+                    </label>
+
+                    <label class="flex flex-col gap-1.5">
+                        <span class="text-[13px] font-medium text-dim">Confirm password</span>
+                        <input
+                            type="password"
+                            name="passwordConfirm"
+                            required
+                            minlength="12"
+                            autocomplete="new-password"
+                            class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors focus:border-accent"
+                        >
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="mt-1 inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >
+                        Create account
+                    </button>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>

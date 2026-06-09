@@ -1,0 +1,251 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+{% import 'components/_btn.html.twig' as btn %}
+{% import 'components/_badge.html.twig' as badge %}
+{% import 'components/_toggle.html.twig' as toggle %}
+
+{% block title %}Probes · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-dim">Settings</span>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <span class="text-ink">Probes</span>
+{% endblock %}
+
+{% block body %}
+    <meta name="csrf-probe-create" content="{{ csrf_token('probe-create') }}">
+    <meta name="csrf-probe-delete" content="{{ csrf_token('probe-delete') }}">
+    <meta name="csrf-probe-rotate" content="{{ csrf_token('probe-rotate') }}">
+    <meta name="csrf-probe-enabled" content="{{ csrf_token('probe-enabled') }}">
+
+    <div class="flex flex-col gap-5" x-data="probes">
+        {% include 'settings/_subnav.html.twig' %}
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-[20px] font-semibold tracking-tight text-ink">Probes</h1>
+                <p class="mt-0.5 text-[13px] text-dim">Agents that run speed tests. Each probe authenticates with its own token.</p>
+            </div>
+            {{ btn.btn('New probe', 'primary', 'md', 'button', '', '@click="openCreate()"') }}
+        </div>
+
+        <div
+            role="alert"
+            x-show="error"
+            x-cloak
+            x-text="error"
+            class="rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+        ></div>
+
+        <div x-show="hasToken" x-cloak>
+            {% set token_body %}
+                <div class="flex flex-col gap-4">
+                    <div
+                        role="alert"
+                        class="rounded-lg border border-[color-mix(in_oklab,var(--warn,var(--accent))_45%,transparent)] bg-[color-mix(in_oklab,var(--accent)_10%,transparent)] px-3 py-2.5 text-[13px] text-ink"
+                    >
+                        This token is shown <strong>once</strong> and cannot be retrieved later. Copy it into the probe's
+                        configuration now. Rotating again invalidates it.
+                    </div>
+
+                    <div>
+                        <div class="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-faint">
+                            Token for <span class="text-dim" x-text="revealedName"></span>
+                        </div>
+                        <div class="flex items-stretch gap-2">
+                            <code
+                                class="min-w-0 flex-1 select-all break-all rounded-lg border border-line-2 bg-surface-2 px-3 py-2 font-mono text-[13px] tracking-wide text-ink"
+                                x-text="revealedToken"
+                            ></code>
+                            <button
+                                type="button"
+                                @click="copyToken()"
+                                x-text="copyLabel"
+                                class="inline-flex shrink-0 select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface-hover active:translate-y-px"
+                            ></button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5 border-t border-line pt-4">
+                        <button
+                            type="button"
+                            @click="dismissToken()"
+                            class="inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                        >I've saved the token</button>
+                        <span class="text-[12.5px] text-dim">Store it in the probe's secret manager — it won't be shown again.</span>
+                    </div>
+                </div>
+            {% endset %}
+            {{ card.card(token_body) }}
+        </div>
+
+        {% if probes is empty %}
+            <div class="grid place-items-center rounded-xl border border-dashed border-line bg-surface px-6 py-16 text-center">
+                <div class="flex max-w-sm flex-col items-center gap-3">
+                    <div>
+                        <p class="text-[14px] font-medium text-ink">No probes yet</p>
+                        <p class="mt-1 text-[13px] text-dim">
+                            Create a probe to register an agent that runs speed tests. You'll get a one-time token to
+                            configure it.
+                        </p>
+                    </div>
+                    {{ btn.btn('New probe', 'primary', 'md', 'button', '', '@click="openCreate()"') }}
+                </div>
+            </div>
+        {% else %}
+            {% set list_body %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-[13px]">
+                        <thead class="text-[11px] uppercase tracking-wide text-faint">
+                            <tr class="border-b border-line">
+                                <th scope="col" class="px-3 py-2 font-medium">Probe</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Status</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Connections</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Created</th>
+                                <th scope="col" class="px-3 py-2 text-right font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for probe in probes %}
+                                <tr class="border-b border-line last:border-0 align-middle hover:bg-surface-2">
+                                    <td class="px-3 py-2.5">
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                data-probe-liveness-dot
+                                                data-probe-id="{{ probe.id }}"
+                                                title="Liveness unknown"
+                                                class="inline-block h-2 w-2 shrink-0 rounded-full bg-faint"
+                                            ></span>
+                                            <div class="font-medium text-ink">{{ probe.name }}</div>
+                                        </div>
+                                        {% if probe.labels is not empty %}
+                                            <div class="mt-1 flex flex-wrap gap-1">
+                                                {% for key, value in probe.labels %}
+                                                    <span class="rounded border border-line bg-bg px-1.5 py-0.5 font-mono text-[11px] text-dim">{{ key }}={{ value }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-3 py-2.5">
+                                        <div class="flex items-center gap-2">
+                                            {{ toggle.toggle(probe.enabled, 'data-probe-action="toggle" data-probe-id="' ~ probe.id ~ '" title="Toggle enabled"') }}
+                                            {% if probe.enabled %}
+                                                {{ badge.badge('On', 'good', true) }}
+                                            {% else %}
+                                                {{ badge.badge('Off', 'neutral', true) }}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2.5 font-mono tnum text-dim">{{ probe.connectionCount }}</td>
+                                    <td class="px-3 py-2.5 text-dim">{{ probe.createdAt|date('Y-m-d H:i') }}</td>
+                                    <td class="px-3 py-2.5">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                data-probe-action="rotate"
+                                                data-probe-id="{{ probe.id }}"
+                                                data-probe-name="{{ probe.name|e('html_attr') }}"
+                                                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-transparent px-2.5 py-1.5 text-xs font-medium text-dim transition-colors hover:text-ink active:translate-y-px"
+                                            >Rotate token</button>
+                                            <button
+                                                type="button"
+                                                data-probe-action="delete"
+                                                data-probe-id="{{ probe.id }}"
+                                                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-transparent px-2.5 py-1.5 text-xs font-medium text-bad transition-colors hover:bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] active:translate-y-px"
+                                            >Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endset %}
+            {{ card.card(list_body, false) }}
+        {% endif %}
+
+        <div x-cloak @keydown.escape.window="closeCreate()">
+            <div
+                x-show="modalOpen"
+                x-transition.opacity
+                @click="closeCreate()"
+                class="fixed inset-0 z-40 bg-black/50"
+            ></div>
+            <div
+                x-show="modalOpen"
+                x-transition.opacity
+                @click="closeCreate()"
+                class="fixed inset-0 z-50 grid place-items-center overflow-y-auto p-4"
+            >
+                <div
+                    @click.stop
+                    role="dialog"
+                    aria-modal="true"
+                    class="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-[12px] border border-line bg-surface shadow-[var(--shadow)]"
+                >
+                    <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+                        <h3 class="text-[14px] font-semibold text-ink">New probe</h3>
+                        <button
+                            type="button"
+                            @click="closeCreate()"
+                            class="grid h-8 w-8 place-items-center rounded-lg text-dim transition-colors hover:bg-surface-2 hover:text-ink"
+                            title="Close"
+                        >
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M6 6l12 12M18 6 6 18"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto px-5 py-4">
+                        <div
+                            class="mb-4 rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+                            role="alert"
+                            x-show="error"
+                            x-cloak
+                            x-text="error"
+                        ></div>
+                        <div class="flex flex-col gap-4">
+                            <label class="flex flex-col gap-1.5">
+                                <span class="text-[13px] font-medium text-dim">Name</span>
+                                <input
+                                    type="text"
+                                    x-model="form.name"
+                                    placeholder="e.g. Office gateway"
+                                    class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent"
+                                >
+                            </label>
+                            <label class="flex flex-col gap-1.5">
+                                <span class="text-[13px] font-medium text-dim">Labels <span class="font-normal text-faint">(optional)</span></span>
+                                <input
+                                    type="text"
+                                    x-model="form.labels"
+                                    placeholder="key=value,site=hq"
+                                    class="rounded-lg border border-line-2 bg-surface-2 px-3 py-2 font-mono text-[13px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent"
+                                >
+                                <span class="text-[11.5px] text-faint">Comma-separated <span class="font-mono">key=value</span> pairs.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2.5 border-t border-line px-5 py-3.5">
+                        <button
+                            type="button"
+                            @click="closeCreate()"
+                            class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface-hover"
+                        >Cancel</button>
+                        <button
+                            type="button"
+                            @click="createProbe()"
+                            :disabled="loading"
+                            class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong"
+                        >Create probe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

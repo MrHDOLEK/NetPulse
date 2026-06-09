@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-density="comfortable" class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Result not found · NetPulse</title>
+
+        {% set csp_nonce = app.request.attributes.get('csp_nonce') %}
+
+        <script nonce="{{ csp_nonce }}">
+            (function () {
+                try {
+                    var stored = localStorage.getItem("netpulse:dark");
+                    var dark = stored === null
+                        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                        : stored === "dark";
+                    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+                } catch (e) {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    </head>
+    <body class="h-full bg-bg font-sans text-ink antialiased">
+        <div class="flex min-h-full items-center justify-center p-6">
+            <div class="w-full max-w-[380px] text-center">
+                <div class="mb-6 flex items-center justify-center gap-3">
+                    {% include 'partials/_logo.html.twig' with { size: 30 } only %}
+                    <span class="text-[16px] font-semibold tracking-tight">NetPulse</span>
+                </div>
+
+                <div class="rounded-[12px] border border-line bg-surface p-7">
+                    <h1 class="text-[16px] font-semibold tracking-tight">Result not found</h1>
+                    <p class="mt-2 text-[13px] leading-relaxed text-dim">This result link is invalid or has expired.</p>
+                </div>
+
+                <p class="mt-5 text-[11.5px] text-faint">Measured with NetPulse</p>
+            </div>
+        </div>
+    </body>
+</html>

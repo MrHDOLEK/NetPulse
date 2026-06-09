@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+{% import 'components/_badge.html.twig' as badge %}
+{% import 'components/_filter_controls.html.twig' as filter_controls %}
+{% import 'components/_pagination.html.twig' as pagination %}
+{% import 'components/_result_detail_modal.html.twig' as result_detail_modal %}
+
+{% block title %}History · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-ink">History</span>
+{% endblock %}
+
+{% set status_tones = { completed: 'good', failed: 'bad' } %}
+{% set status_labels = { completed: 'Completed', failed: 'Failed' } %}
+
+{% block body %}
+    <div class="flex flex-col gap-5" x-data="history">
+        <meta name="csrf-run-test" content="{{ csrf_token('run-test') }}">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-[20px] font-semibold tracking-tight text-ink">History</h1>
+                <p class="mt-0.5 text-[13px] text-dim">Every speed test across your connections.</p>
+            </div>
+
+            <a
+                :href="csvHref"
+                download
+                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-dim transition-colors hover:border-line-2 hover:text-ink active:translate-y-px"
+            >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3v12"></path>
+                    <path d="m8 11 4 4 4-4"></path>
+                    <path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"></path>
+                </svg>
+                Export CSV
+            </a>
+        </div>
+
+        {% if pendingRuns is not empty %}
+            {% set dot_bg = { primary: 'bg-accent', violet: 'bg-violet', amber: 'bg-amber' } %}
+            {% set pending_body %}
+                <div class="mb-3 flex items-center gap-2">
+                    <h3 class="text-[13px] font-semibold text-ink">In progress</h3>
+                    <span class="text-[12px] text-dim">{{ pendingRuns|length }} test{{ pendingRuns|length == 1 ? '' : 's' }} awaiting completion</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                    {% for run in pendingRuns %}
+                        <div class="flex items-center justify-between gap-3 rounded-lg border border-line bg-bg px-3 py-2">
+                            <div class="flex items-center gap-2.5">
+                                <span class="inline-block h-2 w-2 rounded-full {{ dot_bg[run.color]|default('bg-accent') }}"></span>
+                                <span class="text-[13px] text-ink">{{ run.connectionName }}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                {% if run.phase == 'running' %}
+                                    {{ badge.badge('Running', 'accent', true) }}
+                                {% else %}
+                                    {{ badge.badge('Queued', 'neutral', false) }}
+                                {% endif %}
+                                <span class="font-mono text-[12px] text-dim">since {{ run.sinceUnix|date('H:i') }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endset %}
+            {{ card.card(pending_body) }}
+        {% endif %}
+
+        {% set filters_body %}
+            {{ filter_controls.filter_controls(connections, servers) }}
+        {% endset %}
+        {{ card.card(filters_body) }}
+
+        {% set table_body %}
+            <div class="overflow-x-auto">
+                <table id="history-table" class="w-full text-left text-[13px]">
+                    <thead class="text-[11px] uppercase tracking-wide text-faint">
+                        <tr class="border-b border-line">
+                            <th data-sort="completed_at" class="cursor-pointer select-none px-3 py-2 font-medium hover:text-ink">Time</th>
+                            <th class="px-3 py-2 font-medium">Connection</th>
+                            <th class="px-3 py-2 font-medium">Server</th>
+                            <th data-sort="download" class="cursor-pointer select-none px-3 py-2 font-medium hover:text-ink">Download</th>
+                            <th data-sort="upload" class="cursor-pointer select-none px-3 py-2 font-medium hover:text-ink">Upload</th>
+                            <th data-sort="ping" class="cursor-pointer select-none px-3 py-2 font-medium hover:text-ink">Ping</th>
+                            <th data-sort="loss" class="cursor-pointer select-none px-3 py-2 font-medium hover:text-ink">Loss</th>
+                            <th class="px-3 py-2 font-medium">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="row in items" :key="row.id">
+                            <tr
+                                :data-measurement-id="row.id"
+                                class="cursor-pointer border-b border-line last:border-0 hover:bg-surface-2"
+                            >
+                                <td class="px-3 py-2 font-mono tnum text-dim" x-text="row.completedAt"></td>
+                                <td class="px-3 py-2 text-ink" x-text="row.connection"></td>
+                                <td class="px-3 py-2 text-dim" x-text="row.server"></td>
+                                <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.downloadLabel"></td>
+                                <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.uploadLabel"></td>
+                                <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.pingLabel"></td>
+                                <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.lossLabel"></td>
+                                <td class="px-3 py-2">
+                                    <span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-[11.5px] font-medium text-dim">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+                                        <span x-text="row.statusLabel"></span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </template>
+
+                        <tr x-show="!hasResults" x-cloak>
+                            <td colspan="8" class="px-3 py-8 text-center text-[13px] text-dim">No measurements in this window.</td>
+                        </tr>
+
+                        {% for item in items %}
+                            <tr
+                                data-measurement-id="{{ item.id.toString }}"
+                                class="border-b border-line last:border-0 hover:bg-surface-2"
+                                x-show="false"
+                                x-cloak
+                            >
+                                <td class="px-3 py-2 font-mono tnum text-dim">{{ item.completedAtUnix|date('Y-m-d H:i') }}</td>
+                                <td class="px-3 py-2 text-ink">{{ item.connectionName }}</td>
+                                <td class="px-3 py-2 text-dim">{{ item.serverName }}{% if item.serverLocation is not empty %} · {{ item.serverLocation }}{% endif %}</td>
+                                <td class="px-3 py-2 font-mono tnum text-ink">{{ item.downloadBits|mbps }}</td>
+                                <td class="px-3 py-2 font-mono tnum text-ink">{{ item.uploadBits|mbps }}</td>
+                                <td class="px-3 py-2 font-mono tnum text-ink">{{ item.pingSeconds|ms }}</td>
+                                <td class="px-3 py-2 font-mono tnum text-ink">{{ item.packetLossRatio|pct }}</td>
+                                <td class="px-3 py-2">
+                                    {{ badge.badge(status_labels[item.status.value]|default(item.status.value), status_tones[item.status.value]|default('neutral'), true) }}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr x-show="false" x-cloak>
+                                <td colspan="8" class="px-3 py-8 text-center text-[13px] text-dim">No measurements in this window.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {{ pagination.pagination() }}
+        {% endset %}
+        {{ card.card(table_body) }}
+
+        {{ result_detail_modal.result_detail_modal() }}
+
+        <script type="application/json" id="history-bootstrap">{{ bootstrap|json_encode|raw }}</script>
+    </div>
+{% endblock %}

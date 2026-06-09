@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" data-density="comfortable" class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Speedtest result · NetPulse</title>
+
+        {% set csp_nonce = app.request.attributes.get('csp_nonce') %}
+
+        <script nonce="{{ csp_nonce }}">
+            (function () {
+                try {
+                    var stored = localStorage.getItem("netpulse:dark");
+                    var dark = stored === null
+                        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                        : stored === "dark";
+                    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+                } catch (e) {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    </head>
+    <body class="h-full bg-bg font-sans text-ink antialiased">
+        <div class="flex min-h-full items-center justify-center p-6">
+            <div class="w-full max-w-[440px]">
+                <div class="mb-6 flex items-center justify-center gap-3">
+                    {% include 'partials/_logo.html.twig' with { size: 30 } only %}
+                    <span class="text-[16px] font-semibold tracking-tight">NetPulse</span>
+                </div>
+
+                <div class="rounded-[12px] border border-line bg-surface p-6 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between">
+                        <h1 class="text-[15px] font-semibold tracking-tight">Speedtest result</h1>
+                        {% if status == 'completed' %}
+                            {% set badge = healthy is same as(false)
+                                ? 'border-[color-mix(in_oklab,var(--warn)_35%,transparent)] bg-[color-mix(in_oklab,var(--warn)_12%,transparent)] text-warn'
+                                : 'border-[color-mix(in_oklab,var(--good)_35%,transparent)] bg-[color-mix(in_oklab,var(--good)_12%,transparent)] text-good' %}
+                            {% set badgeText = healthy is same as(false) ? 'Degraded' : 'Healthy' %}
+                        {% else %}
+                            {% set badge = 'border-[color-mix(in_oklab,var(--bad)_35%,transparent)] bg-[color-mix(in_oklab,var(--bad)_14%,transparent)] text-bad' %}
+                            {% set badgeText = statusLabel %}
+                        {% endif %}
+                        <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11.5px] font-medium {{ badge }}">{{ badgeText }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="rounded-[10px] bg-surface-2 px-3 py-3 text-center">
+                            <div class="text-[11px] uppercase tracking-wider text-dim">Download</div>
+                            <div class="mt-1 font-mono text-[18px] font-semibold tnum">{{ downloadBits|mbps }}</div>
+                        </div>
+                        <div class="rounded-[10px] bg-surface-2 px-3 py-3 text-center">
+                            <div class="text-[11px] uppercase tracking-wider text-dim">Upload</div>
+                            <div class="mt-1 font-mono text-[18px] font-semibold tnum">{{ uploadBits|mbps }}</div>
+                        </div>
+                        <div class="rounded-[10px] bg-surface-2 px-3 py-3 text-center">
+                            <div class="text-[11px] uppercase tracking-wider text-dim">Ping</div>
+                            <div class="mt-1 font-mono text-[18px] font-semibold tnum">{{ pingSeconds|ms }}</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-2 gap-3">
+                        <div class="flex items-center justify-between rounded-[10px] border border-line-2 px-3 py-2">
+                            <span class="text-[12px] text-dim">Jitter</span>
+                            <span class="font-mono text-[13px] tnum">{{ jitterSeconds|ms }}</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-[10px] border border-line-2 px-3 py-2">
+                            <span class="text-[12px] text-dim">Packet loss</span>
+                            <span class="font-mono text-[13px] tnum">{{ lossRatio|pct }}</span>
+                        </div>
+                    </div>
+
+                    <dl class="mt-5 space-y-2 border-t border-line pt-4 text-[13px]">
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-dim">Server</dt>
+                            <dd class="truncate text-right text-ink">{{ serverName }}{% if serverLocation %} · {{ serverLocation }}{% endif %}</dd>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-dim">ISP</dt>
+                            <dd class="truncate text-right text-ink">{{ isp }}</dd>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <dt class="text-dim">Completed</dt>
+                            <dd class="text-right font-mono text-[12px] text-ink tnum">{{ completedAtUtc }}</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <p class="mt-5 text-center text-[11.5px] text-faint">Measured with NetPulse</p>
+            </div>
+        </div>
+    </body>
+</html>

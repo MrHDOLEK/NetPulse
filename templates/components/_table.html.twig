@@ -1,0 +1,8 @@
+{% macro table(head, body, extra = '') %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-[13px]" {{ extra|raw }}>
+            <thead class="text-[11px] uppercase tracking-wide text-faint">{{ head|raw }}</thead>
+            <tbody>{{ body|raw }}</tbody>
+        </table>
+    </div>
+{% endmacro %}

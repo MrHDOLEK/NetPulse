@@ -1,0 +1,32 @@
+{% macro heatmap_controls(metric, window, connections = []) %}
+    {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-2.5 py-1.5 text-[13px] text-ink outline-none transition-colors focus:border-accent' %}
+    {% set label = 'text-[11px] font-medium uppercase tracking-wide text-faint' %}
+
+    <div class="flex flex-wrap items-end gap-3" data-heatmap-controls>
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Metric</span>
+            <select x-model="metric" class="{{ field }}">
+                <option value="download" {{ metric == 'download' ? 'selected' : '' }}>Download</option>
+                <option value="health" {{ metric == 'health' ? 'selected' : '' }}>Health</option>
+                <option value="ping" {{ metric == 'ping' ? 'selected' : '' }}>Ping</option>
+            </select>
+        </label>
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Window</span>
+            <select x-model="window" class="{{ field }}">
+                <option value="30d" {{ window == '30d' ? 'selected' : '' }}>Last 30 days</option>
+                <option value="90d" {{ window == '90d' ? 'selected' : '' }}>Last 90 days</option>
+            </select>
+        </label>
+
+        <label class="flex flex-col gap-1">
+            <span class="{{ label }}">Connection</span>
+            <select x-model="connectionId" class="{{ field }}">
+                {% for connection in connections %}
+                    <option value="{{ connection.id }}" {{ loop.first ? 'selected' : '' }}>{{ connection.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+{% endmacro %}

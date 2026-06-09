@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+{% import 'components/_heatmap_controls.html.twig' as heatmap_controls %}
+{% import 'components/_heatmap_grid.html.twig' as heatmap_grid %}
+{% import 'components/_heatmap_legend.html.twig' as heatmap_legend %}
+
+{% block title %}Heatmap · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-ink">Heatmap</span>
+{% endblock %}
+
+{% block body %}
+    <div class="flex flex-col gap-5" x-data="heatmap">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-[20px] font-semibold tracking-tight text-ink">Heatmap</h1>
+                <p class="mt-0.5 text-[13px] text-dim">Weekday × hour performance, bucketed in UTC.</p>
+            </div>
+        </div>
+
+        {% if connections is empty %}
+            {% set empty_body %}
+                <div class="flex flex-col items-center gap-3 px-3 py-10 text-center">
+                    <div>
+                        <p class="text-[14px] font-medium text-ink">No connections yet</p>
+                        <p class="mt-1 text-[13px] text-dim">Add a connection and run some speed tests to see the heatmap.</p>
+                    </div>
+                    <a
+                        href="{{ path('settings_connections') }}"
+                        class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >Add a connection</a>
+                </div>
+            {% endset %}
+            {{ card.card(empty_body) }}
+        {% else %}
+            {% set controls_body %}
+                {{ heatmap_controls.heatmap_controls(metric, window, connections) }}
+            {% endset %}
+            {{ card.card(controls_body) }}
+
+            <div class="min-h-[20px] text-[13px]">
+                <span x-show="hasActive" class="text-ink" x-text="active.aria"></span>
+                <span x-show="!hasActive" x-cloak class="text-dim">Hover or focus a cell to see its reading.</span>
+            </div>
+
+            {% set grid_body %}
+                {{ heatmap_grid.heatmap_grid(bootstrap.cells) }}
+            {% endset %}
+            {{ card.card(grid_body) }}
+
+            {% set legend_body %}
+                {{ heatmap_legend.heatmap_legend(bootstrap.legend) }}
+            {% endset %}
+            {{ card.card(legend_body) }}
+
+            <script type="application/json" id="heatmap-bootstrap">{{ bootstrap|json_encode|raw }}</script>
+        {% endif %}
+    </div>
+{% endblock %}

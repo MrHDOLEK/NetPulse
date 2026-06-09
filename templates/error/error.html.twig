@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ status_code|default(500) }} · NetPulse{% endblock %}
+
+{% block body %}
+    <div class="mx-auto flex max-w-md flex-col items-center gap-4 py-16 text-center">
+        <span class="text-[64px] font-semibold leading-none tracking-tight text-dim">
+            {{ status_code|default(500) }}
+        </span>
+
+        <h1 class="text-lg font-semibold text-ink">
+            {% block heading %}Something went wrong{% endblock %}
+        </h1>
+
+        <p class="text-[13.5px] text-dim">
+            {% block message %}
+                An unexpected error occurred. Please try again in a moment.
+            {% endblock %}
+        </p>
+
+        <a
+            href="/"
+            class="mt-2 inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong"
+        >
+            Back to dashboard
+        </a>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Notification\Domain\Entity\NotificationSendCount" table="notification_send_counts">
+        <unique-constraints>
+            <unique-constraint name="uniq_notification_send_counts_kind_channel_status" columns="kind,channel,status"/>
+        </unique-constraints>
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="IDENTITY"/>
+        </id>
+
+        <field name="kind" type="string" column="kind" length="32"/>
+        <field name="channel" type="string" column="channel" length="32"/>
+        <field name="status" type="string" column="status" length="16"/>
+        <field name="total" type="integer" column="total"/>
+    </entity>
+</doctrine-mapping>

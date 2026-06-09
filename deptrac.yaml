@@ -1,0 +1,378 @@
+parameters:
+  paths:
+    - ./src
+  layers:
+    - name: SharedDomain
+      collectors:
+        - type: classLike
+          value: App\\Shared\\Domain\\.*
+    - name: SharedApplication
+      collectors:
+        - type: classLike
+          value: App\\Shared\\Application\\(?!(Action|Api)\\).*
+    - name: SharedInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Shared\\Infrastructure\\.*
+    - name: ProbeDomain
+      collectors:
+        - type: classLike
+          value: App\\Probe\\Domain\\.*
+    - name: ProbeApplication
+      collectors:
+        - type: classLike
+          value: App\\Probe\\Application\\(?!(Action|Api)\\).*
+    - name: ProbeInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Probe\\Infrastructure\\.*
+    - name: ConnectionDomain
+      collectors:
+        - type: classLike
+          value: App\\Connection\\Domain\\.*
+    - name: ConnectionApplication
+      collectors:
+        - type: classLike
+          value: App\\Connection\\Application\\(?!(Action|Api)\\).*
+    - name: ConnectionInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Connection\\Infrastructure\\.*
+    - name: MeasurementDomain
+      collectors:
+        - type: classLike
+          value: App\\Measurement\\Domain\\.*
+    - name: MeasurementApplication
+      collectors:
+        - type: classLike
+          value: App\\Measurement\\Application\\(?!(Action|Api)\\).*
+    - name: MeasurementInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Measurement\\Infrastructure\\.*
+    - name: MetricsDomain
+      collectors:
+        - type: classLike
+          value: App\\Metrics\\Domain\\.*
+    - name: MetricsApplication
+      collectors:
+        - type: classLike
+          value: App\\Metrics\\Application\\(?!(Action|Api)\\).*
+    - name: MetricsInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Metrics\\Infrastructure\\.*
+    - name: SchedulingDomain
+      collectors:
+        - type: classLike
+          value: App\\Scheduling\\Domain\\.*
+    - name: SchedulingApplication
+      collectors:
+        - type: classLike
+          value: App\\Scheduling\\Application\\(?!(Action|Api)\\).*
+    - name: SchedulingInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Scheduling\\Infrastructure\\.*
+    - name: NotificationDomain
+      collectors:
+        - type: classLike
+          value: App\\Notification\\Domain\\.*
+    - name: NotificationApplication
+      collectors:
+        - type: classLike
+          value: App\\Notification\\Application\\(?!(Action|Api)\\).*
+    - name: NotificationInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Notification\\Infrastructure\\.*
+    - name: AuthDomain
+      collectors:
+        - type: classLike
+          value: App\\Auth\\Domain\\.*
+    - name: AuthApplication
+      collectors:
+        - type: classLike
+          value: App\\Auth\\Application\\(?!(Action|Api)\\).*
+    - name: AuthInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Auth\\Infrastructure\\.*
+    - name: SettingsDomain
+      collectors:
+        - type: classLike
+          value: App\\Settings\\Domain\\.*
+    - name: SettingsApplication
+      collectors:
+        - type: classLike
+          value: App\\Settings\\Application\\(?!(Action|Api)\\).*
+    - name: SettingsInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Settings\\Infrastructure\\.*
+    - name: DashboardApplication
+      collectors:
+        - type: classLike
+          value: App\\Dashboard\\Application\\(?!(Action|Api)\\).*
+    - name: DashboardInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Dashboard\\Infrastructure\\.*
+    - name: AgentApplication
+      collectors:
+        - type: classLike
+          value: App\\Agent\\Application\\(?!(Action|Api)\\).*
+    - name: AgentInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Agent\\Infrastructure\\.*
+    - name: DevInfrastructure
+      collectors:
+        - type: classLike
+          value: App\\Dev\\Infrastructure\\.*
+    - name: ApplicationAction
+      collectors:
+        - type: classLike
+          value: App\\[A-Za-z]+\\Application\\(Action|Api)\\.*
+    - name: Vendor
+      collectors:
+        - type: bool
+          must_not:
+            - type: classLike
+              value: App\\.*
+            - type: classNameRegex
+              value: '#^DateTime|^LogicException$|^RuntimeException$|^InvalidArgumentException$|^Throwable$|^Stringable$|^IteratorAggregate$|^Countable$|^Traversable$|^Iterator$|^ArrayIterator$#'
+  ruleset:
+    SharedDomain:
+      - SharedDomain
+    SharedApplication:
+      - SharedDomain
+      - SharedApplication
+    SharedInfrastructure:
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - ProbeDomain
+      - ConnectionDomain
+      - Vendor
+    ProbeDomain:
+      - SharedDomain
+    ProbeApplication:
+      - ProbeDomain
+      - ConnectionDomain
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    ProbeInfrastructure:
+      - ProbeDomain
+      - ProbeApplication
+      - ConnectionDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    ConnectionDomain:
+      - SharedDomain
+      - ProbeDomain
+    ConnectionApplication:
+      - ConnectionDomain
+      - ProbeDomain
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    ConnectionInfrastructure:
+      - ConnectionDomain
+      - ConnectionApplication
+      - ProbeDomain
+      - SchedulingDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    MeasurementDomain:
+      - SharedDomain
+      - ProbeDomain
+      - ConnectionDomain
+    MeasurementApplication:
+      - MeasurementDomain
+      - ProbeDomain
+      - ConnectionDomain
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    MeasurementInfrastructure:
+      - MeasurementDomain
+      - MeasurementApplication
+      - ProbeDomain
+      - ConnectionDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    MetricsDomain:
+      - SharedDomain
+    MetricsApplication:
+      - MetricsDomain
+      - MeasurementDomain
+      - ProbeDomain
+      - ConnectionDomain
+      - SchedulingDomain
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    MetricsInfrastructure:
+      - MetricsDomain
+      - MetricsApplication
+      - MeasurementDomain
+      - ProbeDomain
+      - ConnectionDomain
+      - SchedulingDomain
+      - NotificationDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    SchedulingDomain:
+      - SchedulingDomain
+      - ConnectionDomain
+      - ProbeDomain
+      - SharedDomain
+    SchedulingApplication:
+      - SchedulingDomain
+      - ConnectionDomain
+      - ProbeDomain
+      - MeasurementDomain
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    SchedulingInfrastructure:
+      - SchedulingDomain
+      - SchedulingApplication
+      - ConnectionDomain
+      - ProbeDomain
+      - MeasurementDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    NotificationDomain:
+      - NotificationDomain
+      - SchedulingDomain
+      - SharedDomain
+    NotificationApplication:
+      - NotificationDomain
+      - MeasurementDomain
+      - ConnectionDomain
+      - ProbeDomain
+      - SchedulingDomain
+      - SharedDomain
+      - SharedApplication
+      - Vendor
+    NotificationInfrastructure:
+      - NotificationDomain
+      - NotificationApplication
+      - MeasurementDomain
+      - ConnectionDomain
+      - ProbeDomain
+      - SchedulingDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    AuthDomain:
+      - SharedDomain
+    AuthApplication:
+      - AuthDomain
+      - SharedApplication
+      - Vendor
+    AuthInfrastructure:
+      - AuthDomain
+      - AuthApplication
+      - SharedInfrastructure
+      - Vendor
+    SettingsDomain:
+      - Vendor
+    SettingsApplication:
+      - SettingsDomain
+      - Vendor
+    SettingsInfrastructure:
+      - SettingsDomain
+      - SettingsApplication
+      - AuthInfrastructure
+      - NotificationApplication
+      - NotificationDomain
+      - SharedInfrastructure
+      - Vendor
+    DashboardApplication:
+      - ConnectionDomain
+      - MeasurementDomain
+      - MetricsApplication
+      - SchedulingDomain
+      - SharedApplication
+      - SharedDomain
+      - Vendor
+    DashboardInfrastructure:
+      - DashboardApplication
+      - ConnectionDomain
+      - MeasurementApplication
+      - MeasurementDomain
+      - MetricsApplication
+      - ProbeDomain
+      - SchedulingApplication
+      - SchedulingDomain
+      - SharedDomain
+      - SharedInfrastructure
+      - Vendor
+    AgentApplication:
+      - AgentApplication
+      - SharedDomain
+      - Vendor
+    AgentInfrastructure:
+      - AgentApplication
+      - SharedInfrastructure
+      - Vendor
+    DevInfrastructure:
+      - MetricsApplication
+      - MetricsDomain
+      - MeasurementApplication
+      - MeasurementDomain
+      - ProbeDomain
+      - ConnectionDomain
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - Vendor
+    ApplicationAction:
+      - ApplicationAction
+      - SharedDomain
+      - SharedApplication
+      - SharedInfrastructure
+      - ProbeDomain
+      - ProbeApplication
+      - ProbeInfrastructure
+      - ConnectionDomain
+      - ConnectionApplication
+      - ConnectionInfrastructure
+      - MeasurementDomain
+      - MeasurementApplication
+      - MeasurementInfrastructure
+      - MetricsDomain
+      - MetricsApplication
+      - MetricsInfrastructure
+      - SchedulingDomain
+      - SchedulingApplication
+      - SchedulingInfrastructure
+      - NotificationDomain
+      - NotificationApplication
+      - NotificationInfrastructure
+      - AuthDomain
+      - AuthApplication
+      - AuthInfrastructure
+      - SettingsDomain
+      - SettingsApplication
+      - SettingsInfrastructure
+      - DashboardApplication
+      - DashboardInfrastructure
+      - AgentApplication
+      - AgentInfrastructure
+      - Vendor

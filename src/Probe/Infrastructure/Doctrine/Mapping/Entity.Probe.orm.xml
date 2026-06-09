@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="App\Probe\Domain\Entity\Probe" table="probes">
+        <id name="id" type="probe_id" column="id"/>
+        <field name="name" type="string" length="255"/>
+        <field name="labels" type="labels"/>
+        <field name="tokenHash" type="string" length="255" column="token_hash"/>
+        <field name="enabled" type="boolean"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+        <field name="lastPollAt" type="datetime_immutable" column="last_poll_at" nullable="true"/>
+    </entity>
+</doctrine-mapping>

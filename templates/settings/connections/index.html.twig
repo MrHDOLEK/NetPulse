@@ -1,0 +1,354 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+{% import 'components/_btn.html.twig' as btn %}
+{% import 'components/_badge.html.twig' as badge %}
+{% import 'components/_toggle.html.twig' as toggle %}
+{% import 'components/_inst_dot.html.twig' as dot %}
+
+{% block title %}Connections · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-dim">Settings</span>
+    <svg class="h-3.5 w-3.5 text-faint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 6 6 6-6 6"></path>
+    </svg>
+    <span class="text-ink">Connections</span>
+{% endblock %}
+
+{% macro schedule_summary(conn) %}
+    {% if conn.scheduleMode == 'cron' %}
+        {% if conn.cronExpressions is not empty %}{{ conn.cronExpressions|join(' · ') }}{% else %}cron (none set){% endif %}
+    {% else %}
+        {{ conn.testsPerDay }}/day · jitter {{ conn.jitterSeconds }}s
+    {% endif %}
+{% endmacro %}
+
+{% macro mbps(bits) %}{{ (bits / 1000000)|round }}{% endmacro %}
+
+{% block body %}
+    {% import _self as helper %}
+
+    <meta name="csrf-connection-create" content="{{ csrf_token('connection-create') }}">
+    <meta name="csrf-connection-edit" content="{{ csrf_token('connection-edit') }}">
+    <meta name="csrf-connection-delete" content="{{ csrf_token('connection-delete') }}">
+    <meta name="csrf-connection-enabled" content="{{ csrf_token('connection-enabled') }}">
+
+    <div class="flex flex-col gap-5" x-data="connections">
+        {% include 'settings/_subnav.html.twig' %}
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-[20px] font-semibold tracking-tight text-ink">Connections</h1>
+                <p class="mt-0.5 text-[13px] text-dim">Internet links to monitor. Each connection belongs to a probe and has its own schedule and thresholds.</p>
+            </div>
+            {% if probes is not empty %}
+                <button
+                    type="button"
+                    data-conn-action="create"
+                    class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                >New connection</button>
+            {% endif %}
+        </div>
+
+        <div
+            role="alert"
+            x-show="error"
+            x-cloak
+            x-text="error"
+            class="rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+        ></div>
+
+        {% if probes is empty %}
+            <div class="grid place-items-center rounded-xl border border-dashed border-line bg-surface px-6 py-16 text-center">
+                <div class="flex max-w-md flex-col items-center gap-3">
+                    <div>
+                        <p class="text-[14px] font-medium text-ink">Create a probe first</p>
+                        <p class="mt-1 text-[13px] text-dim">
+                            Every connection runs on a probe (the agent that performs the speed tests). Add a probe,
+                            then come back to create connections for it.
+                        </p>
+                    </div>
+                    <a
+                        href="{{ path('settings_probes') }}"
+                        class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >Go to Probes</a>
+                </div>
+            </div>
+        {% elseif connections is empty %}
+            <div class="grid place-items-center rounded-xl border border-dashed border-line bg-surface px-6 py-16 text-center">
+                <div class="flex max-w-sm flex-col items-center gap-3">
+                    <div>
+                        <p class="text-[14px] font-medium text-ink">No connections yet</p>
+                        <p class="mt-1 text-[13px] text-dim">Add your first connection to start tracking an internet link.</p>
+                    </div>
+                    <button
+                        type="button"
+                        data-conn-action="create"
+                        class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >New connection</button>
+                </div>
+            </div>
+        {% else %}
+            {% set list_body %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-[13px]">
+                        <thead class="text-[11px] uppercase tracking-wide text-faint">
+                            <tr class="border-b border-line">
+                                <th scope="col" class="px-3 py-2 font-medium">Connection</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Probe</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Expected</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Schedule</th>
+                                <th scope="col" class="px-3 py-2 font-medium">Status</th>
+                                <th scope="col" class="px-3 py-2 text-right font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for conn in connections %}
+                                <tr
+                                    class="border-b border-line last:border-0 align-middle hover:bg-surface-2"
+                                    data-connection='{{ conn|json_encode|e('html_attr') }}'
+                                >
+                                    <td class="px-3 py-2.5">
+                                        <div class="flex items-center gap-2">
+                                            {{ dot.inst_dot(conn.color) }}
+                                            <span class="font-medium text-ink">{{ conn.name }}</span>
+                                        </div>
+                                        <div class="mt-0.5 text-[11.5px] text-faint">{{ conn.isp }}</div>
+                                    </td>
+                                    <td class="px-3 py-2.5 text-dim">{{ conn.probeName ?? '—' }}</td>
+                                    <td class="px-3 py-2.5 font-mono tnum text-dim">
+                                        {{ helper.mbps(conn.expectedDownloadBits) }} / {{ helper.mbps(conn.expectedUploadBits) }} Mbps
+                                    </td>
+                                    <td class="px-3 py-2.5 text-dim">{{ helper.schedule_summary(conn)|trim }}</td>
+                                    <td class="px-3 py-2.5">
+                                        <div class="flex items-center gap-2">
+                                            {{ toggle.toggle(conn.enabled, 'data-conn-action="toggle" title="Toggle enabled"') }}
+                                            {% if conn.enabled %}
+                                                {{ badge.badge('Enabled', 'good', true) }}
+                                            {% else %}
+                                                {{ badge.badge('Disabled', 'neutral', true) }}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2.5">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <button
+                                                type="button"
+                                                data-conn-action="edit"
+                                                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-transparent px-2.5 py-1.5 text-xs font-medium text-dim transition-colors hover:text-ink active:translate-y-px"
+                                            >Edit</button>
+                                            <button
+                                                type="button"
+                                                data-conn-action="delete"
+                                                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-transparent px-2.5 py-1.5 text-xs font-medium text-bad transition-colors hover:bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] active:translate-y-px"
+                                            >Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endset %}
+            {{ card.card(list_body, false) }}
+        {% endif %}
+
+        {% if probes is not empty %}
+            {% set field = 'rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-[14px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent' %}
+            {% set numfield = 'rounded-lg border border-line-2 bg-surface-2 px-3 py-2 font-mono text-[13px] text-ink outline-none transition-colors placeholder:text-dim focus:border-accent' %}
+            {% set lbl = 'text-[13px] font-medium text-dim' %}
+            {% set legend = 'mb-2 text-[11px] font-medium uppercase tracking-wide text-faint' %}
+
+            <div x-cloak @keydown.escape.window="closeModal()">
+                <div
+                    x-show="modalOpen"
+                    x-transition.opacity
+                    @click="closeModal()"
+                    class="fixed inset-0 z-40 bg-black/50"
+                ></div>
+                <div
+                    x-show="modalOpen"
+                    x-transition.opacity
+                    @click="closeModal()"
+                    class="fixed inset-0 z-50 grid place-items-start justify-center overflow-y-auto p-4"
+                >
+                    <div
+                        @click.stop
+                        role="dialog"
+                        aria-modal="true"
+                        class="my-4 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-[12px] border border-line bg-surface shadow-[var(--shadow)]"
+                    >
+                        <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+                            <h3 class="text-[14px] font-semibold text-ink" x-text="modalTitle">New connection</h3>
+                            <button
+                                type="button"
+                                @click="closeModal()"
+                                class="grid h-8 w-8 place-items-center rounded-lg text-dim transition-colors hover:bg-surface-2 hover:text-ink"
+                                title="Close"
+                            >
+                                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M6 6l12 12M18 6 6 18"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="flex-1 overflow-y-auto px-5 py-4">
+                            <div
+                                class="mb-4 rounded-lg border border-[color-mix(in_oklab,var(--bad)_45%,transparent)] bg-[color-mix(in_oklab,var(--bad)_12%,transparent)] px-3 py-2.5 text-[13px] text-bad"
+                                role="alert"
+                                x-show="error"
+                                x-cloak
+                                x-text="error"
+                            ></div>
+                            <div class="flex flex-col gap-6">
+                                <div>
+                                    <div class="{{ legend }}">Basic</div>
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Probe</span>
+                                            <select x-model="form.probeId" class="{{ field }}">
+                                                <template x-for="probe in meta.probes" :key="probe.id">
+                                                    <option :value="probe.id" x-text="probe.name"></option>
+                                                </template>
+                                            </select>
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Colour</span>
+                                            <select x-model="form.color" class="{{ field }}">
+                                                <template x-for="color in meta.colors" :key="color">
+                                                    <option :value="color" x-text="color"></option>
+                                                </template>
+                                            </select>
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Name</span>
+                                            <input type="text" x-model="form.name" placeholder="e.g. Office fibre" class="{{ field }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">ISP</span>
+                                            <input type="text" x-model="form.isp" placeholder="e.g. Acme Telecom" class="{{ field }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Expected download (Mbps)</span>
+                                            <input type="number" min="0" x-model="form.downloadMbps" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Expected upload (Mbps)</span>
+                                            <input type="number" min="0" x-model="form.uploadMbps" class="{{ numfield }}">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="{{ legend }}">Schedule</div>
+                                    <label class="mb-3 flex max-w-[240px] flex-col gap-1.5">
+                                        <span class="{{ lbl }}">Mode</span>
+                                        <select x-model="form.scheduleMode" class="{{ field }}">
+                                            <template x-for="mode in meta.scheduleModes" :key="mode">
+                                                <option :value="mode" x-text="mode"></option>
+                                            </template>
+                                        </select>
+                                    </label>
+                                    <div x-show="isEven" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Tests per day</span>
+                                            <input type="number" min="1" x-model="form.testsPerDay" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Jitter (seconds)</span>
+                                            <input type="number" min="0" x-model="form.jitter" class="{{ numfield }}">
+                                        </label>
+                                    </div>
+                                    <div x-show="isCron" x-cloak>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Cron expressions</span>
+                                            <input type="text" x-model="form.cron" placeholder="*/30 * * * *, 0 9 * * *" class="{{ numfield }}">
+                                            <span class="text-[11.5px] text-faint">Comma-separated. One test fires per expression match.</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="{{ legend }}">Thresholds</div>
+                                    <p class="mb-3 text-[11.5px] text-faint">Ratios default when blank. Leave a cap (ping/jitter/loss) blank to disable it.</p>
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Min download ratio</span>
+                                            <input type="number" step="0.01" min="0" x-model="form.minDownloadRatio" placeholder="0.8" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Min upload ratio</span>
+                                            <input type="number" step="0.01" min="0" x-model="form.minUploadRatio" placeholder="0.8" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Max ping (ms)</span>
+                                            <input type="number" step="0.1" min="0" x-model="form.maxPingMs" placeholder="off" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Max jitter (ms)</span>
+                                            <input type="number" step="0.1" min="0" x-model="form.maxJitterMs" placeholder="off" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Max packet loss ratio</span>
+                                            <input type="number" step="0.01" min="0" x-model="form.maxPacketLossRatio" placeholder="off" class="{{ numfield }}">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="{{ legend }}">Adaptive policy</div>
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Adaptive interval (s)</span>
+                                            <input type="number" min="0" x-model="form.adaptiveIntervalSeconds" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Recovery healthy count</span>
+                                            <input type="number" min="0" x-model="form.recoveryHealthyCount" class="{{ numfield }}">
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Max consecutive failures</span>
+                                            <input type="number" min="0" x-model="form.maxConsecutiveFailures" class="{{ numfield }}">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="{{ legend }}">Server pool &amp; labels</div>
+                                    <div class="grid grid-cols-1 gap-3">
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Server pool</span>
+                                            <input type="text" x-model="form.serverPool" placeholder="12345, frankfurt.speedtest.net:8080" class="{{ numfield }}">
+                                            <span class="text-[11.5px] text-faint">Comma-separated Ookla server ids/hosts. Blank lets the scheduler pick.</span>
+                                        </label>
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="{{ lbl }}">Labels</span>
+                                            <input type="text" x-model="form.labels" placeholder="env=prod,site=hq" class="{{ numfield }}">
+                                            <span class="text-[11.5px] text-faint">Comma-separated <span class="font-mono">key=value</span> pairs.</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-2.5 border-t border-line px-5 py-3.5">
+                            <button
+                                type="button"
+                                @click="closeModal()"
+                                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-line-2 bg-surface-2 px-3.5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-surface-hover"
+                            >Cancel</button>
+                            <button
+                                type="button"
+                                @click="submit()"
+                                :disabled="loading"
+                                x-text="submitLabel"
+                                class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong"
+                            >Create connection</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

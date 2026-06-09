@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card_m %}
+{% import 'components/_btn.html.twig' as btn_m %}
+{% import 'components/_badge.html.twig' as badge_m %}
+{% import 'components/_toggle.html.twig' as toggle_m %}
+{% import 'components/_segmented.html.twig' as segmented_m %}
+{% import 'components/_stat_tile.html.twig' as stat_m %}
+{% import 'components/_inst_dot.html.twig' as dot_m %}
+{% import 'components/_code.html.twig' as code_m %}
+{% import 'components/_gauge.html.twig' as gauge_m %}
+{% import 'components/_uptime_bars.html.twig' as uptime_m %}
+{% import 'components/_table.html.twig' as table_m %}
+{% import 'components/_pagination.html.twig' as pagination_m %}
+{% import 'components/_date_range.html.twig' as date_range_m %}
+{% import 'components/_filter_controls.html.twig' as filter_controls_m %}
+{% import 'components/_result_detail_modal.html.twig' as result_detail_modal_m %}
+
+{% block title %}Kitchen Sink — NetPulse{% endblock %}
+
+{% block body %}
+    <div class="flex flex-col gap-6">
+
+        {{ card_m.card(
+            header = '<h3 class="mb-3 text-[15px] font-semibold text-ink">Buttons</h3>',
+            body =
+                btn_m.btn('Run test', 'primary') ~
+                btn_m.btn('Outline', 'outline') ~
+                btn_m.btn('Ghost', 'ghost') ~
+                btn_m.btn('Default', 'default') ~
+                btn_m.btn('Delete', 'danger', 'sm') ~
+                btn_m.btn('Refresh', 'outline', 'sm', 'button', '', '@click="reload()"')
+        ) }}
+
+        {{ card_m.card(
+            header = '<h3 class="mb-3 text-[15px] font-semibold text-ink">Badges</h3>',
+            body =
+                badge_m.badge('Neutral', 'neutral', true) ~
+                badge_m.badge('Good', 'good', true) ~
+                badge_m.badge('Warn', 'warn', true) ~
+                badge_m.badge('Bad', 'bad', true) ~
+                badge_m.badge('Accent', 'accent') ~
+                dot_m.inst_dot('primary') ~ dot_m.inst_dot('violet') ~ dot_m.inst_dot('amber')
+        ) }}
+
+        {{ card_m.card(
+            header = '<h3 class="mb-3 text-[15px] font-semibold text-ink">Controls</h3>',
+            body =
+                toggle_m.toggle(true, ':aria-checked="on"') ~
+                toggle_m.toggle(false) ~
+                segmented_m.segmented(
+                    'range',
+                    [{ value: '24h', label: '24h' }, { value: '7d', label: '7d' }, { value: '30d', label: '30d' }],
+                    '7d',
+                    '@change="range = $event.target.value"'
+                )
+        ) }}
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {{ stat_m.stat_tile('Download', '942.3', 'Mbps', 'good', 4.2, 'avg over 24h') }}
+            {{ stat_m.stat_tile('Upload', '38.1', 'Mbps', 'ink', -1.7, 'avg over 24h') }}
+            {{ stat_m.stat_tile(
+                'Latency', '12', 'ms', 'accent', null, '',
+                '',
+                '<div class="h-[34px] w-full rounded bg-accent-dim"></div>'
+            ) }}
+        </div>
+
+        {{ card_m.card(
+            header = '<h3 class="mb-3 text-[15px] font-semibold text-ink">Gauges</h3>',
+            body =
+                gauge_m.gauge(99.7, 160, 'Uptime') ~
+                gauge_m.gauge(98.3, 160, 'Uptime') ~
+                gauge_m.gauge(95, 160, 'Uptime')
+        ) }}
+
+        {{ card_m.card(
+            header = '<h3 class="mb-3 text-[15px] font-semibold text-ink">Uptime</h3>',
+            body = uptime_m.uptime_bars([
+                { status: 'healthy' }, { status: 'healthy' }, { status: 'degraded' },
+                { status: 'healthy' }, { status: 'down' }, { status: 'healthy' },
+                { status: 'unhealthy' }, { status: 'healthy' }, { status: 'healthy' },
+                { status: 'failed' }, { status: 'healthy' }, { status: 'degraded' },
+                { status: 'healthy' }, { status: 'healthy' }, { status: 'up' },
+                { status: 'ok' }, { status: 'warn' }, { status: 'healthy' },
+                { status: 'down' }, { status: 'healthy' }
+            ])
+        ) }}
+
+        {{ card_m.card(
+            pad = true,
+            hover = true,
+            header = '<h3 class="mb-3 text-[15px] font-semibold text-ink">Code</h3>',
+            body = code_m.code("probe:\n  interval: 5m\n  servers:\n    - auto")
+        ) }}
+
+        <div x-data="history">
+            {% set filters_kitchen %}
+                {{ filter_controls_m.filter_controls([
+                    { connectionId: 'a1', name: 'Office fibre' },
+                    { connectionId: 'b2', name: 'Backup LTE' }
+                ], [
+                    { serverId: 's1', name: 'Frankfurt', location: 'Germany' },
+                    { serverId: 's2', name: 'Warsaw', location: 'Poland' }
+                ]) }}
+            {% endset %}
+            {{ card_m.card(filters_kitchen) }}
+
+            {% set table_head %}
+                <tr class="border-b border-line">
+                    <th class="px-3 py-2 font-medium">Time</th>
+                    <th class="px-3 py-2 font-medium">Connection</th>
+                    <th class="px-3 py-2 font-medium">Download</th>
+                </tr>
+            {% endset %}
+            {% set table_rows %}
+                <tr data-measurement-id="m1" class="border-b border-line last:border-0 hover:bg-surface-2">
+                    <td class="px-3 py-2 font-mono tnum text-dim">2026-06-07 09:14</td>
+                    <td class="px-3 py-2 text-ink">Office fibre</td>
+                    <td class="px-3 py-2 font-mono tnum text-ink">942 Mbps</td>
+                </tr>
+            {% endset %}
+            {% set table_kitchen %}
+                {{ table_m.table(table_head, table_rows, 'id="history-table"') }}
+                {{ pagination_m.pagination() }}
+            {% endset %}
+            {{ card_m.card(table_kitchen) }}
+
+            {{ result_detail_modal_m.result_detail_modal() }}
+        </div>
+
+    </div>
+{% endblock %}

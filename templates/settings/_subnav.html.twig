@@ -1,0 +1,44 @@
+{% set route = app.request.attributes.get('_route') %}
+{% set general_active = route starts with 'settings_general' %}
+{% set sso_active = route starts with 'settings_sso' %}
+{% set security_active = route starts with 'settings_security' %}
+{% set notifications_active = route starts with 'settings_notifications' %}
+{% set connections_active = route starts with 'settings_connections' %}
+{% set probes_active = route starts with 'settings_probes' %}
+
+{% set base = 'inline-flex select-none items-center rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors' %}
+{% set on = 'border border-accent bg-accent-dim text-accent' %}
+{% set off = 'border border-line bg-surface-2 text-dim hover:text-ink' %}
+
+<nav class="flex flex-wrap items-center gap-2" aria-label="Settings sections">
+    <a
+        href="{{ path('settings_general') }}"
+        class="{{ base }} {{ general_active ? on : off }}"
+        {% if general_active %}aria-current="page"{% endif %}
+    >General</a>
+    <a
+        href="{{ path('settings_sso') }}"
+        class="{{ base }} {{ sso_active ? on : off }}"
+        {% if sso_active %}aria-current="page"{% endif %}
+    >SSO</a>
+    <a
+        href="{{ path('settings_security') }}"
+        class="{{ base }} {{ security_active ? on : off }}"
+        {% if security_active %}aria-current="page"{% endif %}
+    >Security</a>
+    <a
+        href="{{ path('settings_notifications') }}"
+        class="{{ base }} {{ notifications_active ? on : off }}"
+        {% if notifications_active %}aria-current="page"{% endif %}
+    >Notifications</a>
+    <a
+        href="{{ path('settings_connections') }}"
+        class="{{ base }} {{ connections_active ? on : off }}"
+        {% if connections_active %}aria-current="page"{% endif %}
+    >Connections</a>
+    <a
+        href="{{ path('settings_probes') }}"
+        class="{{ base }} {{ probes_active ? on : off }}"
+        {% if probes_active %}aria-current="page"{% endif %}
+    >Probes</a>
+</nav>

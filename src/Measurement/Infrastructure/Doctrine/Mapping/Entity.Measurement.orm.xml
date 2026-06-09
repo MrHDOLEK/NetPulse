@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Measurement\Domain\Entity\Measurement" table="measurements">
+        <id name="id" type="measurement_id" column="id"/>
+
+        <field name="probeId" type="probe_id" column="probe_id"/>
+        <field name="connectionId" type="connection_id" column="connection_id"/>
+        <field name="status" type="string" column="status" length="16" enum-type="App\Measurement\Domain\Enum\MeasurementStatus"/>
+        <field name="scheduled" type="boolean" column="scheduled"/>
+        <field name="startedAt" type="datetime_immutable" column="started_at"/>
+        <field name="completedAt" type="datetime_immutable" column="completed_at"/>
+
+        <field name="serverId" type="string" column="server_id" length="64"/>
+        <field name="serverName" type="string" column="server_name" length="255"/>
+        <field name="serverLocation" type="string" column="server_location" length="255"/>
+        <field name="serverHost" type="string" column="server_host" length="255"/>
+        <field name="isp" type="string" column="isp" length="255"/>
+
+        <field name="downloadBits" type="bigint" column="download_bits" nullable="true"/>
+        <field name="uploadBits" type="bigint" column="upload_bits" nullable="true"/>
+        <field name="downloadBytes" type="bigint" column="download_bytes" nullable="true"/>
+        <field name="uploadBytes" type="bigint" column="upload_bytes" nullable="true"/>
+
+        <field name="ping" type="float" column="ping" nullable="true"/>
+        <field name="pingLow" type="float" column="ping_low" nullable="true"/>
+        <field name="pingHigh" type="float" column="ping_high" nullable="true"/>
+        <field name="jitter" type="float" column="jitter" nullable="true"/>
+        <field name="downloadJitter" type="float" column="download_jitter" nullable="true"/>
+        <field name="uploadJitter" type="float" column="upload_jitter" nullable="true"/>
+        <field name="downloadLatencyIqm" type="float" column="download_latency_iqm" nullable="true"/>
+        <field name="downloadLatencyLow" type="float" column="download_latency_low" nullable="true"/>
+        <field name="downloadLatencyHigh" type="float" column="download_latency_high" nullable="true"/>
+        <field name="uploadLatencyIqm" type="float" column="upload_latency_iqm" nullable="true"/>
+        <field name="uploadLatencyLow" type="float" column="upload_latency_low" nullable="true"/>
+        <field name="uploadLatencyHigh" type="float" column="upload_latency_high" nullable="true"/>
+
+        <field name="packetLossRatio" type="float" column="packet_loss_ratio" nullable="true"/>
+        <field name="dataUsedDownload" type="bigint" column="data_used_download"/>
+        <field name="dataUsedUpload" type="bigint" column="data_used_upload"/>
+        <field name="downloadElapsed" type="integer" column="download_elapsed"/>
+        <field name="uploadElapsed" type="integer" column="upload_elapsed"/>
+        <field name="resultUrl" type="string" column="result_url" length="512" nullable="true"/>
+        <field name="rawPayload" type="json" column="raw_payload"/>
+        <field name="healthy" type="boolean" column="healthy" nullable="true"/>
+        <field name="shareToken" type="string" column="share_token" length="64" nullable="true"/>
+
+        <indexes>
+            <index name="idx_measurement_connection_completed" columns="connection_id,completed_at"/>
+            <index name="idx_measurement_probe_status" columns="probe_id,status"/>
+        </indexes>
+
+        <unique-constraints>
+            <unique-constraint name="uniq_measurement_share_token" columns="share_token"/>
+        </unique-constraints>
+    </entity>
+</doctrine-mapping>

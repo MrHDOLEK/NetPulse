@@ -1,0 +1,249 @@
+{% extends 'base.html.twig' %}
+
+{% import 'components/_card.html.twig' as card %}
+{% import 'components/_btn.html.twig' as btn %}
+{% import 'components/_badge.html.twig' as badge %}
+{% import 'components/_segmented.html.twig' as segmented %}
+{% import 'components/_stat_tile.html.twig' as stat %}
+{% import 'components/_inst_dot.html.twig' as dot %}
+{% import 'components/_gauge.html.twig' as gauge %}
+{% import 'components/_uptime_bars.html.twig' as uptime %}
+{% import 'components/_code.html.twig' as code %}
+{% import 'components/_run_test_modal.html.twig' as run_test_modal %}
+
+{% block title %}Dashboard · NetPulse{% endblock %}
+
+{% block breadcrumb %}
+    <span class="text-ink">Dashboard</span>
+{% endblock %}
+
+{% set status_tones = { healthy: 'good', degraded: 'warn', down: 'bad' } %}
+{% set status_labels = { healthy: 'Healthy', degraded: 'Degraded', down: 'Down' } %}
+
+{% block body %}
+    <div class="flex flex-col gap-5" x-data="dashboard">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-[20px] font-semibold tracking-tight text-ink">Dashboard</h1>
+                <p class="mt-0.5 flex items-center gap-1.5 text-[13px] text-dim">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-good"></span>
+                    <span>Live</span>
+                    <span class="text-faint" x-text="updatedAgo"></span>
+                </p>
+            </div>
+            <div class="flex items-center gap-2.5">
+                {{ segmented.segmented(
+                    'range',
+                    [
+                        { value: '24h', label: '24h' },
+                        { value: '7d', label: '7d' },
+                        { value: '30d', label: '30d' },
+                        { value: '90d', label: '90d' },
+                    ],
+                    range.value,
+                    'x-model="range"'
+                ) }}
+                {{ btn.btn(
+                    'Run test',
+                    'primary',
+                    'md',
+                    'button',
+                    '',
+                    '@click="openRunModal()"
+                     :disabled="isRunning"
+                     :class="runBtnClass"
+                     x-text="runLabel"'
+                ) }}
+            </div>
+        </div>
+        <meta name="csrf-run-test" content="{{ csrf_token('run-test') }}">
+        <p
+            class="text-[12px] text-faint"
+            x-show="runWaiting"
+            x-cloak
+            x-transition
+        >Waiting for the agent to report back…</p>
+
+        {% if overview.isEmpty %}
+            <div class="grid place-items-center rounded-xl border border-dashed border-line bg-surface px-6 py-16 text-center">
+                <div class="flex max-w-sm flex-col items-center gap-3">
+                    {% include 'partials/_nav_icon.html.twig' with { name: 'dashboard', active: false } only %}
+                    <div>
+                        <p class="text-[14px] font-medium text-ink">No connections yet</p>
+                        <p class="mt-1 text-[13px] text-dim">
+                            Add a connection and run a speed test to start tracking your internet.
+                        </p>
+                    </div>
+                    <a
+                        href="{{ path('settings_connections') }}"
+                        class="inline-flex select-none items-center gap-2 whitespace-nowrap rounded-lg border border-accent bg-accent px-3.5 py-2.5 text-[13px] font-semibold text-[oklch(0.2_0.02_250)] transition-colors hover:bg-accent-strong active:translate-y-px"
+                    >Add a connection</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+                {% for item in overview %}
+                    {% set cid = item.connectionId.toString %}
+                    {% set selected = default is not null and cid == default.connectionId.toString %}
+                    <button
+                        type="button"
+                        data-connection-id="{{ cid }}"
+                        data-card-connection="{{ cid }}"
+                        class="rounded-[12px] border bg-surface p-4 text-left transition-all {{ selected ? 'border-accent ring-2 ring-accent-dim' : 'border-line hover:border-line-2' }}"
+                    >
+                        <div class="mb-3 flex items-center justify-between gap-2">
+                            <div class="flex min-w-0 items-center gap-2">
+                                {{ dot.inst_dot(item.color.value) }}
+                                <span class="truncate text-[13.5px] font-medium text-ink">{{ item.name }}</span>
+                            </div>
+                            {{ badge.badge(status_labels[item.status.value], status_tones[item.status.value], true, '', 'data-card-status') }}
+                        </div>
+                        <div class="flex items-end justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="font-mono text-[24px] font-semibold leading-none tnum text-ink" data-card-download>
+                                    {{ item.downloadBits|mbps }}
+                                </div>
+                                <div class="mt-1.5 truncate text-[11.5px] text-faint">{{ item.isp }}</div>
+                            </div>
+                            <div
+                                class="h-8 w-24 shrink-0"
+                                x-data="chart"
+                                data-spark
+                                data-metric="speed"
+                                data-only="dl"
+                                data-range="24h"
+                                data-connection-id="{{ cid }}"
+                            ></div>
+                        </div>
+                    </button>
+                {% endfor %}
+            </div>
+
+            <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
+                <div class="flex flex-col gap-5 lg:col-span-2">
+                    {% set chart_body %}
+                        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                {{ dot.inst_dot(default.color.value) }}
+                                <h3 class="text-[14px] font-semibold text-ink">{{ default.name }}</h3>
+                                {{ badge.badge(range.value, 'neutral', false, 'font-mono', 'x-text="range"') }}
+                            </div>
+                            {{ segmented.segmented(
+                                'metric',
+                                [
+                                    { value: 'speed', label: 'Speed' },
+                                    { value: 'ping', label: 'Ping' },
+                                    { value: 'loss', label: 'Loss' },
+                                ],
+                                'speed',
+                                'x-model="metric"'
+                            ) }}
+                        </div>
+                        <div id="main-chart" data-chart class="relative h-[250px] w-full"></div>
+                        <div class="mt-3 flex items-center gap-4 text-[12px]" x-show="isSpeed">
+                            <span class="flex items-center gap-1.5 text-dim">
+                                <span class="h-2.5 w-2.5 rounded-sm bg-accent"></span>Download
+                            </span>
+                            <span class="flex items-center gap-1.5 text-dim">
+                                <span class="h-2.5 w-2.5 rounded-sm bg-violet"></span>Upload
+                            </span>
+                        </div>
+                    {% endset %}
+                    {{ card.card(chart_body) }}
+
+                    <div class="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+                        {% set download_spark %}<div class="h-8 w-full" data-tile-spark="download"></div>{% endset %}
+                        {{ stat.stat_tile('Download', default.downloadBits|mbps, '', 'ink', series is not null ? series.trendPct : null, '', '', download_spark, '', 'data-tile-download') }}
+
+                        {% set upload_spark %}<div class="h-8 w-full" data-tile-spark="upload"></div>{% endset %}
+                        {{ stat.stat_tile('Upload', default.uploadBits|mbps, '', 'ink', null, '', '', upload_spark, '', 'data-tile-upload') }}
+
+                        {% set ping_spark %}<div class="h-8 w-full" data-tile-spark="ping"></div>{% endset %}
+                        {{ stat.stat_tile('Ping', default.pingSeconds|ms, '', 'ink', null, '', '', ping_spark, '', 'data-tile-ping') }}
+
+                        {% set loss_spark %}<div class="h-8 w-full" data-tile-spark="loss"></div>{% endset %}
+                        {{ stat.stat_tile('Packet loss', default.packetLossRatio|pct, '', default.packetLossRatio is not null and default.packetLossRatio > 0.01 ? 'warn' : 'ink', null, '', '', loss_spark, '', 'data-tile-loss') }}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-5">
+                    {% set health_body %}
+                        <div class="mb-4 flex items-center gap-2 text-[13px] font-semibold text-ink">Connection health</div>
+                        <div class="flex items-center gap-5">
+                            <div class="relative grid place-items-center">
+                                {{ gauge.gauge(default.uptimePct, 130, 'Uptime', '', 'data-health-uptime') }}
+                            </div>
+                            <div class="flex flex-1 flex-col gap-3">
+                                <div>
+                                    <div class="text-[11px] uppercase tracking-wide text-faint">Incidents</div>
+                                    <div class="font-mono text-[20px] tnum text-ink">{{ default.incidents }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] uppercase tracking-wide text-faint">Tests run</div>
+                                    <div class="font-mono text-[20px] tnum text-ink">{{ default.testsRun }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="mb-2 text-[11px] uppercase tracking-wide text-faint">Recent results</div>
+                            {% set samples = [] %}
+                            {% for sample in recent %}
+                                {% set samples = samples|merge([{
+                                    status: sample.failed ? 'failed' : (sample.healthy == false ? 'degraded' : 'healthy'),
+                                    title: sample.completedAt|date('Y-m-d H:i'),
+                                }]) %}
+                            {% endfor %}
+                            {{ uptime.uptime_bars(samples) }}
+                        </div>
+                    {% endset %}
+                    {{ card.card(health_body) }}
+
+                    {% set prometheus_body %}
+                        <div class="mb-3 flex items-center justify-between">
+                            <span class="text-[13px] font-semibold text-ink">Prometheus</span>
+                            {{ badge.badge('Scraping', 'good', true) }}
+                        </div>
+                        <div class="truncate rounded-lg border border-line bg-bg px-3 py-2 font-mono text-[11.5px] text-dim">
+                            GET /metrics → 200
+                        </div>
+                    {% endset %}
+                    {{ card.card(prometheus_body) }}
+
+                    {% set latest_body %}
+                        <div class="mb-3 flex items-center justify-between">
+                            <span class="text-[13px] font-semibold text-ink">Latest test</span>
+                            {% if default.completedAtUnix is not null %}
+                                <span class="font-mono text-[11.5px] text-faint">{{ default.completedAtUnix|date('H:i') }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex flex-col gap-2 text-[12.5px]">
+                            <div class="flex items-center justify-between gap-3 border-b border-line py-1">
+                                <span class="text-faint">Server</span>
+                                <span class="truncate text-ink">{{ default.serverName }}{% if default.serverLocation is not empty %} · {{ default.serverLocation }}{% endif %}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 border-b border-line py-1">
+                                <span class="text-faint">Download</span>
+                                <span class="font-mono tnum text-ink">{{ default.downloadBits|mbps }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 border-b border-line py-1">
+                                <span class="text-faint">Upload</span>
+                                <span class="font-mono tnum text-ink">{{ default.uploadBits|mbps }}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 py-1">
+                                <span class="text-faint">Ping / Jitter</span>
+                                <span class="font-mono tnum text-ink">{{ default.pingSeconds|ms }} / {{ default.jitterSeconds|ms }}</span>
+                            </div>
+                        </div>
+                    {% endset %}
+                    {{ card.card(latest_body) }}
+                </div>
+            </div>
+
+            {% if bootstrap is not null %}
+                <script type="application/json" id="dashboard-bootstrap">{{ bootstrap|json_encode|raw }}</script>
+            {% endif %}
+        {% endif %}
+
+        {{ run_test_modal.run_test_modal() }}
+    </div>
+{% endblock %}

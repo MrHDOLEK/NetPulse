@@ -1,0 +1,61 @@
+{% macro server_table(rows = []) %}
+    {% set th = 'cursor-pointer select-none px-3 py-2 font-medium hover:text-ink' %}
+
+    <div class="overflow-x-auto">
+        <table id="servers-table" class="w-full text-left text-[13px]">
+            <thead class="text-[11px] uppercase tracking-wide text-faint">
+                <tr class="border-b border-line">
+                    <th scope="col" class="px-3 py-2 font-medium">Server</th>
+                    <th scope="col" data-sort="download" class="{{ th }}">Download</th>
+                    <th scope="col" data-sort="upload" class="{{ th }}">Upload</th>
+                    <th scope="col" data-sort="ping" class="{{ th }}">Ping</th>
+                    <th scope="col" data-sort="loss" class="{{ th }}">Loss</th>
+                    <th scope="col" data-sort="tests" class="{{ th }}">Tests</th>
+                    <th scope="col" data-sort="health" class="{{ th }}">Health</th>
+                    <th scope="col" data-sort="lastSeen" class="{{ th }}">Last seen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="row in sortedRows" :key="row.serverId">
+                    <tr class="border-b border-line last:border-0 hover:bg-surface-2">
+                        <td class="px-3 py-2">
+                            <span class="text-ink" x-text="row.name"></span>
+                            <span class="text-dim" x-show="row.location" x-text="row.location"></span>
+                        </td>
+                        <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.downloadLabel"></td>
+                        <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.uploadLabel"></td>
+                        <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.pingLabel"></td>
+                        <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.lossLabel"></td>
+                        <td class="px-3 py-2 font-mono tnum text-dim" x-text="row.tests"></td>
+                        <td class="px-3 py-2 font-mono tnum text-ink" x-text="row.healthLabel"></td>
+                        <td class="px-3 py-2 text-dim" x-text="row.lastSeenLabel"></td>
+                    </tr>
+                </template>
+
+                <tr x-show="!hasRows" x-cloak>
+                    <td colspan="8" class="px-3 py-8 text-center text-[13px] text-dim">No servers measured in this window.</td>
+                </tr>
+
+                {% for row in rows %}
+                    <tr class="border-b border-line last:border-0 hover:bg-surface-2" x-show="false" x-cloak>
+                        <td class="px-3 py-2">
+                            <span class="text-ink">{{ row.name }}</span>
+                            {% if row.location is not empty %}<span class="text-dim">{{ row.location }}</span>{% endif %}
+                        </td>
+                        <td class="px-3 py-2 font-mono tnum text-ink">{{ row.downloadLabel }}</td>
+                        <td class="px-3 py-2 font-mono tnum text-ink">{{ row.uploadLabel }}</td>
+                        <td class="px-3 py-2 font-mono tnum text-ink">{{ row.pingLabel }}</td>
+                        <td class="px-3 py-2 font-mono tnum text-ink">{{ row.lossLabel }}</td>
+                        <td class="px-3 py-2 font-mono tnum text-dim">{{ row.tests }}</td>
+                        <td class="px-3 py-2 font-mono tnum text-ink">{{ row.healthLabel }}</td>
+                        <td class="px-3 py-2 text-dim">{{ row.lastSeenLabel }}</td>
+                    </tr>
+                {% else %}
+                    <tr x-show="false" x-cloak>
+                        <td colspan="8" class="px-3 py-8 text-center text-[13px] text-dim">No servers measured in this window.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}
