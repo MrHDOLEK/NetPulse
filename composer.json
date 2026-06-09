@@ -70,7 +70,6 @@
         "symfony/web-profiler-bundle": "7.3.*",
         "symplify/config-transformer": "^12.4",
         "symplify/easy-coding-standard": "12.3.*",
-        "tomasvotruba/symfony-config-generator": "^0.1.10",
         "zircote/swagger-php": "5.3.*"
     },
     "autoload": {
