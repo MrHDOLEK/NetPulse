@@ -95,7 +95,7 @@ raw request content in the Action).
 ## What's enforced
 
 - **Deptrac** — the layer/module boundaries above, 0 violations.
-- **Mago** — linter, formatter & static analyzer (replaced PHPStan + php-cs-fixer); strict types everywhere (`declare(strict_types=1)`). `mago analyze` is gated against `mago-baseline.toml`.
+- **Mago** — linter, formatter & static analyzer (replaced PHPStan + php-cs-fixer); strict types everywhere (`declare(strict_types=1)`). `mago analyze` (scoped to `src` + `config`) must be clean — no baseline; in CI its findings go to GitHub Code scanning.
 - **PHPUnit** — unit and integration suites. (Behat is parked until its ecosystem supports Symfony 8.)
 
 CI (`Test&lint PHP codebase`) runs the same gate on every push and pull request.

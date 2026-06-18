@@ -52,14 +52,14 @@ Before you push, this checklist must be green. CI runs the same job — **Test&l
 
 ```bash
 just lint          # Mago format --check + Mago lint
-just analyze       # Mago static analysis (gated against mago-baseline.toml)
+just analyze       # Mago static analysis (src + config; must be clean)
 just deptrac       # architecture, 0 violations
 composer db:test   # apply migrations to the TEST database
 composer test      # PHPUnit
 just fix           # auto-format + auto-fix (Mago)
 ```
 
-[Mago](https://mago.carthage.software/) is the sole linter, formatter, and static analyzer — it replaced PHP-CS-Fixer and PHPStan. Mago and Deptrac are isolated Composer tools under `tools/`. `mago analyze` is gated against the committed `mago-baseline.toml`, so it fails only on **new** findings; burn the baseline down over time.
+[Mago](https://mago.carthage.software/) is the sole linter, formatter, and static analyzer — it replaced PHP-CS-Fixer and PHPStan. Mago and Deptrac are isolated Composer tools under `tools/`. `mago analyze` covers `src` + `config` (matching the previous PHPStan scope) and must be clean — there is **no baseline**; two checks that go beyond that standard (`mixed-assignment`, `avoid-catching-error`) are intentionally not enforced (see `mago.toml`). In CI, `mago lint`/`analyze` findings are uploaded to **GitHub Code scanning** (Security tab + inline annotations on the PR diff).
 
 ::: info Behat is parked
 The Behat suite is paused until its ecosystem supports Symfony 8 (`behat/behat` caps Symfony at `^7`). The `.feature` files and `behat.yml` stay in the repo; coverage currently rests on the PHPUnit integration tests.
