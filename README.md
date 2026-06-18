@@ -44,6 +44,25 @@ It runs entirely on **Docker**, is **single-tenant** (one admin, your data only)
 - 🐳 **Self-hosted** — Docker Compose for the server, Prometheus, Grafana, and the probe agent. No third-party telemetry.
 - 🧩 **Clean & strict** — Hexagonal + DDD enforced by deptrac, PHPStan level 10, a no-Node frontend (AssetMapper + Tailwind + Alpine + uPlot).
 
+## Screenshots
+
+The live dashboard — per-connection health, speed / ping / loss charts, trend tiles and sparklines:
+
+![NetPulse dashboard](docs/public/screenshots/dashboard.webp)
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/public/screenshots/heatmap.webp" alt="When-is-it-slow heatmap"></td>
+    <td width="50%"><img src="docs/public/screenshots/history.webp" alt="Measurement history"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/public/screenshots/notifications.webp" alt="Alerts and notifications"></td>
+    <td width="50%"><img src="docs/public/screenshots/servers.webp" alt="Per-server performance"></td>
+  </tr>
+</table>
+
+More in the **[screenshots gallery](https://mrhdolek.github.io/NetPulse/guide/screenshots)**.
+
 ## How it works
 
 NetPulse is **pull-based**: lightweight **probe agents** poll the server for due work, run the
