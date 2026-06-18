@@ -26,6 +26,40 @@ just start     # docker compose up -d
 - If you hit permission errors talking to the Docker daemon, prefix the command with `sudo`.
 :::
 
+## Develop with Nix (optional)
+
+Prefer to run the PHP toolchain on your **host** instead of inside Docker? A `shell.nix` (classic, no flake) provides **PHP 8.5, Composer, [Mago](https://mago.carthage.software/), the Symfony CLI and [`just`](https://github.com/casey/just)** — everything the quality gate and CLI need. The full app stack (nginx, the agent + Ookla CLI, Prometheus, Grafana) still runs in Docker Compose.
+
+**1. Install Nix** — follow the [official installer](https://nixos.org/download/). On macOS/Linux:
+
+```bash
+sh <(curl -L https://nixos.org/nix/install)
+# then restart your shell
+```
+
+**2. Enter the shell** from the project root:
+
+```bash
+nix-shell                          # PHP 8.5 + Composer + Mago + Symfony CLI + just
+nix-shell --pure                   # full isolation from the host
+nix-shell --arg php-version 8.4    # choose a PHP version (default: 8.5)
+nix-shell --arg with-xdebug true   # add Xdebug
+type php                           # show the Nix-provided PHP path (handy for IDE config)
+```
+
+**3. Inside the shell**, install dependencies and run the gate:
+
+```bash
+composer install   # also installs the Mago + Deptrac tools under tools/
+just lint          # Mago format check + lint
+just analyze       # Mago static analysis
+just deptrac       # architecture (0 violations)
+```
+
+::: tip
+The Nix shell is the host alternative to `just bash` / `docker compose exec app …` for tooling. You still bring the stack up with `just install` / `just start` (Docker) for nginx, the agent, Prometheus and Grafana.
+:::
+
 ## Build the database
 
 NetPulse is **migrations-only** — never run `doctrine:schema:update`. Apply the migrations to build each database.

@@ -67,7 +67,7 @@ the [documentation](https://mrhdolek.github.io/NetPulse/guide/how-it-works).
 
 ## Quick start
 
-> **Prerequisites:** Docker + Docker Compose, git, and [`just`](https://github.com/casey/just) (`brew install just`, or use the [Nix shell](#tech-stack) which provides it).
+> **Prerequisites:** Docker + Docker Compose, git, and [`just`](https://github.com/casey/just) (`brew install just`, or use the [Nix shell](https://mrhdolek.github.io/NetPulse/guide/getting-started#develop-with-nix-optional) — it provides `just`; see *Getting started* for how to install Nix and enter the shell).
 
 ```bash
 git clone https://github.com/MrHDOLEK/NetPulse.git
