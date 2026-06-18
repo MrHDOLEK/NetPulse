@@ -19,6 +19,7 @@
 .phpunit.result.cache
 .deptrac.cache
 /config/reference.php
+*.sarif
 
 AGENTS.md
 CLAUDE.md
