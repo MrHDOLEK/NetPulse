@@ -56,8 +56,38 @@ just analyze       # Mago static analysis
 just deptrac       # architecture (0 violations)
 ```
 
-::: tip
-The Nix shell is the host alternative to `just bash` / `docker compose exec app …` for tooling. You still bring the stack up with `just install` / `just start` (Docker) for nginx, the agent, Prometheus and Grafana.
+**4. Serve the app from the host** (browser access, no Docker) with the bundled Symfony CLI:
+
+```bash
+cp .env.dist .env                  # dev env — SQLite at var/netpulse.sqlite
+php bin/console importmap:install  # fetch the import-map assets
+php bin/console tailwind:build     # compile the Tailwind CSS
+composer migrate                   # create/upgrade the dev database
+symfony server:start               # serves on https://127.0.0.1:8000
+```
+
+Open the printed URL in your browser — the first visit lands on `/setup`. Useful flags & commands:
+
+```bash
+symfony server:start -d            # run as a background daemon
+symfony server:start --no-tls      # plain HTTP instead of HTTPS
+symfony server:ca:install          # trust the local HTTPS cert (once)
+symfony server:log                 # tail the server logs
+symfony server:stop                # stop it
+```
+
+**5. Run the probe agent** as a plain host process — it's just a console command (`app:agent:run`: poll for due work → run Ookla → push results). The Nix shell already bundles the Ookla **`speedtest`** CLI (`pkgs.ookla-speedtest`), so just create a probe and run the agent against the server you started in step 4:
+
+```bash
+php bin/console app:probe:create "My probe"     # prints PROBE_ID + a one-time token
+PROBE_ID=<id> PROBE_TOKEN=<token> NETPULSE_API_URL=http://127.0.0.1:8000 \
+  php bin/console app:agent:run                  # daemon loop; add --once for a single tick
+```
+
+It reads `NETPULSE_API_URL`, `PROBE_ID`, `PROBE_TOKEN`, `OOKLA_BINARY` (default `speedtest`) and `AGENT_POLL_INTERVAL` (default `60`s) from the environment.
+
+::: tip Everything on the host (no Docker)
+`symfony server:start` (web + API) + `app:agent:run` (agent, using the shell's bundled `speedtest`) runs the whole app on the host. Docker Compose is then only the convenient way to get **Prometheus + Grafana** (`just start`).
 :::
 
 ## Build the database

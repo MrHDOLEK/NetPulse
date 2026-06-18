@@ -79,6 +79,18 @@ just install          # build the image, start containers, composer install
 docker compose exec -T app composer migrate
 ```
 
+> **Develop on the host with Nix** (instead of Docker for the PHP toolchain): install Nix once —
+> `sh <(curl -L https://nixos.org/nix/install)` ([instructions](https://nixos.org/download/)) — then run
+> **`nix-shell`** from the project root to get PHP 8.5 + Composer + Mago + Symfony CLI + `just` + the Ookla `speedtest` CLI:
+>
+> ```bash
+> nix-shell                          # enter the dev shell
+> nix-shell --pure                   # full isolation from the host
+> nix-shell --arg php-version 8.4    # pick a PHP version (default: 8.5)
+> ```
+>
+> More in [Getting started → Develop with Nix](https://mrhdolek.github.io/NetPulse/guide/getting-started#develop-with-nix-optional).
+
 Open **http://localhost:8080** — every page redirects to **`/setup`** until you create the first
 admin (email + password, min 12 chars). Then add a probe and a connection, and start the agent:
 
@@ -180,7 +192,7 @@ cd docs && npm install && npm run docs:dev
 PHP 8.5 · Symfony 8.1 · Doctrine ORM (XML mapping, migrations-only) · SQLite / PostgreSQL ·
 Ookla Speedtest CLI · Prometheus + Grafana · Twig + Tailwind 3 + Alpine.js (CSP build) + uPlot via
 AssetMapper (no Node) · Hexagonal + DDD (deptrac) · Mago (lint/format/analyze) · PHPUnit.
-A host **Nix shell** (`shell.nix`) provides PHP 8.5 + Composer + Mago + Symfony CLI + `just`.
+A host **Nix shell** (`shell.nix`) provides PHP 8.5 + Composer + Mago + Symfony CLI + `just` + the Ookla `speedtest` CLI — enough to serve the app (`symfony server:start`) and run the agent (`app:agent:run`) on the host.
 
 ## Contributing
 

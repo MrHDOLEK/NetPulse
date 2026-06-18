@@ -52,6 +52,7 @@ pkgs.mkShell {
         pkgs.symfony-cli
         pkgs.just
         pkgs.starship
+        pkgs.ookla-speedtest   # official Ookla `speedtest` CLI, so the agent can run from the host (unfree)
     ];
 
     shellHook = ''
