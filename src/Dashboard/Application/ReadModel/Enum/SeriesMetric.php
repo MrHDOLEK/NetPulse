@@ -8,9 +8,9 @@ use InvalidArgumentException;
 
 enum SeriesMetric: string
 {
-    case Speed = "speed";
-    case Ping = "ping";
-    case Loss = "loss";
+    case Speed = 'speed';
+    case Ping = 'ping';
+    case Loss = 'loss';
 
     public static function fromParam(string $param): self
     {

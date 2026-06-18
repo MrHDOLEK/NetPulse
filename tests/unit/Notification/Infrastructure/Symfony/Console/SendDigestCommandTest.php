@@ -27,18 +27,18 @@ use function dirname;
 
 final class SendDigestCommandTest extends TestCase
 {
-    private const string TEMPLATES_DIR = __DIR__ . "/../../../../../../templates/notification";
+    private const string TEMPLATES_DIR = __DIR__ . '/../../../../../../templates/notification';
 
     public function testDailyPeriodDispatchesOneDigestWithPerConnectionContent(): void
     {
         $dispatcher = new RecordingDigestDispatcher();
         $digests = ConnectionDigestCollection::of(
-            new ConnectionDigest("home", "wan1", 250_000_000, 50_000_000, 12.3, 0.01, 0.9, 20, 2),
-            new ConnectionDigest("home", "wan2", 80_000_000, 8_000_000, 30.0, 0.05, 0.5, 10, 4),
+            new ConnectionDigest('home', 'wan1', 250_000_000, 50_000_000, 12.3, 0.01, 0.9, 20, 2),
+            new ConnectionDigest('home', 'wan2', 80_000_000, 8_000_000, 30.0, 0.05, 0.5, 10, 4),
         );
 
         $tester = new CommandTester($this->command($dispatcher, new FixedDigestRepository($digests)));
-        $exitCode = $tester->execute(["--period" => "daily"]);
+        $exitCode = $tester->execute(['--period' => 'daily']);
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertCount(1, $dispatcher->sent);
@@ -46,34 +46,34 @@ final class SendDigestCommandTest extends TestCase
         $notification = $dispatcher->sent[0];
         self::assertSame(NotificationKind::Digest, $notification->kind);
         self::assertSame(NotificationSeverity::Info, $notification->severity);
-        self::assertSame("[NetPulse] daily digest — 2 connections", $notification->subject);
-        self::assertStringContainsString("home/wan1", $notification->body);
-        self::assertStringContainsString("down 250 Mbps", $notification->body);
-        self::assertStringContainsString("home/wan2", $notification->body);
-        self::assertStringContainsString("20 tests, 2 failures", $notification->body);
-        self::assertSame(["period" => "daily", "connections" => 2], $notification->context);
+        self::assertSame('[NetPulse] daily digest — 2 connections', $notification->subject);
+        self::assertStringContainsString('home/wan1', $notification->body);
+        self::assertStringContainsString('down 250 Mbps', $notification->body);
+        self::assertStringContainsString('home/wan2', $notification->body);
+        self::assertStringContainsString('20 tests, 2 failures', $notification->body);
+        self::assertSame(['period' => 'daily', 'connections' => 2], $notification->context);
     }
 
     public function testWeeklyPeriodIsAccepted(): void
     {
         $dispatcher = new RecordingDigestDispatcher();
         $digests = ConnectionDigestCollection::of(
-            new ConnectionDigest("home", "wan1", 100_000_000, 10_000_000, 9.0, 0.0, 1.0, 5, 0),
+            new ConnectionDigest('home', 'wan1', 100_000_000, 10_000_000, 9.0, 0.0, 1.0, 5, 0),
         );
 
         $tester = new CommandTester($this->command($dispatcher, new FixedDigestRepository($digests)));
-        $exitCode = $tester->execute(["--period" => "weekly"]);
+        $exitCode = $tester->execute(['--period' => 'weekly']);
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertCount(1, $dispatcher->sent);
-        self::assertSame("[NetPulse] weekly digest — 1 connection", $dispatcher->sent[0]->subject);
+        self::assertSame('[NetPulse] weekly digest — 1 connection', $dispatcher->sent[0]->subject);
     }
 
     public function testDefaultPeriodIsDaily(): void
     {
         $dispatcher = new RecordingDigestDispatcher();
         $readModel = new FixedDigestRepository(ConnectionDigestCollection::of(
-            new ConnectionDigest("home", "wan1", 100_000_000, 10_000_000, 9.0, 0.0, 1.0, 5, 0),
+            new ConnectionDigest('home', 'wan1', 100_000_000, 10_000_000, 9.0, 0.0, 1.0, 5, 0),
         ));
 
         $tester = new CommandTester($this->command($dispatcher, $readModel));
@@ -81,30 +81,33 @@ final class SendDigestCommandTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertCount(1, $dispatcher->sent);
-        self::assertStringContainsString("daily digest", $dispatcher->sent[0]->subject);
+        self::assertStringContainsString('daily digest', $dispatcher->sent[0]->subject);
 
-        self::assertEquals(new DateTimeImmutable("2026-06-05 08:00:00"), $readModel->lastSince);
+        self::assertEquals(new DateTimeImmutable('2026-06-05 08:00:00'), $readModel->lastSince);
     }
 
     public function testWeeklyWindowOpensSevenDaysBeforeNow(): void
     {
         $dispatcher = new RecordingDigestDispatcher();
         $readModel = new FixedDigestRepository(ConnectionDigestCollection::of(
-            new ConnectionDigest("home", "wan1", 100_000_000, 10_000_000, 9.0, 0.0, 1.0, 5, 0),
+            new ConnectionDigest('home', 'wan1', 100_000_000, 10_000_000, 9.0, 0.0, 1.0, 5, 0),
         ));
 
         $tester = new CommandTester($this->command($dispatcher, $readModel));
-        $tester->execute(["--period" => "weekly"]);
+        $tester->execute(['--period' => 'weekly']);
 
-        self::assertEquals(new DateTimeImmutable("2026-05-30 08:00:00"), $readModel->lastSince);
+        self::assertEquals(new DateTimeImmutable('2026-05-30 08:00:00'), $readModel->lastSince);
     }
 
     public function testEmptyDataDispatchesNothing(): void
     {
         $dispatcher = new RecordingDigestDispatcher();
 
-        $tester = new CommandTester($this->command($dispatcher, new FixedDigestRepository(ConnectionDigestCollection::fromList([]))));
-        $exitCode = $tester->execute(["--period" => "daily"]);
+        $tester = new CommandTester($this->command(
+            $dispatcher,
+            new FixedDigestRepository(ConnectionDigestCollection::fromList([])),
+        ));
+        $exitCode = $tester->execute(['--period' => 'daily']);
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertCount(0, $dispatcher->sent);
@@ -114,18 +117,19 @@ final class SendDigestCommandTest extends TestCase
     {
         $dispatcher = new RecordingDigestDispatcher();
 
-        $tester = new CommandTester($this->command($dispatcher, new FixedDigestRepository(ConnectionDigestCollection::fromList([]))));
-        $exitCode = $tester->execute(["--period" => "hourly"]);
+        $tester = new CommandTester($this->command(
+            $dispatcher,
+            new FixedDigestRepository(ConnectionDigestCollection::fromList([])),
+        ));
+        $exitCode = $tester->execute(['--period' => 'hourly']);
 
         self::assertSame(Command::FAILURE, $exitCode);
         self::assertCount(0, $dispatcher->sent);
-        self::assertStringContainsString("Invalid --period", $tester->getDisplay());
+        self::assertStringContainsString('Invalid --period', $tester->getDisplay());
     }
 
-    private function command(
-        RecordingDigestDispatcher $dispatcher,
-        FixedDigestRepository $readModel,
-    ): SendDigestCommand {
+    private function command(RecordingDigestDispatcher $dispatcher, FixedDigestRepository $readModel): SendDigestCommand
+    {
         $twig = new Environment(new FilesystemLoader(dirname(self::TEMPLATES_DIR)));
         $renderer = new TwigNotificationRenderer($twig);
 
@@ -133,7 +137,7 @@ final class SendDigestCommandTest extends TestCase
             $readModel,
             $renderer,
             $dispatcher,
-            new MockClock("2026-06-06 08:00:00"),
+            new MockClock('2026-06-06 08:00:00'),
             new NullLogger(),
         );
 

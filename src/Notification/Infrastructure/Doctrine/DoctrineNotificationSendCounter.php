@@ -18,15 +18,12 @@ final readonly class DoctrineNotificationSendCounter implements NotificationSend
 
     public function increment(NotificationKind $kind, string $channel, string $status): void
     {
-        $this->connection->executeStatement(
-            "INSERT INTO notification_send_counts (kind, channel, status, total) "
-            . "VALUES (:kind, :channel, :status, 1) "
-            . "ON CONFLICT (kind, channel, status) DO UPDATE SET total = total + 1",
-            [
-                "kind" => $kind->value,
-                "channel" => $channel,
-                "status" => $status,
-            ],
-        );
+        $this->connection->executeStatement('INSERT INTO notification_send_counts (kind, channel, status, total) '
+        . 'VALUES (:kind, :channel, :status, 1) '
+        . 'ON CONFLICT (kind, channel, status) DO UPDATE SET total = total + 1', [
+            'kind' => $kind->value,
+            'channel' => $channel,
+            'status' => $status,
+        ]);
     }
 }

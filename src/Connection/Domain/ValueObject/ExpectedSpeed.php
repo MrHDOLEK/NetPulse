@@ -13,11 +13,11 @@ final readonly class ExpectedSpeed
         public int $expectedUploadBits,
     ) {
         if ($this->expectedDownloadBits < 0) {
-            throw new InvalidExpectedSpeed("Expected download bits must not be negative.");
+            throw new InvalidExpectedSpeed('Expected download bits must not be negative.');
         }
 
         if ($this->expectedUploadBits < 0) {
-            throw new InvalidExpectedSpeed("Expected upload bits must not be negative.");
+            throw new InvalidExpectedSpeed('Expected upload bits must not be negative.');
         }
     }
 }

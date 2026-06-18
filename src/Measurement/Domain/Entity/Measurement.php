@@ -17,11 +17,11 @@ use DateTimeImmutable;
 
 class Measurement
 {
-    private string $serverId = "";
-    private string $serverName = "";
-    private string $serverLocation = "";
-    private string $serverHost = "";
-    private string $isp = "";
+    private string $serverId = '';
+    private string $serverName = '';
+    private string $serverLocation = '';
+    private string $serverHost = '';
+    private string $isp = '';
     private ?int $downloadBits = null;
     private ?int $uploadBits = null;
     private ?int $downloadBytes = null;
@@ -38,8 +38,8 @@ class Measurement
     private ?float $uploadLatencyIqm = null;
     private ?float $uploadLatencyLow = null;
     private ?float $uploadLatencyHigh = null;
-    private ?float $packetLossRatio = null;    
-    private ?bool $healthy = null;    
+    private ?float $packetLossRatio = null;
+    private ?bool $healthy = null;
     private ?string $shareToken = null;
 
     /**
@@ -134,18 +134,13 @@ class Measurement
 
     public function server(): ServerInfo
     {
-        return new ServerInfo(
-            $this->serverId,
-            $this->serverName,
-            $this->serverLocation,
-            $this->serverHost,
-            $this->isp,
-        );
+        return new ServerInfo($this->serverId, $this->serverName, $this->serverLocation, $this->serverHost, $this->isp);
     }
 
     public function bandwidth(): ?Bandwidth
     {
-        if ($this->downloadBits === null
+        if (
+            $this->downloadBits === null
             || $this->uploadBits === null
             || $this->downloadBytes === null
             || $this->uploadBytes === null
@@ -153,12 +148,7 @@ class Measurement
             return null;
         }
 
-        return new Bandwidth(
-            $this->downloadBits,
-            $this->uploadBits,
-            $this->downloadBytes,
-            $this->uploadBytes,
-        );
+        return new Bandwidth($this->downloadBits, $this->uploadBits, $this->downloadBytes, $this->uploadBytes);
     }
 
     public function latency(): ?Latency
@@ -169,17 +159,17 @@ class Measurement
 
         return new Latency(
             $this->ping,
-            (float)$this->pingLow,
-            (float)$this->pingHigh,
-            (float)$this->jitter,
-            (float)$this->downloadJitter,
-            (float)$this->uploadJitter,
-            (float)$this->downloadLatencyIqm,
-            (float)$this->downloadLatencyLow,
-            (float)$this->downloadLatencyHigh,
-            (float)$this->uploadLatencyIqm,
-            (float)$this->uploadLatencyLow,
-            (float)$this->uploadLatencyHigh,
+            (float) $this->pingLow,
+            (float) $this->pingHigh,
+            (float) $this->jitter,
+            (float) $this->downloadJitter,
+            (float) $this->uploadJitter,
+            (float) $this->downloadLatencyIqm,
+            (float) $this->downloadLatencyLow,
+            (float) $this->downloadLatencyHigh,
+            (float) $this->uploadLatencyIqm,
+            (float) $this->uploadLatencyLow,
+            (float) $this->uploadLatencyHigh,
         );
     }
 

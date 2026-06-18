@@ -23,7 +23,7 @@ final readonly class TwigNotificationRenderer implements NotificationRenderer
     {
         $rendered = $this->twig->render(
             "notification/{$kind->value}.txt.twig",
-            $context + ["severity" => $severity->value],
+            $context + ['severity' => $severity->value],
         );
 
         [$subject, $body] = $this->split($rendered);
@@ -33,24 +33,18 @@ final readonly class TwigNotificationRenderer implements NotificationRenderer
 
     public function renderDigest(string $period, ConnectionDigestCollection $digests): Notification
     {
-        $rendered = $this->twig->render("notification/digest.txt.twig", [
-            "period" => $period,
-            "digests" => $digests->toArray(),
-            "severity" => NotificationSeverity::Info->value,
+        $rendered = $this->twig->render('notification/digest.txt.twig', [
+            'period' => $period,
+            'digests' => $digests->toArray(),
+            'severity' => NotificationSeverity::Info->value,
         ]);
 
         [$subject, $body] = $this->split($rendered);
 
-        return new Notification(
-            NotificationKind::Digest,
-            NotificationSeverity::Info,
-            $subject,
-            $body,
-            [
-                "period" => $period,
-                "connections" => $digests->count(),
-            ],
-        );
+        return new Notification(NotificationKind::Digest, NotificationSeverity::Info, $subject, $body, [
+            'period' => $period,
+            'connections' => $digests->count(),
+        ]);
     }
 
     /**
@@ -62,7 +56,7 @@ final readonly class TwigNotificationRenderer implements NotificationRenderer
         $parts = preg_split('/\R\s*\R/', $normalized, 2);
 
         if ($parts === false || count($parts) < 2) {
-            return [trim($normalized), ""];
+            return [trim($normalized), ''];
         }
 
         return [trim($parts[0]), trim($parts[1])];

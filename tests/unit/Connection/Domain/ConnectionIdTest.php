@@ -13,7 +13,7 @@ final class ConnectionIdTest extends TestCase
 {
     public function testCanCreateValidConnectionId(): void
     {
-        $uuid = "550e8400-e29b-41d4-a716-446655440001";
+        $uuid = '550e8400-e29b-41d4-a716-446655440001';
         $id = new ConnectionId($uuid);
 
         $this->assertSame($uuid, $id->toString());
@@ -23,20 +23,20 @@ final class ConnectionIdTest extends TestCase
     {
         $this->expectException(InvalidId::class);
 
-        new ConnectionId("nope");
+        new ConnectionId('nope');
     }
 
     public function testEqualsIsTrueForSameConnectionId(): void
     {
-        $uuid = "550e8400-e29b-41d4-a716-446655440001";
+        $uuid = '550e8400-e29b-41d4-a716-446655440001';
 
-        $this->assertTrue((new ConnectionId($uuid))->equals(new ConnectionId($uuid)));
+        $this->assertTrue(new ConnectionId($uuid)->equals(new ConnectionId($uuid)));
     }
 
     public function testEqualsIsTypeDistinctFromMeasurementId(): void
     {
-        $uuid = "550e8400-e29b-41d4-a716-446655440001";
+        $uuid = '550e8400-e29b-41d4-a716-446655440001';
 
-        $this->assertFalse((new ConnectionId($uuid))->equals(new MeasurementId($uuid)));
+        $this->assertFalse(new ConnectionId($uuid)->equals(new MeasurementId($uuid)));
     }
 }

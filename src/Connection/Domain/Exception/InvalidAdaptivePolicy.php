@@ -10,6 +10,6 @@ final class InvalidAdaptivePolicy extends DomainException
 {
     public static function tooLow(string $field, int $value): self
     {
-        return new self($field . " must be >= 1, got " . $value . ".");
+        return new self($field . ' must be >= 1, got ' . $value . '.');
     }
 }

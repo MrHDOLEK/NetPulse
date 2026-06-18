@@ -14,7 +14,7 @@ use function is_string;
 
 final class ConnectionIdType extends GuidType
 {
-    private const string NAME = "connection_id";
+    private const string NAME = 'connection_id';
 
     public function getName(): string
     {
@@ -28,7 +28,7 @@ final class ConnectionIdType extends GuidType
         }
 
         if (!$value instanceof ConnectionId) {
-            throw InvalidType::new($value, self::NAME, [ConnectionId::class, "null"]);
+            throw InvalidType::new($value, self::NAME, [ConnectionId::class, 'null']);
         }
 
         return $value->toString();

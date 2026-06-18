@@ -22,7 +22,7 @@ final class HeatmapAction extends AbstractController
         private readonly ConnectionListRepository $connections,
     ) {}
 
-    #[Route("/heatmap", name: "heatmap", methods: ["GET"])]
+    #[Route('/heatmap', name: 'heatmap', methods: ['GET'])]
     public function __invoke(): Response
     {
         $metric = HeatmapMetric::Download;
@@ -34,17 +34,17 @@ final class HeatmapAction extends AbstractController
 
         foreach ($connections as $connection) {
             $connectionOptions[] = [
-                "id" => $connection->connectionId->toString(),
-                "name" => $connection->name,
+                'id' => $connection->connectionId->toString(),
+                'name' => $connection->name,
             ];
         }
 
         if ($connectionOptions === []) {
-            return $this->render("heatmap/index.html.twig", [
-                "metric" => $metric->value,
-                "window" => $window->value,
-                "connections" => [],
-                "bootstrap" => null,
+            return $this->render('heatmap/index.html.twig', [
+                'metric' => $metric->value,
+                'window' => $window->value,
+                'connections' => [],
+                'bootstrap' => null,
             ]);
         }
 
@@ -55,13 +55,13 @@ final class HeatmapAction extends AbstractController
         $scale = HeatmapScale::forGrid($grid, $metric);
 
         $bootstrap = HeatmapResponse::fromGrid($query, $grid, $scale)->toArray();
-        $bootstrap["connections"] = $connectionOptions;
+        $bootstrap['connections'] = $connectionOptions;
 
-        return $this->render("heatmap/index.html.twig", [
-            "metric" => $metric->value,
-            "window" => $window->value,
-            "connections" => $connectionOptions,
-            "bootstrap" => $bootstrap,
+        return $this->render('heatmap/index.html.twig', [
+            'metric' => $metric->value,
+            'window' => $window->value,
+            'connections' => $connectionOptions,
+            'bootstrap' => $bootstrap,
         ]);
     }
 }

@@ -35,7 +35,7 @@ final readonly class GetDueWorkHandler
         private RunStateRepository $runStates,
         private ClockInterface $clock,
         private LoggerInterface $logger,
-        #[Autowire("%env(int:AGENT_POLL_INTERVAL)%")]
+        #[Autowire('%env(int:AGENT_POLL_INTERVAL)%')]
         private int $pollAfterSeconds,
     ) {}
 
@@ -67,16 +67,13 @@ final readonly class GetDueWorkHandler
 
         $tasks = array_values($tasksByConnection);
 
-        $this->logger->debug("due work computed", [
-            "probe" => $query->probeId->toString(),
-            "tasks" => count($tasks),
-            "forced" => $forced,
+        $this->logger->debug('due work computed', [
+            'probe' => $query->probeId->toString(),
+            'tasks' => count($tasks),
+            'forced' => $forced,
         ]);
 
-        return new DueWork(
-            DueTaskCollection::fromList($tasks),
-            $this->pollAfterSeconds,
-        );
+        return new DueWork(DueTaskCollection::fromList($tasks), $this->pollAfterSeconds);
     }
 
     /**

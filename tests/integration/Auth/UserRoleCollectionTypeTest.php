@@ -30,12 +30,12 @@ final class UserRoleCollectionTypeTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $repository = $container->get("test." . UserRepository::class);
+        $repository = $container->get('test.' . UserRepository::class);
         self::assertInstanceOf(UserRepository::class, $repository);
 
         $this->repository = $repository;
         $this->entityManager = $container->get(EntityManagerInterface::class);
-        $this->db = $container->get("doctrine.dbal.default_connection");
+        $this->db = $container->get('doctrine.dbal.default_connection');
     }
 
     public function testRolesRoundTripAsAPlainJsonArray(): void
@@ -44,13 +44,13 @@ final class UserRoleCollectionTypeTest extends KernelTestCase
         $this->repository->save($user);
         $this->entityManager->clear();
 
-        $loaded = $this->repository->byEmail(new Email("owner@example.com"));
+        $loaded = $this->repository->byEmail(new Email('owner@example.com'));
         self::assertInstanceOf(User::class, $loaded);
-        self::assertSame(["ROLE_ADMIN", "ROLE_USER"], $loaded->roles()->toStringArray());
+        self::assertSame(['ROLE_ADMIN', 'ROLE_USER'], $loaded->roles()->toStringArray());
 
-        $stored = $this->db->fetchOne("SELECT roles FROM users WHERE id = ?", [$user->id()->toString()]);
+        $stored = $this->db->fetchOne('SELECT roles FROM users WHERE id = ?', [$user->id()->toString()]);
         self::assertIsString($stored);
-        self::assertSame(["ROLE_ADMIN", "ROLE_USER"], json_decode($stored, true));
+        self::assertSame(['ROLE_ADMIN', 'ROLE_USER'], json_decode($stored, true));
     }
 
     public function testUnknownPersistedRoleFailsClosedOnHydration(): void
@@ -66,11 +66,11 @@ final class UserRoleCollectionTypeTest extends KernelTestCase
     private function userWith(UserRole ...$roles): User
     {
         return User::register(
-            new UserId("550e8400-e29b-41d4-a716-446655440000"),
-            new Email("owner@example.com"),
-            HashedPassword::fromHash("hashed-secret"),
+            new UserId('550e8400-e29b-41d4-a716-446655440000'),
+            new Email('owner@example.com'),
+            HashedPassword::fromHash('hashed-secret'),
             new UserRoleCollection($roles),
-            new DateTimeImmutable("2026-06-05T10:00:00+00:00"),
+            new DateTimeImmutable('2026-06-05T10:00:00+00:00'),
         );
     }
 }

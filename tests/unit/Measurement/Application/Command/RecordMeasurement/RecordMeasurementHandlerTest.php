@@ -40,10 +40,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class RecordMeasurementHandlerTest extends TestCase
 {
-    private const PROBE_ID = "22222222-2222-4222-8222-222222222222";
-    private const CONNECTION_ID = "33333333-3333-4333-8333-333333333333";
-    private const MEASUREMENT_ID = "99999999-9999-4999-8999-999999999999";
-    private const RECORDED_AT = "2026-06-06T10:00:00+00:00";
+    private const PROBE_ID = '22222222-2222-4222-8222-222222222222';
+    private const CONNECTION_ID = '33333333-3333-4333-8333-333333333333';
+    private const MEASUREMENT_ID = '99999999-9999-4999-8999-999999999999';
+    private const RECORDED_AT = '2026-06-06T10:00:00+00:00';
 
     public function testRecordsMeasurementAndDispatchesEvent(): void
     {
@@ -62,23 +62,41 @@ final class RecordMeasurementHandlerTest extends TestCase
         );
 
         $payload = [
-            "type" => "result",
-            "ping" => ["latency" => 12.5, "jitter" => 1.2],
-            "download" => ["bandwidth" => 117_875_000, "bytes" => 1_200_000_000, "elapsed" => 9_000, "latency" => ["iqm" => 18.4]],
-            "upload" => ["bandwidth" => 23_375_000, "bytes" => 240_000_000, "elapsed" => 8_000, "latency" => ["iqm" => 22.1]],
-            "packetLoss" => 0.0,
-            "isp" => "Orange Polska",
-            "server" => ["id" => 12746, "name" => "Orange Polska", "location" => "Warsaw", "host" => "speedtest.orange.pl", "port" => 8080],
-            "result" => ["url" => "https://www.speedtest.net/result/c/abc-123"],
+            'type' => 'result',
+            'ping' => ['latency' => 12.5, 'jitter' => 1.2],
+            'download' => [
+                'bandwidth' => 117_875_000,
+                'bytes' => 1_200_000_000,
+                'elapsed' => 9_000,
+                'latency' => ['iqm' => 18.4],
+            ],
+            'upload' => [
+                'bandwidth' => 23_375_000,
+                'bytes' => 240_000_000,
+                'elapsed' => 8_000,
+                'latency' => ['iqm' => 22.1],
+            ],
+            'packetLoss' => 0.0,
+            'isp' => 'Orange Polska',
+            'server' => [
+                'id' => 12746,
+                'name' => 'Orange Polska',
+                'location' => 'Warsaw',
+                'host' => 'speedtest.orange.pl',
+                'port' => 8080,
+            ],
+            'result' => ['url' => 'https://www.speedtest.net/result/c/abc-123'],
         ];
 
-        $handler(new RecordMeasurementCommand(
-            new ProbeId(self::PROBE_ID),
-            new ConnectionId(self::CONNECTION_ID),
-            MeasurementMother::deserialize($payload),
-            true,
-            $payload,
-        ));
+        $handler(
+            new RecordMeasurementCommand(
+                new ProbeId(self::PROBE_ID),
+                new ConnectionId(self::CONNECTION_ID),
+                MeasurementMother::deserialize($payload),
+                true,
+                $payload,
+            ),
+        );
 
         $this->assertNotNull($repository->saved);
         $this->assertSame(MeasurementStatus::Completed, $repository->saved->status());
@@ -107,15 +125,17 @@ final class RecordMeasurementHandlerTest extends TestCase
             new NullLogger(),
         );
 
-        $payload = ["type" => "error", "error" => "boom"];
+        $payload = ['type' => 'error', 'error' => 'boom'];
 
-        $handler(new RecordMeasurementCommand(
-            new ProbeId(self::PROBE_ID),
-            new ConnectionId(self::CONNECTION_ID),
-            MeasurementMother::deserialize($payload),
-            false,
-            $payload,
-        ));
+        $handler(
+            new RecordMeasurementCommand(
+                new ProbeId(self::PROBE_ID),
+                new ConnectionId(self::CONNECTION_ID),
+                MeasurementMother::deserialize($payload),
+                false,
+                $payload,
+            ),
+        );
 
         $this->assertNotNull($repository->saved);
         $this->assertSame(MeasurementStatus::Failed, $repository->saved->status());
@@ -129,7 +149,7 @@ final class RecordMeasurementHandlerTest extends TestCase
 
         $handler = new RecordMeasurementHandler(
             $repository,
-            $this->connectionRepository(new ProbeId("44444444-4444-4444-8444-444444444444")),
+            $this->connectionRepository(new ProbeId('44444444-4444-4444-8444-444444444444')),
             $this->idGenerator(),
             $this->eventBus(),
             new MockClock(self::RECORDED_AT),
@@ -143,9 +163,9 @@ final class RecordMeasurementHandlerTest extends TestCase
         $handler(new RecordMeasurementCommand(
             new ProbeId(self::PROBE_ID),
             new ConnectionId(self::CONNECTION_ID),
-            new OoklaResult("error"),
+            new OoklaResult('error'),
             false,
-            ["type" => "error", "error" => "boom"],
+            ['type' => 'error', 'error' => 'boom'],
         ));
 
         $this->assertNull($repository->saved);
@@ -212,12 +232,12 @@ final class RecordMeasurementHandlerTest extends TestCase
         $connection = new Connection(
             new ConnectionId(self::CONNECTION_ID),
             $owner,
-            "wan1",
-            "Orange Polska",
+            'wan1',
+            'Orange Polska',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
             Labels::empty(),
-            ServerPool::fromList("12746"),
+            ServerPool::fromList('12746'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -229,13 +249,9 @@ final class RecordMeasurementHandlerTest extends TestCase
                 private readonly Connection $connection,
             ) {}
 
-            public function save(Connection $connection): void
-            {
-            }
+            public function save(Connection $connection): void {}
 
-            public function delete(Connection $connection): void
-            {
-            }
+            public function delete(Connection $connection): void {}
 
             public function get(ConnectionId $id): Connection
             {

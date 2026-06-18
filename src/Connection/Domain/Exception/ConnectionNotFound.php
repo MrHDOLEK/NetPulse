@@ -11,6 +11,6 @@ final class ConnectionNotFound extends NotFoundException
 {
     public static function withId(ConnectionId $connectionId): self
     {
-        return new self("Connection " . $connectionId->toString() . " not found.");
+        return new self('Connection ' . $connectionId->toString() . ' not found.');
     }
 }

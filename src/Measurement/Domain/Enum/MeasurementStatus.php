@@ -6,6 +6,6 @@ namespace App\Measurement\Domain\Enum;
 
 enum MeasurementStatus: string
 {
-    case Completed = "completed";
-    case Failed = "failed";
+    case Completed = 'completed';
+    case Failed = 'failed';
 }

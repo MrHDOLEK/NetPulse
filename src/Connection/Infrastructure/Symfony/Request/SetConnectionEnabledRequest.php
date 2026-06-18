@@ -8,6 +8,6 @@ use App\Shared\Infrastructure\Utils\Request\RequestInterface;
 
 final class SetConnectionEnabledRequest implements RequestInterface
 {
-    public string $probeId = "";
+    public string $probeId = '';
     public bool $enabled = false;
 }

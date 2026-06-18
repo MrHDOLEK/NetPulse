@@ -17,10 +17,10 @@ final class ServerPoolTest extends TestCase
      */
     public static function provideArrays(): iterable
     {
-        yield "empty" => [[], []];
-        yield "already a list" => [["a", "b"], ["a", "b"]];
-        yield "gapped keys reindexed" => [[3 => "a", 7 => "b"], ["a", "b"]];
-        yield "single" => [[42 => "only"], ["only"]];
+        yield 'empty' => [[], []];
+        yield 'already a list' => [['a', 'b'], ['a', 'b']];
+        yield 'gapped keys reindexed' => [[3 => 'a', 7 => 'b'], ['a', 'b']];
+        yield 'single' => [[42 => 'only'], ['only']];
     }
 
     public function testEmptyHasNoServers(): void
@@ -34,11 +34,11 @@ final class ServerPoolTest extends TestCase
 
     public function testFromListKeepsOrder(): void
     {
-        $pool = ServerPool::fromList("12345", "23456", "34567");
+        $pool = ServerPool::fromList('12345', '23456', '34567');
 
         self::assertFalse($pool->isEmpty());
-        self::assertSame(["12345", "23456", "34567"], $pool->all());
-        self::assertSame(["12345", "23456", "34567"], iterator_to_array($pool));
+        self::assertSame(['12345', '23456', '34567'], $pool->all());
+        self::assertSame(['12345', '23456', '34567'], iterator_to_array($pool));
         self::assertCount(3, $pool);
     }
 
@@ -46,7 +46,7 @@ final class ServerPoolTest extends TestCase
      * @param array<int, string> $input
      * @param list<string> $expected
      */
-    #[DataProvider("provideArrays")]
+    #[DataProvider('provideArrays')]
     public function testFromArrayReindexesToAList(array $input, array $expected): void
     {
         self::assertSame($expected, ServerPool::fromArray($input)->all());

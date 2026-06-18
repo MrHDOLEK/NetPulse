@@ -16,20 +16,20 @@ use PHPUnit\Framework\TestCase;
 
 final class SeriesBucketingTest extends TestCase
 {
-    private const int NOW = 1_780_833_600; 
+    private const int NOW = 1_780_833_600;
 
     /**
      * @return iterable<string, array{SeriesRange}>
      */
     public static function rangeProvider(): iterable
     {
-        yield "day" => [SeriesRange::Day];
-        yield "week" => [SeriesRange::Week];
-        yield "month" => [SeriesRange::Month];
-        yield "quarter" => [SeriesRange::Quarter];
+        yield 'day' => [SeriesRange::Day];
+        yield 'week' => [SeriesRange::Week];
+        yield 'month' => [SeriesRange::Month];
+        yield 'quarter' => [SeriesRange::Quarter];
     }
 
-    #[DataProvider("rangeProvider")]
+    #[DataProvider('rangeProvider')]
     public function testBucketCountEqualsRangeBuckets(SeriesRange $range): void
     {
         $result = $this->bucket($range, SeriesMetric::Speed, MeasurementSampleCollection::fromList([]));
@@ -37,7 +37,7 @@ final class SeriesBucketingTest extends TestCase
         self::assertCount($range->buckets(), $result);
     }
 
-    #[DataProvider("rangeProvider")]
+    #[DataProvider('rangeProvider')]
     public function testBucketsAreEquallySpacedAscendingUtcCoveringTheWindow(SeriesRange $range): void
     {
         $width = $range->bucketWidthSeconds();
@@ -51,14 +51,11 @@ final class SeriesBucketingTest extends TestCase
         $previous = null;
 
         foreach ($buckets as $index => $bucket) {
-            self::assertSame("UTC", $bucket->bucketStart->getTimezone()->getName());
-            self::assertSame($since + $index * $width, $bucket->bucketStart->getTimestamp());
+            self::assertSame('UTC', $bucket->bucketStart->getTimezone()->getName());
+            self::assertSame($since + ($index * $width), $bucket->bucketStart->getTimestamp());
 
             if ($previous !== null) {
-                self::assertSame(
-                    $width,
-                    $bucket->bucketStart->getTimestamp() - $previous->bucketStart->getTimestamp(),
-                );
+                self::assertSame($width, $bucket->bucketStart->getTimestamp() - $previous->bucketStart->getTimestamp());
             }
 
             $previous = $bucket;
@@ -91,7 +88,7 @@ final class SeriesBucketingTest extends TestCase
 
         $samplesAcross = MeasurementSampleCollection::fromList([
             $this->speedSample($since + 10, 100, 10),
-            $this->speedSample($since + 5 * $width + 10, 500, 50),
+            $this->speedSample($since + (5 * $width) + 10, 500, 50),
         ]);
         $across = $this->bucket($range, SeriesMetric::Speed, $samplesAcross)->toArray();
         self::assertSame(100, $across[0]->downloadBits);
@@ -294,7 +291,7 @@ final class SeriesBucketingTest extends TestCase
             [100, 200, 300, 400],
             array_map(static fn(SeriesBucket $bucket): ?int => $bucket->downloadBits, $buckets),
         );
-        self::assertSame("UTC", $buckets[0]->bucketStart->getTimezone()->getName());
+        self::assertSame('UTC', $buckets[0]->bucketStart->getTimezone()->getName());
     }
 
     public function testDenseCurrentWindowFallsBackToBucketedAverages(): void
@@ -371,30 +368,24 @@ final class SeriesBucketingTest extends TestCase
         self::assertNull($buckets[1]->downloadBits);
     }
 
-    private function build(SeriesRange $range, SeriesMetric $metric, MeasurementSampleCollection $samples): SeriesBucketCollection
-    {
+    private function build(
+        SeriesRange $range,
+        SeriesMetric $metric,
+        MeasurementSampleCollection $samples,
+    ): SeriesBucketCollection {
         $since = self::NOW - $range->windowSeconds();
 
-        return (new Bucketer())->build(
-            $since,
-            $range->bucketWidthSeconds(),
-            $range->buckets(),
-            $metric,
-            $samples,
-        );
+        return new Bucketer()->build($since, $range->bucketWidthSeconds(), $range->buckets(), $metric, $samples);
     }
 
-    private function bucket(SeriesRange $range, SeriesMetric $metric, MeasurementSampleCollection $samples): SeriesBucketCollection
-    {
+    private function bucket(
+        SeriesRange $range,
+        SeriesMetric $metric,
+        MeasurementSampleCollection $samples,
+    ): SeriesBucketCollection {
         $since = self::NOW - $range->windowSeconds();
 
-        return (new Bucketer())->bucket(
-            $since,
-            $range->bucketWidthSeconds(),
-            $range->buckets(),
-            $metric,
-            $samples,
-        );
+        return new Bucketer()->bucket($since, $range->bucketWidthSeconds(), $range->buckets(), $metric, $samples);
     }
 
     private function speedSample(int $completedAtUnix, int $downloadBits, int $uploadBits): MeasurementSample

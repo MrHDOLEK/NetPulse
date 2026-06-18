@@ -29,7 +29,7 @@ final class MeasurementMother
     ): Measurement {
         $result = self::deserialize($oookla);
 
-        return (new DefaultOoklaResultMapper())->toMeasurement(
+        return new DefaultOoklaResultMapper()->toMeasurement(
             new MeasurementId($measurementId),
             new ProbeId($probeId),
             new ConnectionId($connectionId),
@@ -47,11 +47,7 @@ final class MeasurementMother
     {
         $serializer = OoklaSerializerFactory::create();
 
-        $result = $serializer->deserialize(
-            (string)json_encode($ookla),
-            OoklaResult::class,
-            "json",
-        );
+        $result = $serializer->deserialize((string) json_encode($ookla), OoklaResult::class, 'json');
 
         return $result instanceof OoklaResult ? $result : new OoklaResult();
     }

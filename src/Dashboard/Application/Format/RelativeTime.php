@@ -15,22 +15,22 @@ final class RelativeTime
         $delta = max(0, $nowUnix - $thenUnix);
 
         if ($delta < self::SECONDS_PER_MINUTE) {
-            return "just now";
+            return 'just now';
         }
 
         if ($delta < self::SECONDS_PER_HOUR) {
-            return self::plural(intdiv($delta, self::SECONDS_PER_MINUTE), "minute");
+            return self::plural(intdiv($delta, self::SECONDS_PER_MINUTE), 'minute');
         }
 
         if ($delta < self::SECONDS_PER_DAY) {
-            return self::plural(intdiv($delta, self::SECONDS_PER_HOUR), "hour");
+            return self::plural(intdiv($delta, self::SECONDS_PER_HOUR), 'hour');
         }
 
-        return self::plural(intdiv($delta, self::SECONDS_PER_DAY), "day");
+        return self::plural(intdiv($delta, self::SECONDS_PER_DAY), 'day');
     }
 
     private static function plural(int $count, string $unit): string
     {
-        return $count . " " . $unit . ($count === 1 ? "" : "s") . " ago";
+        return $count . ' ' . $unit . ($count === 1 ? '' : 's') . ' ago';
     }
 }

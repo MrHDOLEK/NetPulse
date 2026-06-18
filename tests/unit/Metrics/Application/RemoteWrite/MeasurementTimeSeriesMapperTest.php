@@ -25,13 +25,13 @@ use Symfony\Component\Clock\MockClock;
 
 final class MeasurementTimeSeriesMapperTest extends TestCase
 {
-    private const string MEASUREMENT_ID = "11111111-1111-4111-8111-111111111111";
-    private const string PROBE_ID = "22222222-2222-4222-8222-222222222222";
-    private const string CONNECTION_ID = "33333333-3333-4333-8333-333333333333";
-    private const string PROBE_NAME = "home";
-    private const string CONNECTION_NAME = "wan1";
-    private const string SITE = "warsaw";
-    private const string RECORDED_AT = "2026-06-06T10:00:00+00:00";
+    private const string MEASUREMENT_ID = '11111111-1111-4111-8111-111111111111';
+    private const string PROBE_ID = '22222222-2222-4222-8222-222222222222';
+    private const string CONNECTION_ID = '33333333-3333-4333-8333-333333333333';
+    private const string PROBE_NAME = 'home';
+    private const string CONNECTION_NAME = 'wan1';
+    private const string SITE = 'warsaw';
+    private const string RECORDED_AT = '2026-06-06T10:00:00+00:00';
 
     public function testMapsCompletedMeasurementToGaugeSeriesWithMillisecondTimestamp(): void
     {
@@ -41,67 +41,67 @@ final class MeasurementTimeSeriesMapperTest extends TestCase
             self::PROBE_ID,
             self::CONNECTION_ID,
             true,
-            (new MockClock(self::RECORDED_AT))->now(),
+            new MockClock(self::RECORDED_AT)->now(),
         );
 
-        $mapper = new MeasurementTimeSeriesMapper("env=prod");
+        $mapper = new MeasurementTimeSeriesMapper('env=prod');
 
         $series = $mapper->map($measurement, $this->connection(), $this->probe());
 
         $byName = $this->indexByName($series);
 
-        self::assertArrayHasKey("netpulse_up", $byName);
-        self::assertSame(1.0, $byName["netpulse_up"]->samples->toArray()[0]->value);
+        self::assertArrayHasKey('netpulse_up', $byName);
+        self::assertSame(1.0, $byName['netpulse_up']->samples->toArray()[0]->value);
 
-        self::assertArrayHasKey("netpulse_download_bits_per_second", $byName);
-        self::assertSame(94_000_000.0, $byName["netpulse_download_bits_per_second"]->samples->toArray()[0]->value);
+        self::assertArrayHasKey('netpulse_download_bits_per_second', $byName);
+        self::assertSame(94_000_000.0, $byName['netpulse_download_bits_per_second']->samples->toArray()[0]->value);
 
-        self::assertArrayHasKey("netpulse_ping_seconds", $byName);
+        self::assertArrayHasKey('netpulse_ping_seconds', $byName);
 
-        self::assertSame(0.0125, $byName["netpulse_ping_seconds"]->samples->toArray()[0]->value);
+        self::assertSame(0.0125, $byName['netpulse_ping_seconds']->samples->toArray()[0]->value);
 
-        self::assertArrayHasKey("netpulse_packet_loss_ratio", $byName);
+        self::assertArrayHasKey('netpulse_packet_loss_ratio', $byName);
 
-        $expectedMs = (int)$measurement->completedAt()->format("Uv");
-        self::assertSame($expectedMs, $byName["netpulse_up"]->samples->toArray()[0]->timestampMs);
+        $expectedMs = (int) $measurement->completedAt()->format('Uv');
+        self::assertSame($expectedMs, $byName['netpulse_up']->samples->toArray()[0]->timestampMs);
 
         foreach ($series as $timeSeries) {
             $labels = $this->labelMap($timeSeries);
-            self::assertSame(self::PROBE_NAME, $labels["probe"]);
-            self::assertSame(self::CONNECTION_NAME, $labels["connection"]);
-            self::assertSame(self::SITE, $labels["site"]);
-            self::assertSame("S", $labels["server_name"]);
-            self::assertSame("1", $labels["server_id"]);
-            self::assertSame("Orange Polska", $labels["isp"]);
-            self::assertSame("prod", $labels["env"]);
-            self::assertArrayHasKey("__name__", $labels);
+            self::assertSame(self::PROBE_NAME, $labels['probe']);
+            self::assertSame(self::CONNECTION_NAME, $labels['connection']);
+            self::assertSame(self::SITE, $labels['site']);
+            self::assertSame('S', $labels['server_name']);
+            self::assertSame('1', $labels['server_id']);
+            self::assertSame('Orange Polska', $labels['isp']);
+            self::assertSame('prod', $labels['env']);
+            self::assertArrayHasKey('__name__', $labels);
         }
     }
 
     public function testFailedMeasurementMapsOnlyToUpZero(): void
     {
         $measurement = MeasurementMother::fromOoklaArray(
-            ["type" => "result", "error" => "timeout"],
+            ['type' => 'result', 'error' => 'timeout'],
             self::MEASUREMENT_ID,
             self::PROBE_ID,
             self::CONNECTION_ID,
             false,
-            (new MockClock(self::RECORDED_AT))->now(),
+            new MockClock(self::RECORDED_AT)->now(),
         );
 
-        $mapper = new MeasurementTimeSeriesMapper("");
+        $mapper = new MeasurementTimeSeriesMapper('');
 
         $series = $mapper->map($measurement, $this->connection(), $this->probe());
         $byName = $this->indexByName($series);
 
-        self::assertArrayHasKey("netpulse_up", $byName);
-        self::assertSame(0.0, $byName["netpulse_up"]->samples->toArray()[0]->value);
-        self::assertArrayNotHasKey("netpulse_download_bits_per_second", $byName);
-        self::assertArrayNotHasKey("netpulse_ping_seconds", $byName);
+        self::assertArrayHasKey('netpulse_up', $byName);
+        self::assertSame(0.0, $byName['netpulse_up']->samples->toArray()[0]->value);
+        self::assertArrayNotHasKey('netpulse_download_bits_per_second', $byName);
+        self::assertArrayNotHasKey('netpulse_ping_seconds', $byName);
 
-        $labels = $this->labelMap($byName["netpulse_up"]);
-        self::assertSame(self::PROBE_NAME, $labels["probe"]);
-        self::assertSame(self::CONNECTION_NAME, $labels["connection"]);
+        $labels = $this->labelMap($byName['netpulse_up']);
+        self::assertSame(self::PROBE_NAME, $labels['probe']);
+        self::assertSame(self::CONNECTION_NAME, $labels['connection']);
     }
 
     /**
@@ -112,7 +112,7 @@ final class MeasurementTimeSeriesMapperTest extends TestCase
         $indexed = [];
 
         foreach ($series as $timeSeries) {
-            $indexed[$this->labelMap($timeSeries)["__name__"]] = $timeSeries;
+            $indexed[$this->labelMap($timeSeries)['__name__']] = $timeSeries;
         }
 
         return $indexed;
@@ -138,15 +138,15 @@ final class MeasurementTimeSeriesMapperTest extends TestCase
     private function completedOoklaJson(): array
     {
         return [
-            "type" => "result",
-            "timestamp" => "2026-06-05T10:00:01Z",
-            "ping" => ["jitter" => 0.5, "latency" => 12.5, "low" => 11.0, "high" => 14.0],
-            "download" => ["bandwidth" => 11_750_000, "bytes" => 50_000_000, "elapsed" => 5000],
-            "upload" => ["bandwidth" => 2_000_000, "bytes" => 10_000_000, "elapsed" => 5000],
-            "packetLoss" => 0.0,
-            "isp" => "Orange Polska",
-            "server" => ["id" => 1, "name" => "S", "location" => "L", "host" => "h", "ip" => "1.2.3.4"],
-            "result" => ["url" => "https://x"],
+            'type' => 'result',
+            'timestamp' => '2026-06-05T10:00:01Z',
+            'ping' => ['jitter' => 0.5, 'latency' => 12.5, 'low' => 11.0, 'high' => 14.0],
+            'download' => ['bandwidth' => 11_750_000, 'bytes' => 50_000_000, 'elapsed' => 5000],
+            'upload' => ['bandwidth' => 2_000_000, 'bytes' => 10_000_000, 'elapsed' => 5000],
+            'packetLoss' => 0.0,
+            'isp' => 'Orange Polska',
+            'server' => ['id' => 1, 'name' => 'S', 'location' => 'L', 'host' => 'h', 'ip' => '1.2.3.4'],
+            'result' => ['url' => 'https://x'],
         ];
     }
 
@@ -156,11 +156,11 @@ final class MeasurementTimeSeriesMapperTest extends TestCase
             new ConnectionId(self::CONNECTION_ID),
             new ProbeId(self::PROBE_ID),
             self::CONNECTION_NAME,
-            "Orange Polska",
+            'Orange Polska',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
             Labels::empty(),
-            ServerPool::fromList("12746"),
+            ServerPool::fromList('12746'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -173,8 +173,8 @@ final class MeasurementTimeSeriesMapperTest extends TestCase
         return new Probe(
             new ProbeId(self::PROBE_ID),
             self::PROBE_NAME,
-            Labels::fromArray(["site" => self::SITE]),
-            "hash",
+            Labels::fromArray(['site' => self::SITE]),
+            'hash',
             true,
             new DateTimeImmutable(self::RECORDED_AT),
         );

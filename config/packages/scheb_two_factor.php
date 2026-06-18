@@ -7,26 +7,23 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
-
 return static function (ContainerConfigurator $containerConfigurator): void {
-    $containerConfigurator->extension("scheb_two_factor", [
-        "security_tokens" => [
+    $containerConfigurator->extension('scheb_two_factor', [
+        'security_tokens' => [
             UsernamePasswordToken::class,
             PostAuthenticationToken::class,
         ],
-        "totp" => [
-            "enabled" => true,
-            "issuer" => "NetPulse",
-            "server_name" => "NetPulse",
-            "template" => "security/2fa_form.html.twig",
-            
-            
-            
-            "leeway" => 10,
+        'totp' => [
+            'enabled' => true,
+            'issuer' => 'NetPulse',
+            'server_name' => 'NetPulse',
+            'template' => 'security/2fa_form.html.twig',
+
+            'leeway' => 10,
         ],
-        "backup_codes" => [
-            "enabled" => true,
-            "manager" => RecoveryCodeManager::class,
+        'backup_codes' => [
+            'enabled' => true,
+            'manager' => RecoveryCodeManager::class,
         ],
     ]);
 };

@@ -28,10 +28,10 @@ use function is_string;
 use function json_decode;
 use function trim;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class NotificationSettingsAction extends AbstractController
 {
-    private const string CSRF_TOKEN_ID = "settings-notifications";
+    private const string CSRF_TOKEN_ID = 'settings-notifications';
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
@@ -40,44 +40,44 @@ final class NotificationSettingsAction extends AbstractController
         private readonly NotificationTester $tester,
     ) {}
 
-    #[Route("/settings/notifications", name: "settings_notifications", methods: ["GET"])]
+    #[Route('/settings/notifications', name: 'settings_notifications', methods: ['GET'])]
     public function index(): Response
     {
         $channels = $this->settings->getString(SettingKey::NotifyChannels);
 
-        return $this->render("settings/notifications/index.html.twig", [
-            "enabled" => $this->settings->getBool(SettingKey::NotifyEnabled),
-            "threshold" => $this->settings->getString(SettingKey::NotifyThreshold),
-            "emailEnabled" => $this->hasChannel($channels, "email"),
-            "chatEnabled" => $this->hasChannel($channels, "chat"),
-            "webhookEnabled" => $this->hasChannel($channels, "webhook"),
-            "emailTo" => $this->settings->getString(SettingKey::NotifyEmailTo),
-            "emailDsnSet" => $this->isSet(SettingKey::NotifyEmailDsn),
-            "chatDsnSet" => $this->isSet(SettingKey::NotifyChatDsn),
-            "webhookUrlSet" => $this->isSet(SettingKey::NotifyWebhookUrl),
-            "canEncrypt" => $this->encryptor->canEncrypt(),
+        return $this->render('settings/notifications/index.html.twig', [
+            'enabled' => $this->settings->getBool(SettingKey::NotifyEnabled),
+            'threshold' => $this->settings->getString(SettingKey::NotifyThreshold),
+            'emailEnabled' => $this->hasChannel($channels, 'email'),
+            'chatEnabled' => $this->hasChannel($channels, 'chat'),
+            'webhookEnabled' => $this->hasChannel($channels, 'webhook'),
+            'emailTo' => $this->settings->getString(SettingKey::NotifyEmailTo),
+            'emailDsnSet' => $this->isSet(SettingKey::NotifyEmailDsn),
+            'chatDsnSet' => $this->isSet(SettingKey::NotifyChatDsn),
+            'webhookUrlSet' => $this->isSet(SettingKey::NotifyWebhookUrl),
+            'canEncrypt' => $this->encryptor->canEncrypt(),
         ]);
     }
 
-    #[Route("/settings/notifications", name: "settings_notifications_save", methods: ["POST"])]
+    #[Route('/settings/notifications', name: 'settings_notifications_save', methods: ['POST'])]
     public function save(Request $request): Response
     {
         if (!$this->csrfValid($request)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         $body = json_decode($request->getContent(), true);
         $body = is_array($body) ? $body : [];
 
         $values = [
-            SettingKey::NotifyEnabled->value => $this->bool($body, "enabled") ? "1" : "0",
-            SettingKey::NotifyThreshold->value => $this->str($body, "threshold"),
+            SettingKey::NotifyEnabled->value => $this->bool($body, 'enabled') ? '1' : '0',
+            SettingKey::NotifyThreshold->value => $this->str($body, 'threshold'),
             SettingKey::NotifyChannels->value => $this->channels($body),
-            SettingKey::NotifyEmailTo->value => $this->str($body, "emailTo"),
+            SettingKey::NotifyEmailTo->value => $this->str($body, 'emailTo'),
 
-            SettingKey::NotifyEmailDsn->value => $this->secret($body, "emailDsn"),
-            SettingKey::NotifyChatDsn->value => $this->secret($body, "chatDsn"),
-            SettingKey::NotifyWebhookUrl->value => $this->secret($body, "webhookUrl"),
+            SettingKey::NotifyEmailDsn->value => $this->secret($body, 'emailDsn'),
+            SettingKey::NotifyChatDsn->value => $this->secret($body, 'chatDsn'),
+            SettingKey::NotifyWebhookUrl->value => $this->secret($body, 'webhookUrl'),
         ];
 
         try {
@@ -86,51 +86,51 @@ final class NotificationSettingsAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof SettingsException) {
-                return new JsonResponse(["error" => $cause->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+                return new JsonResponse(['error' => $cause->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             throw $exception;
         }
 
         return new JsonResponse([
-            "saved" => true,
-            "emailDsnSet" => $this->isSet(SettingKey::NotifyEmailDsn),
-            "chatDsnSet" => $this->isSet(SettingKey::NotifyChatDsn),
-            "webhookUrlSet" => $this->isSet(SettingKey::NotifyWebhookUrl),
+            'saved' => true,
+            'emailDsnSet' => $this->isSet(SettingKey::NotifyEmailDsn),
+            'chatDsnSet' => $this->isSet(SettingKey::NotifyChatDsn),
+            'webhookUrlSet' => $this->isSet(SettingKey::NotifyWebhookUrl),
         ]);
     }
 
-    #[Route("/settings/notifications/test", name: "settings_notifications_test", methods: ["POST"])]
+    #[Route('/settings/notifications/test', name: 'settings_notifications_test', methods: ['POST'])]
     public function test(Request $request): Response
     {
         if (!$this->csrfValid($request)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         $results = $this->tester->test();
 
         if ($results === []) {
             return new JsonResponse([
-                "ok" => false,
-                "message" => "No channels are enabled — enable at least one channel and save first.",
-                "results" => [],
+                'ok' => false,
+                'message' => 'No channels are enabled — enable at least one channel and save first.',
+                'results' => [],
             ]);
         }
 
-        $ok = in_array("sent", $results, true);
+        $ok = in_array('sent', $results, true);
 
         return new JsonResponse([
-            "ok" => $ok,
-            "message" => $ok
-                ? "Test dispatched — check your channels."
-                : "Nothing was delivered. See the per-channel results below.",
-            "results" => $results,
+            'ok' => $ok,
+            'message' => $ok
+                ? 'Test dispatched — check your channels.'
+                : 'Nothing was delivered. See the per-channel results below.',
+            'results' => $results,
         ]);
     }
 
     private function csrfValid(Request $request): bool
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         return is_string($token) && $this->isCsrfTokenValid(self::CSRF_TOKEN_ID, $token);
     }
@@ -142,24 +142,24 @@ final class NotificationSettingsAction extends AbstractController
     {
         $active = [];
 
-        if ($this->bool($body, "emailEnabled")) {
-            $active[] = "email";
+        if ($this->bool($body, 'emailEnabled')) {
+            $active[] = 'email';
         }
 
-        if ($this->bool($body, "chatEnabled")) {
-            $active[] = "chat";
+        if ($this->bool($body, 'chatEnabled')) {
+            $active[] = 'chat';
         }
 
-        if ($this->bool($body, "webhookEnabled")) {
-            $active[] = "webhook";
+        if ($this->bool($body, 'webhookEnabled')) {
+            $active[] = 'webhook';
         }
 
-        return implode(",", $active);
+        return implode(',', $active);
     }
 
     private function hasChannel(string $csv, string $channel): bool
     {
-        foreach (explode(",", $csv) as $item) {
+        foreach (explode(',', $csv) as $item) {
             if (trim($item) === $channel) {
                 return true;
             }
@@ -172,7 +172,7 @@ final class NotificationSettingsAction extends AbstractController
     {
         $value = trim($this->settings->getString($key));
 
-        return $value !== "" && $value !== "null://null";
+        return $value !== '' && $value !== 'null://null';
     }
 
     /**
@@ -186,7 +186,7 @@ final class NotificationSettingsAction extends AbstractController
 
         $value = $body[$key];
 
-        if (!is_string($value) || trim($value) === "") {
+        if (!is_string($value) || trim($value) === '') {
             return null;
         }
 
@@ -200,7 +200,7 @@ final class NotificationSettingsAction extends AbstractController
     {
         $value = $body[$key] ?? null;
 
-        return is_string($value) ? trim($value) : "";
+        return is_string($value) ? trim($value) : '';
     }
 
     /**

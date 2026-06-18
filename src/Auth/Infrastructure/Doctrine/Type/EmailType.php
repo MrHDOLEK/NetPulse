@@ -14,14 +14,14 @@ use function is_string;
 
 final class EmailType extends Type
 {
-    private const string NAME = "email";
+    private const string NAME = 'email';
 
     /**
      * @param array<string, mixed> $column
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getStringTypeDeclarationSQL(["length" => 255]);
+        return $platform->getStringTypeDeclarationSQL(['length' => 255]);
     }
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
@@ -34,7 +34,7 @@ final class EmailType extends Type
             return $value->value();
         }
 
-        throw InvalidType::new($value, self::NAME, ["null", Email::class]);
+        throw InvalidType::new($value, self::NAME, ['null', Email::class]);
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?Email

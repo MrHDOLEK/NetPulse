@@ -13,7 +13,7 @@ use Psr\Clock\ClockInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class GetDueWorkAction extends AbstractController
 {
@@ -23,7 +23,7 @@ final class GetDueWorkAction extends AbstractController
         private readonly ClockInterface $clock,
     ) {}
 
-    #[Route("/v1/probes/{probeId}/due", name: "scheduling.due", methods: ["GET"])]
+    #[Route('/v1/probes/{probeId}/due', name: 'scheduling.due', methods: ['GET'])]
     public function __invoke(Probe $probe): Response
     {
         $this->pollRecorder->recordPoll($probe->id(), $this->clock->now());

@@ -32,8 +32,8 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 final class ProbeTokenResolverTest extends TestCase
 {
-    private const PROBE_ID = "22222222-2222-4222-8222-222222222222";
-    private const CONNECTION_ID = "33333333-3333-4333-8333-333333333333";
+    private const PROBE_ID = '22222222-2222-4222-8222-222222222222';
+    private const CONNECTION_ID = '33333333-3333-4333-8333-333333333333';
 
     public function testResolvesProbeForValidToken(): void
     {
@@ -43,14 +43,14 @@ final class ProbeTokenResolverTest extends TestCase
             $this->hasher(),
         );
 
-        $request = $this->request("Bearer secret", json_encode(["connectionId" => self::CONNECTION_ID]));
+        $request = $this->request('Bearer secret', json_encode(['connectionId' => self::CONNECTION_ID]));
 
         $resolved = iterator_to_array($resolver->resolve($request, $this->metadata()));
 
         $this->assertCount(1, $resolved);
         $this->assertInstanceOf(Probe::class, $resolved[0]);
         $this->assertTrue($resolved[0]->id()->equals(new ProbeId(self::PROBE_ID)));
-        $this->assertSame($resolved[0], $request->attributes->get("_probe"));
+        $this->assertSame($resolved[0], $request->attributes->get('_probe'));
     }
 
     public function testThrowsInvalidProbeTokenWhenHeaderMissing(): void
@@ -68,7 +68,7 @@ final class ProbeTokenResolverTest extends TestCase
 
         $this->expectException(InvalidProbeToken::class);
 
-        iterator_to_array($resolver->resolve($this->request("Bearer wrong", null), $this->metadata()));
+        iterator_to_array($resolver->resolve($this->request('Bearer wrong', null), $this->metadata()));
     }
 
     public function testThrowsProbeDisabledWhenProbeDisabled(): void
@@ -77,19 +77,19 @@ final class ProbeTokenResolverTest extends TestCase
 
         $this->expectException(ProbeDisabled::class);
 
-        iterator_to_array($resolver->resolve($this->request("Bearer secret", null), $this->metadata()));
+        iterator_to_array($resolver->resolve($this->request('Bearer secret', null), $this->metadata()));
     }
 
     public function testThrowsConnectionNotOwnedWhenForeignConnection(): void
     {
-        $foreignOwner = new ProbeId("44444444-4444-4444-8444-444444444444");
+        $foreignOwner = new ProbeId('44444444-4444-4444-8444-444444444444');
         $resolver = $this->resolver(
             $this->probe(true),
             [self::CONNECTION_ID => $this->connection($foreignOwner)],
             $this->hasher(),
         );
 
-        $request = $this->request("Bearer secret", json_encode(["connectionId" => self::CONNECTION_ID]));
+        $request = $this->request('Bearer secret', json_encode(['connectionId' => self::CONNECTION_ID]));
 
         $this->expectException(ConnectionNotOwnedByProbe::class);
 
@@ -100,7 +100,7 @@ final class ProbeTokenResolverTest extends TestCase
     {
         $resolver = $this->resolver($this->probe(true), [], $this->hasher());
 
-        $request = $this->request("Bearer secret", json_encode(["connectionId" => self::CONNECTION_ID]));
+        $request = $this->request('Bearer secret', json_encode(['connectionId' => self::CONNECTION_ID]));
 
         $this->expectException(ConnectionNotOwnedByProbe::class);
 
@@ -112,12 +112,12 @@ final class ProbeTokenResolverTest extends TestCase
         return new class() implements ProbeTokenHasher {
             public function hash(string $plaintext): string
             {
-                return "hash:" . $plaintext;
+                return 'hash:' . $plaintext;
             }
 
             public function verify(string $plaintext, string $hash): bool
             {
-                return $hash === "hash:" . $plaintext;
+                return $hash === 'hash:' . $plaintext;
             }
         };
     }
@@ -126,9 +126,9 @@ final class ProbeTokenResolverTest extends TestCase
     {
         return new Probe(
             new ProbeId(self::PROBE_ID),
-            "home",
-            Labels::fromArray(["site" => "home"]),
-            "hash:secret",
+            'home',
+            Labels::fromArray(['site' => 'home']),
+            'hash:secret',
             $enabled,
             new DateTimeImmutable(),
         );
@@ -139,8 +139,8 @@ final class ProbeTokenResolverTest extends TestCase
         return new Connection(
             new ConnectionId(self::CONNECTION_ID),
             $owner,
-            "wan1",
-            "Orange",
+            'wan1',
+            'Orange',
             new ExpectedSpeed(1_000_000_000, 1_000_000_000),
             ConnectionColor::Primary,
             Labels::empty(),
@@ -162,13 +162,9 @@ final class ProbeTokenResolverTest extends TestCase
                 private readonly Probe $probe,
             ) {}
 
-            public function save(Probe $probe): void
-            {
-            }
+            public function save(Probe $probe): void {}
 
-            public function delete(Probe $probe): void
-            {
-            }
+            public function delete(Probe $probe): void {}
 
             public function get(ProbeId $id): Probe
             {
@@ -198,13 +194,9 @@ final class ProbeTokenResolverTest extends TestCase
                 private readonly array $byId,
             ) {}
 
-            public function save(Connection $connection): void
-            {
-            }
+            public function save(Connection $connection): void {}
 
-            public function delete(Connection $connection): void
-            {
-            }
+            public function delete(Connection $connection): void {}
 
             public function get(ConnectionId $id): Connection
             {
@@ -240,17 +232,17 @@ final class ProbeTokenResolverTest extends TestCase
         $server = [];
 
         if ($authorization !== null) {
-            $server["HTTP_AUTHORIZATION"] = $authorization;
+            $server['HTTP_AUTHORIZATION'] = $authorization;
         }
 
-        $request = Request::create("/api/v1/probes/" . self::PROBE_ID . "/results", "POST", [], [], [], $server, $body);
-        $request->attributes->set("probeId", self::PROBE_ID);
+        $request = Request::create('/api/v1/probes/' . self::PROBE_ID . '/results', 'POST', [], [], [], $server, $body);
+        $request->attributes->set('probeId', self::PROBE_ID);
 
         return $request;
     }
 
     private function metadata(): ArgumentMetadata
     {
-        return new ArgumentMetadata("probe", Probe::class, false, false, null);
+        return new ArgumentMetadata('probe', Probe::class, false, false, null);
     }
 }

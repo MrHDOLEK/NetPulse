@@ -28,10 +28,11 @@ final readonly class SqlProbeLivenessRepository implements ProbeLivenessReposito
     public function all(): array
     {
         /** @var list<array{id: string, name: string, last_poll_at: string|null}> $rows */
-        $rows = $this->connection->createQueryBuilder()
-            ->select("probe.id", "probe.name", "probe.last_poll_at")
-            ->from("probes", "probe")
-            ->orderBy("probe.created_at", "DESC")
+        $rows = $this->connection
+            ->createQueryBuilder()
+            ->select('probe.id', 'probe.name', 'probe.last_poll_at')
+            ->from('probes', 'probe')
+            ->orderBy('probe.created_at', 'DESC')
             ->executeQuery()
             ->fetchAllAssociative();
 
@@ -40,15 +41,15 @@ final readonly class SqlProbeLivenessRepository implements ProbeLivenessReposito
         $liveness = [];
 
         foreach ($rows as $row) {
-            $lastPollUnix = $row["last_poll_at"] === null
+            $lastPollUnix = $row['last_poll_at'] === null
                 ? null
-                : new DateTimeImmutable($row["last_poll_at"], new DateTimeZone("UTC"))->getTimestamp();
+                : new DateTimeImmutable($row['last_poll_at'], new DateTimeZone('UTC'))->getTimestamp();
 
             $secondsSince = $lastPollUnix === null ? null : max(0, $nowUnix - $lastPollUnix);
 
             $liveness[] = new ProbeLiveness(
-                $row["id"],
-                $row["name"],
+                $row['id'],
+                $row['name'],
                 $secondsSince !== null && $secondsSince <= self::ONLINE_WINDOW_SECONDS,
                 $lastPollUnix,
                 $secondsSince === null ? null : intdiv($secondsSince, 60),

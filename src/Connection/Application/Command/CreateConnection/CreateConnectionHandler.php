@@ -11,7 +11,7 @@ use App\Probe\Domain\ProbeRepository;
 use App\Shared\Application\Service\IdGeneratorInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class CreateConnectionHandler
 {
     public function __construct(

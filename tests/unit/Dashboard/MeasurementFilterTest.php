@@ -20,10 +20,10 @@ final class MeasurementFilterTest extends TestCase
      */
     public static function lastDaysWindowProvider(): iterable
     {
-        yield "one day" => [1, "2026-06-06 12:00:00"];
-        yield "seven days" => [7, "2026-05-31 12:00:00"];
-        yield "thirty days" => [30, "2026-05-08 12:00:00"];
-        yield "ninety days" => [90, "2026-03-09 12:00:00"];
+        yield 'one day' => [1, '2026-06-06 12:00:00'];
+        yield 'seven days' => [7, '2026-05-31 12:00:00'];
+        yield 'thirty days' => [30, '2026-05-08 12:00:00'];
+        yield 'ninety days' => [90, '2026-03-09 12:00:00'];
     }
 
     public function testRejectsSinceAfterUntil(): void
@@ -32,8 +32,8 @@ final class MeasurementFilterTest extends TestCase
 
         new MeasurementFilter(
             connection: null,
-            since: new DateTimeImmutable("2026-06-07 12:00:01", new DateTimeZone("UTC")),
-            until: new DateTimeImmutable("2026-06-07 12:00:00", new DateTimeZone("UTC")),
+            since: new DateTimeImmutable('2026-06-07 12:00:01', new DateTimeZone('UTC')),
+            until: new DateTimeImmutable('2026-06-07 12:00:00', new DateTimeZone('UTC')),
             serverId: null,
             status: null,
             healthy: null,
@@ -43,8 +43,8 @@ final class MeasurementFilterTest extends TestCase
 
     public function testAcceptsSinceBeforeUntil(): void
     {
-        $since = new DateTimeImmutable("2026-06-01 00:00:00", new DateTimeZone("UTC"));
-        $until = new DateTimeImmutable("2026-06-07 12:00:00", new DateTimeZone("UTC"));
+        $since = new DateTimeImmutable('2026-06-01 00:00:00', new DateTimeZone('UTC'));
+        $until = new DateTimeImmutable('2026-06-07 12:00:00', new DateTimeZone('UTC'));
 
         $filter = new MeasurementFilter(
             connection: null,
@@ -62,7 +62,7 @@ final class MeasurementFilterTest extends TestCase
 
     public function testAcceptsSinceEqualToUntil(): void
     {
-        $instant = new DateTimeImmutable("2026-06-07 12:00:00", new DateTimeZone("UTC"));
+        $instant = new DateTimeImmutable('2026-06-07 12:00:00', new DateTimeZone('UTC'));
 
         $filter = new MeasurementFilter(
             connection: null,
@@ -80,7 +80,7 @@ final class MeasurementFilterTest extends TestCase
 
     public function testLastDaysBuildsWindowFromNow(): void
     {
-        $now = new DateTimeImmutable("2026-06-07 12:00:00", new DateTimeZone("UTC"));
+        $now = new DateTimeImmutable('2026-06-07 12:00:00', new DateTimeZone('UTC'));
 
         $filter = MeasurementFilter::lastDays(
             days: 7,
@@ -93,36 +93,36 @@ final class MeasurementFilterTest extends TestCase
         );
 
         self::assertSame($now, $filter->until);
-        self::assertSame("2026-05-31 12:00:00", $filter->since->format("Y-m-d H:i:s"));
+        self::assertSame('2026-05-31 12:00:00', $filter->since->format('Y-m-d H:i:s'));
     }
 
     public function testLastDaysPassesThroughAllCriteria(): void
     {
-        $now = new DateTimeImmutable("2026-06-07 12:00:00", new DateTimeZone("UTC"));
-        $connection = new ConnectionId("0191E5C2-7A3B-7E4A-9C1D-2F6B8A0E4D11");
+        $now = new DateTimeImmutable('2026-06-07 12:00:00', new DateTimeZone('UTC'));
+        $connection = new ConnectionId('0191E5C2-7A3B-7E4A-9C1D-2F6B8A0E4D11');
 
         $filter = MeasurementFilter::lastDays(
             days: 30,
             now: $now,
             connection: $connection,
-            serverId: "server-42",
+            serverId: 'server-42',
             status: MeasurementStatus::Failed,
             healthy: false,
             scheduled: true,
         );
 
         self::assertSame($connection, $filter->connection);
-        self::assertSame("server-42", $filter->serverId);
+        self::assertSame('server-42', $filter->serverId);
         self::assertSame(MeasurementStatus::Failed, $filter->status);
         self::assertFalse($filter->healthy);
         self::assertTrue($filter->scheduled);
-        self::assertSame("2026-05-08 12:00:00", $filter->since->format("Y-m-d H:i:s"));
+        self::assertSame('2026-05-08 12:00:00', $filter->since->format('Y-m-d H:i:s'));
     }
 
-    #[DataProvider("lastDaysWindowProvider")]
+    #[DataProvider('lastDaysWindowProvider')]
     public function testLastDaysWindowBounds(int $days, string $expectedSince): void
     {
-        $now = new DateTimeImmutable("2026-06-07 12:00:00", new DateTimeZone("UTC"));
+        $now = new DateTimeImmutable('2026-06-07 12:00:00', new DateTimeZone('UTC'));
 
         $filter = MeasurementFilter::lastDays(
             days: $days,
@@ -134,7 +134,7 @@ final class MeasurementFilterTest extends TestCase
             scheduled: null,
         );
 
-        self::assertSame($expectedSince, $filter->since->format("Y-m-d H:i:s"));
-        self::assertSame("2026-06-07 12:00:00", $filter->until->format("Y-m-d H:i:s"));
+        self::assertSame($expectedSince, $filter->since->format('Y-m-d H:i:s'));
+        self::assertSame('2026-06-07 12:00:00', $filter->until->format('Y-m-d H:i:s'));
     }
 }

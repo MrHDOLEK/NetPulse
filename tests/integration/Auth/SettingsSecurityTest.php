@@ -21,10 +21,10 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
 final class SettingsSecurityTest extends KernelTestCase
 {
-    private const string LOGIN_CSRF_ID = "authenticate";
-    private const string LOGIN_CSRF_RAW = "phpunit-login-token";
-    private const string ADMIN_EMAIL = "admin@example.com";
-    private const string ADMIN_PASSWORD = "correct-horse-battery";
+    private const string LOGIN_CSRF_ID = 'authenticate';
+    private const string LOGIN_CSRF_RAW = 'phpunit-login-token';
+    private const string ADMIN_EMAIL = 'admin@example.com';
+    private const string ADMIN_PASSWORD = 'correct-horse-battery';
 
     private DbalConnection $db;
     private MessageBusInterface $commandBus;
@@ -37,11 +37,11 @@ final class SettingsSecurityTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->db = $container->get("doctrine.dbal.default_connection");
+        $this->db = $container->get('doctrine.dbal.default_connection');
         $this->commandBus = $container->get(MessageBusInterface::class);
         $this->em = $container->get(EntityManagerInterface::class);
 
-        $users = $container->get("test." . UserRepository::class);
+        $users = $container->get('test.' . UserRepository::class);
         self::assertInstanceOf(UserRepository::class, $users);
         $this->users = $users;
 
@@ -54,22 +54,22 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $response = $this->get("/settings/security");
+        $response = $this->get('/settings/security');
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $html = (string)$response->getContent();
-        self::assertStringContainsString("Set up two-factor authentication", $html);
-        self::assertStringContainsString("Off", $html);
+        $html = (string) $response->getContent();
+        self::assertStringContainsString('Set up two-factor authentication', $html);
+        self::assertStringContainsString('Off', $html);
     }
 
     public function testRequiresAuthentication(): void
     {
         $this->seedAdmin();
 
-        $response = $this->get("/settings/security");
+        $response = $this->get('/settings/security');
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/login", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/login', (string) $response->headers->get('Location'));
     }
 
     public function testBeginStashesSecretInSessionAndRendersEnrolPage(): void
@@ -77,19 +77,19 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $response = $this->post("/settings/security/2fa/begin", [
-            "_csrf_token" => $this->csrf("twofa_begin"),
+        $response = $this->post('/settings/security/2fa/begin', [
+            '_csrf_token' => $this->csrf('twofa_begin'),
         ]);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
-        $secret = $this->session->get("twofa_setup_secret");
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
-        self::assertNotSame("", $secret);
+        self::assertNotSame('', $secret);
 
-        $html = (string)$response->getContent();
+        $html = (string) $response->getContent();
 
-        self::assertStringContainsString("data:image/png;base64,", $html);
+        self::assertStringContainsString('data:image/png;base64,', $html);
         self::assertStringContainsString($secret, $html);
         self::assertStringContainsString('name="code"', $html);
 
@@ -101,15 +101,15 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $this->post("/settings/security/2fa/begin", ["_csrf_token" => $this->csrf("twofa_begin")]);
-        $secret = $this->session->get("twofa_setup_secret");
+        $this->post('/settings/security/2fa/begin', ['_csrf_token' => $this->csrf('twofa_begin')]);
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
 
         $code = TOTP::createFromSecret($secret)->now();
 
-        $response = $this->post("/settings/security/2fa/confirm", [
-            "_csrf_token" => $this->csrf("twofa_confirm"),
-            "code" => $code,
+        $response = $this->post('/settings/security/2fa/confirm', [
+            '_csrf_token' => $this->csrf('twofa_confirm'),
+            'code' => $code,
         ]);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -120,24 +120,21 @@ final class SettingsSecurityTest extends KernelTestCase
         $recoveryCodes = $user->recoveryCodes();
         self::assertCount(8, $recoveryCodes);
 
-        $html = (string)$response->getContent();
+        $html = (string) $response->getContent();
         $shown = $this->extractShownCodes($html);
-        self::assertCount(8, $shown, "expected 8 plaintext recovery codes on the page");
+        self::assertCount(8, $shown, 'expected 8 plaintext recovery codes on the page');
 
         foreach ($shown as $plain) {
-            self::assertNotContains($plain, $recoveryCodes, "plaintext code must NOT be stored verbatim");
+            self::assertNotContains($plain, $recoveryCodes, 'plaintext code must NOT be stored verbatim');
         }
 
-        $stored = (string)$this->db->fetchOne(
-            "SELECT recovery_codes FROM users WHERE email = ?",
-            [self::ADMIN_EMAIL],
-        );
+        $stored = (string) $this->db->fetchOne('SELECT recovery_codes FROM users WHERE email = ?', [self::ADMIN_EMAIL]);
 
         foreach ($shown as $plain) {
-            self::assertStringNotContainsString($plain, $stored, "plaintext code leaked into the DB column");
+            self::assertStringNotContainsString($plain, $stored, 'plaintext code leaked into the DB column');
         }
 
-        $storedSecret = $this->db->fetchOne("SELECT totp_secret FROM users WHERE email = ?", [self::ADMIN_EMAIL]);
+        $storedSecret = $this->db->fetchOne('SELECT totp_secret FROM users WHERE email = ?', [self::ADMIN_EMAIL]);
         self::assertIsString($storedSecret);
         self::assertNotSame($secret, $storedSecret);
         self::assertStringNotContainsString($secret, $storedSecret);
@@ -148,13 +145,13 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $this->post("/settings/security/2fa/begin", ["_csrf_token" => $this->csrf("twofa_begin")]);
-        $secret = $this->session->get("twofa_setup_secret");
+        $this->post('/settings/security/2fa/begin', ['_csrf_token' => $this->csrf('twofa_begin')]);
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
 
-        $response = $this->post("/settings/security/2fa/confirm", [
-            "_csrf_token" => $this->csrf("twofa_confirm"),
-            "code" => "000000",
+        $response = $this->post('/settings/security/2fa/confirm', [
+            '_csrf_token' => $this->csrf('twofa_confirm'),
+            'code' => '000000',
         ]);
 
         self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
@@ -166,16 +163,16 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $this->post("/settings/security/2fa/begin", ["_csrf_token" => $this->csrf("twofa_begin")]);
-        $secret = $this->session->get("twofa_setup_secret");
+        $this->post('/settings/security/2fa/begin', ['_csrf_token' => $this->csrf('twofa_begin')]);
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
 
         $code = TOTP::createFromSecret($secret)->now();
 
-        $response = $this->post("/settings/security/2fa/confirm", ["code" => $code]);
+        $response = $this->post('/settings/security/2fa/confirm', ['code' => $code]);
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/settings/security", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/settings/security', (string) $response->headers->get('Location'));
         self::assertFalse($this->reloadUser()->hasTotp());
     }
 
@@ -184,18 +181,18 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $this->post("/settings/security/2fa/begin", ["_csrf_token" => $this->csrf("twofa_begin")]);
-        $secret = $this->session->get("twofa_setup_secret");
+        $this->post('/settings/security/2fa/begin', ['_csrf_token' => $this->csrf('twofa_begin')]);
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
-        $this->post("/settings/security/2fa/confirm", [
-            "_csrf_token" => $this->csrf("twofa_confirm"),
-            "code" => TOTP::createFromSecret($secret)->now(),
+        $this->post('/settings/security/2fa/confirm', [
+            '_csrf_token' => $this->csrf('twofa_confirm'),
+            'code' => TOTP::createFromSecret($secret)->now(),
         ]);
         self::assertTrue($this->reloadUser()->hasTotp());
 
-        $response = $this->post("/settings/security/2fa/disable", [
-            "_csrf_token" => $this->csrf("twofa_disable"),
-            "confirm" => "DISABLE",
+        $response = $this->post('/settings/security/2fa/disable', [
+            '_csrf_token' => $this->csrf('twofa_disable'),
+            'confirm' => 'DISABLE',
         ]);
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
@@ -210,17 +207,17 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $this->post("/settings/security/2fa/begin", ["_csrf_token" => $this->csrf("twofa_begin")]);
-        $secret = $this->session->get("twofa_setup_secret");
+        $this->post('/settings/security/2fa/begin', ['_csrf_token' => $this->csrf('twofa_begin')]);
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
-        $this->post("/settings/security/2fa/confirm", [
-            "_csrf_token" => $this->csrf("twofa_confirm"),
-            "code" => TOTP::createFromSecret($secret)->now(),
+        $this->post('/settings/security/2fa/confirm', [
+            '_csrf_token' => $this->csrf('twofa_confirm'),
+            'code' => TOTP::createFromSecret($secret)->now(),
         ]);
         self::assertTrue($this->reloadUser()->hasTotp());
 
-        $response = $this->post("/settings/security/2fa/disable", [
-            "_csrf_token" => $this->csrf("twofa_disable"),
+        $response = $this->post('/settings/security/2fa/disable', [
+            '_csrf_token' => $this->csrf('twofa_disable'),
         ]);
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
@@ -232,19 +229,19 @@ final class SettingsSecurityTest extends KernelTestCase
         $this->seedAdmin();
         $this->login();
 
-        $this->post("/settings/security/2fa/begin", ["_csrf_token" => $this->csrf("twofa_begin")]);
-        $secret = $this->session->get("twofa_setup_secret");
+        $this->post('/settings/security/2fa/begin', ['_csrf_token' => $this->csrf('twofa_begin')]);
+        $secret = $this->session->get('twofa_setup_secret');
         self::assertIsString($secret);
-        $this->post("/settings/security/2fa/confirm", [
-            "_csrf_token" => $this->csrf("twofa_confirm"),
-            "code" => TOTP::createFromSecret($secret)->now(),
+        $this->post('/settings/security/2fa/confirm', [
+            '_csrf_token' => $this->csrf('twofa_confirm'),
+            'code' => TOTP::createFromSecret($secret)->now(),
         ]);
 
         $before = $this->reloadUser()->recoveryCodes();
         self::assertCount(8, $before);
 
-        $response = $this->post("/settings/security/2fa/recovery/regenerate", [
-            "_csrf_token" => $this->csrf("twofa_regenerate"),
+        $response = $this->post('/settings/security/2fa/recovery/regenerate', [
+            '_csrf_token' => $this->csrf('twofa_regenerate'),
         ]);
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -254,7 +251,7 @@ final class SettingsSecurityTest extends KernelTestCase
 
         self::assertNotSame($before, $after);
 
-        $shown = $this->extractShownCodes((string)$response->getContent());
+        $shown = $this->extractShownCodes((string) $response->getContent());
         self::assertCount(8, $shown);
 
         foreach ($shown as $plain) {
@@ -288,25 +285,22 @@ final class SettingsSecurityTest extends KernelTestCase
 
     private function login(): void
     {
-        $this->session->set(
-            SessionTokenStorage::SESSION_NAMESPACE . "/" . self::LOGIN_CSRF_ID,
-            self::LOGIN_CSRF_RAW,
-        );
+        $this->session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . self::LOGIN_CSRF_ID, self::LOGIN_CSRF_RAW);
 
-        $request = Request::create("/login", "POST", [
-            "_username" => self::ADMIN_EMAIL,
-            "_password" => self::ADMIN_PASSWORD,
-            "_csrf_token" => self::LOGIN_CSRF_RAW,
+        $request = Request::create('/login', 'POST', [
+            '_username' => self::ADMIN_EMAIL,
+            '_password' => self::ADMIN_PASSWORD,
+            '_csrf_token' => self::LOGIN_CSRF_RAW,
         ]);
         $this->attachSession($request);
 
-        self::getContainer()->get("kernel")->handle($request);
+        self::getContainer()->get('kernel')->handle($request);
     }
 
     private function csrf(string $tokenId): string
     {
-        $raw = "phpunit-" . $tokenId;
-        $this->session->set(SessionTokenStorage::SESSION_NAMESPACE . "/" . $tokenId, $raw);
+        $raw = 'phpunit-' . $tokenId;
+        $this->session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . $tokenId, $raw);
 
         return $raw;
     }
@@ -316,18 +310,18 @@ final class SettingsSecurityTest extends KernelTestCase
      */
     private function post(string $path, array $body): Response
     {
-        $request = Request::create($path, "POST", $body);
+        $request = Request::create($path, 'POST', $body);
         $this->attachSession($request);
 
-        return self::getContainer()->get("kernel")->handle($request);
+        return self::getContainer()->get('kernel')->handle($request);
     }
 
     private function get(string $path): Response
     {
-        $request = Request::create($path, "GET");
+        $request = Request::create($path, 'GET');
         $this->attachSession($request);
 
-        return self::getContainer()->get("kernel")->handle($request);
+        return self::getContainer()->get('kernel')->handle($request);
     }
 
     private function attachSession(Request $request): void

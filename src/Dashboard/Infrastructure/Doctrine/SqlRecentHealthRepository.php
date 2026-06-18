@@ -33,14 +33,14 @@ final readonly class SqlRecentHealthRepository implements RecentHealthRepository
         $rows = $this->entityManager
             ->createQueryBuilder()
             ->select(
-                "measurement.completedAt AS completedAt",
-                "measurement.status AS status",
-                "measurement.healthy AS healthy",
+                'measurement.completedAt AS completedAt',
+                'measurement.status AS status',
+                'measurement.healthy AS healthy',
             )
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.connectionId = :connectionId")
-            ->setParameter("connectionId", $id, "connection_id")
-            ->orderBy("measurement.completedAt", "DESC")
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.connectionId = :connectionId')
+            ->setParameter('connectionId', $id, 'connection_id')
+            ->orderBy('measurement.completedAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -48,7 +48,7 @@ final readonly class SqlRecentHealthRepository implements RecentHealthRepository
         $samples = [];
 
         foreach ($rows as $row) {
-            $samples[] = $this->toSample($row["completedAt"], $row["status"], $row["healthy"]);
+            $samples[] = $this->toSample($row['completedAt'], $row['status'], $row['healthy']);
         }
 
         return HealthHistory::fromList($samples);

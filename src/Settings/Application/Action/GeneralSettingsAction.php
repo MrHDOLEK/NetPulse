@@ -22,40 +22,40 @@ use function is_string;
 use function json_decode;
 use function trim;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class GeneralSettingsAction extends AbstractController
 {
-    private const string CSRF_TOKEN_ID = "settings-general";
+    private const string CSRF_TOKEN_ID = 'settings-general';
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
         private readonly SettingsReader $settings,
     ) {}
 
-    #[Route("/settings/general", name: "settings_general", methods: ["GET"])]
+    #[Route('/settings/general', name: 'settings_general', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render("settings/general/index.html.twig", [
-            "siteName" => $this->settings->getString(SettingKey::SiteName),
-            "timezone" => $this->settings->getString(SettingKey::Timezone),
+        return $this->render('settings/general/index.html.twig', [
+            'siteName' => $this->settings->getString(SettingKey::SiteName),
+            'timezone' => $this->settings->getString(SettingKey::Timezone),
         ]);
     }
 
-    #[Route("/settings/general", name: "settings_general_save", methods: ["POST"])]
+    #[Route('/settings/general', name: 'settings_general_save', methods: ['POST'])]
     public function save(Request $request): Response
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         if (!is_string($token) || !$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, $token)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         $body = json_decode($request->getContent(), true);
         $body = is_array($body) ? $body : [];
 
         $command = new SaveSettingsCommand([
-            SettingKey::SiteName->value => $this->str($body, "siteName"),
-            SettingKey::Timezone->value => $this->str($body, "timezone"),
+            SettingKey::SiteName->value => $this->str($body, 'siteName'),
+            SettingKey::Timezone->value => $this->str($body, 'timezone'),
         ]);
 
         try {
@@ -64,16 +64,16 @@ final class GeneralSettingsAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof SettingsException) {
-                return new JsonResponse(["error" => $cause->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+                return new JsonResponse(['error' => $cause->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             throw $exception;
         }
 
         return new JsonResponse([
-            "saved" => true,
-            "siteName" => $this->settings->getString(SettingKey::SiteName),
-            "timezone" => $this->settings->getString(SettingKey::Timezone),
+            'saved' => true,
+            'siteName' => $this->settings->getString(SettingKey::SiteName),
+            'timezone' => $this->settings->getString(SettingKey::Timezone),
         ]);
     }
 
@@ -84,6 +84,6 @@ final class GeneralSettingsAction extends AbstractController
     {
         $value = $body[$key] ?? null;
 
-        return is_string($value) ? trim($value) : "";
+        return is_string($value) ? trim($value) : '';
     }
 }

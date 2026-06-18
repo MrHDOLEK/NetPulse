@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class ProbeListAction extends AbstractController
 {
     public function __construct(
@@ -21,7 +21,7 @@ final class ProbeListAction extends AbstractController
         private readonly ConnectionRepository $connections,
     ) {}
 
-    #[Route("/settings/probes", name: "settings_probes", methods: ["GET"])]
+    #[Route('/settings/probes', name: 'settings_probes', methods: ['GET'])]
     public function __invoke(): Response
     {
         $probes = [];
@@ -30,8 +30,8 @@ final class ProbeListAction extends AbstractController
             $probes[] = $this->toRow($probe);
         }
 
-        return $this->render("settings/probes/index.html.twig", [
-            "probes" => $probes,
+        return $this->render('settings/probes/index.html.twig', [
+            'probes' => $probes,
         ]);
     }
 
@@ -41,12 +41,12 @@ final class ProbeListAction extends AbstractController
     private function toRow(Probe $probe): array
     {
         return [
-            "id" => $probe->id()->toString(),
-            "name" => $probe->name(),
-            "enabled" => $probe->isEnabled(),
-            "labels" => $probe->labels()->all(),
-            "createdAt" => $probe->createdAt()->format(DateTimeInterface::ATOM),
-            "connectionCount" => $this->connections->byProbe($probe->id())->count(),
+            'id' => $probe->id()->toString(),
+            'name' => $probe->name(),
+            'enabled' => $probe->isEnabled(),
+            'labels' => $probe->labels()->all(),
+            'createdAt' => $probe->createdAt()->format(DateTimeInterface::ATOM),
+            'connectionCount' => $this->connections->byProbe($probe->id())->count(),
         ];
     }
 }

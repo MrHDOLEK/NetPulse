@@ -23,15 +23,15 @@ final class HeatmapGridTest extends TestCase
         self::assertSame(0, $cells[0]->dow);
         self::assertSame(0, $cells[0]->hour);
         self::assertNull($cells[0]->value);
-        self::assertSame(250.0, $cells[0 * 24 + 9]->value);
+        self::assertSame(250.0, $cells[(0 * 24) + 9]->value);
         self::assertSame(6, $cells[167]->dow);
         self::assertSame(23, $cells[167]->hour);
     }
 
     public function testKeyFormat(): void
     {
-        self::assertSame("0:9", HeatmapGrid::key(0, 9));
-        self::assertSame("6:23", HeatmapGrid::key(6, 23));
+        self::assertSame('0:9', HeatmapGrid::key(0, 9));
+        self::assertSame('6:23', HeatmapGrid::key(6, 23));
     }
 
     public function testEmptyCellHasNullValueAndZeroCounts(): void

@@ -6,6 +6,6 @@ namespace App\Auth\Domain\Entity\User;
 
 enum UserRole: string
 {
-    case Admin = "ROLE_ADMIN";
-    case User = "ROLE_USER";
+    case Admin = 'ROLE_ADMIN';
+    case User = 'ROLE_USER';
 }

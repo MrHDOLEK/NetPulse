@@ -24,7 +24,7 @@ final readonly class OoklaSpeedtestRunner implements SpeedtestRunner
     private const int TIMEOUT_SECONDS = 120;
 
     public function __construct(
-        #[Autowire("%env(OOKLA_BINARY)%")]
+        #[Autowire('%env(OOKLA_BINARY)%')]
         private string $binary,
     ) {}
 
@@ -53,15 +53,13 @@ final readonly class OoklaSpeedtestRunner implements SpeedtestRunner
     {
         $command = [
             $this->binary,
-            "--format=json",
-            "--accept-license",
-            "--accept-gdpr",
+            '--format=json',
+            '--accept-license',
+            '--accept-gdpr',
         ];
 
         if ($serverId !== null) {
-            $command[] = ctype_digit($serverId)
-                ? "--server-id=" . $serverId
-                : "--host=" . $serverId;
+            $command[] = ctype_digit($serverId) ? '--server-id=' . $serverId : '--host=' . $serverId;
         }
 
         return $command;
@@ -73,17 +71,17 @@ final readonly class OoklaSpeedtestRunner implements SpeedtestRunner
             /** @var mixed $decoded */
             $decoded = json_decode($output, true, 512, JSON_THROW_ON_ERROR);
         } catch (Throwable $exception) {
-            return SpeedtestOutcome::failure("invalid Ookla JSON: " . $exception->getMessage());
+            return SpeedtestOutcome::failure('invalid Ookla JSON: ' . $exception->getMessage());
         }
 
         if (!is_array($decoded) || array_is_list($decoded)) {
-            return SpeedtestOutcome::failure("Ookla output was not a JSON object");
+            return SpeedtestOutcome::failure('Ookla output was not a JSON object');
         }
 
         $payload = [];
 
         foreach ($decoded as $key => $value) {
-            $payload[(string)$key] = $value;
+            $payload[(string) $key] = $value;
         }
 
         return SpeedtestOutcome::success($payload);
@@ -92,8 +90,8 @@ final readonly class OoklaSpeedtestRunner implements SpeedtestRunner
     private function describeFailure(Process $process): string
     {
         $stderr = trim($process->getErrorOutput());
-        $message = "speedtest exited with code " . (string)$process->getExitCode();
+        $message = 'speedtest exited with code ' . (string) $process->getExitCode();
 
-        return $stderr === "" ? $message : $message . ": " . $stderr;
+        return $stderr === '' ? $message : $message . ': ' . $stderr;
     }
 }

@@ -10,7 +10,7 @@ use App\Notification\Application\NotificationSettingsProvider;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-#[AsMessageHandler(bus: "event.bus")]
+#[AsMessageHandler(bus: 'event.bus')]
 final readonly class NotifyOnMeasurementRecorded
 {
     public function __construct(
@@ -24,8 +24,6 @@ final readonly class NotifyOnMeasurementRecorded
             return;
         }
 
-        $this->commandBus->dispatch(
-            new NotifyOnMeasurementCommand($event->measurementId->toString()),
-        );
+        $this->commandBus->dispatch(new NotifyOnMeasurementCommand($event->measurementId->toString()));
     }
 }

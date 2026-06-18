@@ -16,7 +16,7 @@ use function is_string;
 
 final class TotpSecretType extends Type
 {
-    private const string NAME = "totp_secret";
+    private const string NAME = 'totp_secret';
 
     private static ?TotpSecretEncryptor $encryptor = null;
 
@@ -30,7 +30,7 @@ final class TotpSecretType extends Type
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getStringTypeDeclarationSQL(["length" => 255]);
+        return $platform->getStringTypeDeclarationSQL(['length' => 255]);
     }
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
@@ -43,7 +43,7 @@ final class TotpSecretType extends Type
             return self::encryptor()->encrypt($value->value());
         }
 
-        throw InvalidType::new($value, self::NAME, ["null", TotpSecret::class]);
+        throw InvalidType::new($value, self::NAME, ['null', TotpSecret::class]);
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?TotpSecret
@@ -72,8 +72,8 @@ final class TotpSecretType extends Type
     {
         if (self::$encryptor === null) {
             throw new LogicException(
-                "TotpSecretType has no encryptor. RegisterTotpSecretTypeMiddleware must run "
-                . "(it is wired as a doctrine.middleware) before a TOTP secret is read or written.",
+                'TotpSecretType has no encryptor. RegisterTotpSecretTypeMiddleware must run '
+                . '(it is wired as a doctrine.middleware) before a TOTP secret is read or written.',
             );
         }
 

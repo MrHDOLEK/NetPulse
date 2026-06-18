@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class MetricsAction
 {
-    private const string CONTENT_TYPE = "text/plain; version=0.0.4; charset=utf-8";
+    private const string CONTENT_TYPE = 'text/plain; version=0.0.4; charset=utf-8';
 
     public function __construct(
         private readonly MetricsRepository $readModel,
@@ -20,7 +20,7 @@ final class MetricsAction
         private readonly PrometheusConfig $config,
     ) {}
 
-    #[Route("/metrics", name: "metrics.scrape", methods: ["GET"])]
+    #[Route('/metrics', name: 'metrics.scrape', methods: ['GET'])]
     public function scrape(): Response
     {
         $body = $this->renderer->render(
@@ -34,10 +34,6 @@ final class MetricsAction
             $this->config->freshnessWindowSeconds(),
         );
 
-        return new Response(
-            $body,
-            Response::HTTP_OK,
-            ["Content-Type" => self::CONTENT_TYPE],
-        );
+        return new Response($body, Response::HTTP_OK, ['Content-Type' => self::CONTENT_TYPE]);
     }
 }

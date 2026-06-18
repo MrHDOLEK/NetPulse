@@ -23,20 +23,20 @@ final class MeasurementIdTypeTest extends TestCase
 
     public function testConvertsMeasurementIdToDatabaseString(): void
     {
-        $id = new MeasurementId("11111111-1111-4111-8111-111111111111");
+        $id = new MeasurementId('11111111-1111-4111-8111-111111111111');
 
-        $this->assertSame(
-            "11111111-1111-4111-8111-111111111111",
-            $this->type->convertToDatabaseValue($id, $this->platform),
-        );
+        $this->assertSame('11111111-1111-4111-8111-111111111111', $this->type->convertToDatabaseValue(
+            $id,
+            $this->platform,
+        ));
     }
 
     public function testConvertsDatabaseStringToMeasurementId(): void
     {
-        $id = $this->type->convertToPHPValue("11111111-1111-4111-8111-111111111111", $this->platform);
+        $id = $this->type->convertToPHPValue('11111111-1111-4111-8111-111111111111', $this->platform);
 
         $this->assertInstanceOf(MeasurementId::class, $id);
-        $this->assertSame("11111111-1111-4111-8111-111111111111", $id->toString());
+        $this->assertSame('11111111-1111-4111-8111-111111111111', $id->toString());
     }
 
     public function testNullRoundTripsAsNull(): void

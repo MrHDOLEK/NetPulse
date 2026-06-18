@@ -25,12 +25,12 @@ use Throwable;
 #[AsAlias(id: NotificationTester::class)]
 final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher, NotificationTester
 {
-    private const string CHANNEL_EMAIL = "email";
-    private const string CHANNEL_CHAT = "chat";
-    private const string CHANNEL_WEBHOOK = "webhook";
-    private const string STATUS_SENT = "sent";
-    private const string STATUS_FAILED = "failed";
-    private const string STATUS_SKIPPED = "skipped";
+    private const string CHANNEL_EMAIL = 'email';
+    private const string CHANNEL_CHAT = 'chat';
+    private const string CHANNEL_WEBHOOK = 'webhook';
+    private const string STATUS_SENT = 'sent';
+    private const string STATUS_FAILED = 'failed';
+    private const string STATUS_SKIPPED = 'skipped';
 
     public function __construct(
         private HttpClientInterface $httpClient,
@@ -78,9 +78,9 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
                 default => $this->unknownChannel($channel),
             };
         } catch (Throwable $exception) {
-            $this->logger->error("notification channel failed", [
-                "channel" => $channel,
-                "error" => $this->redactSecrets($exception->getMessage(), $settings),
+            $this->logger->error('notification channel failed', [
+                'channel' => $channel,
+                'error' => $this->redactSecrets($exception->getMessage(), $settings),
             ]);
 
             return self::STATUS_FAILED;
@@ -92,7 +92,7 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
      */
     private function sendEmail(Notification $notification, NotificationSettings $settings): string
     {
-        if ($settings->emailRecipients === [] || trim($settings->emailDsn) === "") {
+        if ($settings->emailRecipients === [] || trim($settings->emailDsn) === '') {
             return $this->skip(self::CHANNEL_EMAIL);
         }
 
@@ -111,7 +111,7 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
      */
     private function sendChat(Notification $notification, NotificationSettings $settings): string
     {
-        if (trim($settings->chatDsn) === "") {
+        if (trim($settings->chatDsn) === '') {
             return $this->skip(self::CHANNEL_CHAT);
         }
 
@@ -125,21 +125,21 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
      */
     private function sendWebhook(Notification $notification, NotificationSettings $settings): string
     {
-        if (trim($settings->webhookUrl) === "") {
+        if (trim($settings->webhookUrl) === '') {
             return $this->skip(self::CHANNEL_WEBHOOK);
         }
 
         $payload = [
-            "kind" => $notification->kind->value,
-            "severity" => $notification->severity->value,
-            "subject" => $notification->subject,
-            "body" => $notification->body,
-            "context" => $notification->context,
-            "timestamp" => $this->clock->now()->format(DATE_ATOM),
+            'kind' => $notification->kind->value,
+            'severity' => $notification->severity->value,
+            'subject' => $notification->subject,
+            'body' => $notification->body,
+            'context' => $notification->context,
+            'timestamp' => $this->clock->now()->format(DATE_ATOM),
         ];
 
-        $response = $this->httpClient->request("POST", $settings->webhookUrl, [
-            "json" => $payload,
+        $response = $this->httpClient->request('POST', $settings->webhookUrl, [
+            'json' => $payload,
         ]);
 
         $httpStatus = $response->getStatusCode();
@@ -156,17 +156,17 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
         return new Notification(
             NotificationKind::Alert,
             NotificationSeverity::Info,
-            "NetPulse test notification",
-            "This is a test alert from NetPulse — if you can read it, this channel is configured correctly.",
-            ["test" => true],
+            'NetPulse test notification',
+            'This is a test alert from NetPulse — if you can read it, this channel is configured correctly.',
+            ['test' => true],
         );
     }
 
     private function redactSecrets(string $message, NotificationSettings $settings): string
     {
         foreach ([$settings->webhookUrl, $settings->chatDsn, $settings->emailDsn] as $secret) {
-            if (trim($secret) !== "") {
-                $message = str_replace($secret, "[redacted]", $message);
+            if (trim($secret) !== '') {
+                $message = str_replace($secret, '[redacted]', $message);
             }
         }
 
@@ -179,9 +179,9 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
     private function humanize(string $status): string
     {
         return match ($status) {
-            self::STATUS_SENT => "sent",
-            self::STATUS_SKIPPED => "skipped (not configured)",
-            default => "failed (check the logs)",
+            self::STATUS_SENT => 'sent',
+            self::STATUS_SKIPPED => 'skipped (not configured)',
+            default => 'failed (check the logs)',
         };
     }
 
@@ -190,9 +190,9 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
      */
     private function skip(string $channel): string
     {
-        $this->logger->warning("notification channel skipped", [
-            "channel" => $channel,
-            "reason" => "not_configured",
+        $this->logger->warning('notification channel skipped', [
+            'channel' => $channel,
+            'reason' => 'not_configured',
         ]);
 
         return self::STATUS_SKIPPED;
@@ -203,9 +203,9 @@ final readonly class SymfonyNotifierDispatcher implements NotificationDispatcher
      */
     private function unknownChannel(string $channel): string
     {
-        $this->logger->warning("notification channel skipped", [
-            "channel" => $channel,
-            "reason" => "unknown_channel",
+        $this->logger->warning('notification channel skipped', [
+            'channel' => $channel,
+            'reason' => 'unknown_channel',
         ]);
 
         return self::STATUS_SKIPPED;

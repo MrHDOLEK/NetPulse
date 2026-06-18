@@ -21,28 +21,28 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function is_string;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class RotateProbeTokenAction extends AbstractController
 {
-    private const string CSRF_TOKEN_ID = "probe-rotate";
+    private const string CSRF_TOKEN_ID = 'probe-rotate';
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
     ) {}
 
-    #[Route("/settings/probes/{probeId}/rotate-token", name: "settings_probes_rotate", methods: ["POST"])]
+    #[Route('/settings/probes/{probeId}/rotate-token', name: 'settings_probes_rotate', methods: ['POST'])]
     public function __invoke(Request $request, string $probeId): Response
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         if (!is_string($token) || !$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, $token)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         try {
             $id = new ProbeId($probeId);
         } catch (InvalidId) {
-            return new JsonResponse(["error" => "Invalid probe id"], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Invalid probe id'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
@@ -51,7 +51,7 @@ final class RotateProbeTokenAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof ProbeNotFound) {
-                return new JsonResponse(["error" => "Probe not found"], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['error' => 'Probe not found'], Response::HTTP_NOT_FOUND);
             }
 
             throw $exception;
@@ -60,11 +60,11 @@ final class RotateProbeTokenAction extends AbstractController
         $result = $envelope->last(HandledStamp::class)?->getResult();
 
         if (!$result instanceof ProbeTokenRotated) {
-            return new JsonResponse(["error" => "Token rotation failed"], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => 'Token rotation failed'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $response = new JsonResponse(["token" => $result->plaintextToken], Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response = new JsonResponse(['token' => $result->plaintextToken], Response::HTTP_OK);
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }

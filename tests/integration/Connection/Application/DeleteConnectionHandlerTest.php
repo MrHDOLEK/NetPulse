@@ -25,9 +25,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class DeleteConnectionHandlerTest extends KernelTestCase
 {
-    private const string PROBE = "cccccccc-cccc-7ccc-8ccc-cccccccccccc";
-    private const string OTHER_PROBE = "dddddddd-dddd-7ddd-8ddd-dddddddddddd";
-    private const string CONNECTION = "10000000-0000-7000-8000-0000000000d1";
+    private const string PROBE = 'cccccccc-cccc-7ccc-8ccc-cccccccccccc';
+    private const string OTHER_PROBE = 'dddddddd-dddd-7ddd-8ddd-dddddddddddd';
+    private const string CONNECTION = '10000000-0000-7000-8000-0000000000d1';
 
     private MessageBusInterface $commandBus;
     private ConnectionRepository $connections;
@@ -39,22 +39,21 @@ final class DeleteConnectionHandlerTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->commandBus = $container->get("command.bus");
+        $this->commandBus = $container->get('command.bus');
         $this->connections = $container->get(ConnectionRepository::class);
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->dbal = $container->get(DbalConnection::class);
 
-        $this->dbal->executeStatement("DELETE FROM connections");
+        $this->dbal->executeStatement('DELETE FROM connections');
     }
 
     public function testDeletesAnOwnedConnection(): void
     {
         $this->connections->save($this->connection());
 
-        $this->commandBus->dispatch(new DeleteConnectionCommand(
-            new ConnectionId(self::CONNECTION),
-            new ProbeId(self::PROBE),
-        ));
+        $this->commandBus->dispatch(
+            new DeleteConnectionCommand(new ConnectionId(self::CONNECTION), new ProbeId(self::PROBE)),
+        );
 
         $this->entityManager->clear();
         $this->assertNull($this->connections->find(new ConnectionId(self::CONNECTION)));
@@ -65,11 +64,10 @@ final class DeleteConnectionHandlerTest extends KernelTestCase
         $this->connections->save($this->connection());
 
         try {
-            $this->commandBus->dispatch(new DeleteConnectionCommand(
-                new ConnectionId(self::CONNECTION),
-                new ProbeId(self::OTHER_PROBE),
-            ));
-            self::fail("Expected ConnectionNotFound for an ownership mismatch.");
+            $this->commandBus->dispatch(
+                new DeleteConnectionCommand(new ConnectionId(self::CONNECTION), new ProbeId(self::OTHER_PROBE)),
+            );
+            self::fail('Expected ConnectionNotFound for an ownership mismatch.');
         } catch (HandlerFailedException $exception) {
             self::assertInstanceOf(ConnectionNotFound::class, $exception->getPrevious());
         }
@@ -83,8 +81,8 @@ final class DeleteConnectionHandlerTest extends KernelTestCase
         return new Connection(
             new ConnectionId(self::CONNECTION),
             new ProbeId(self::PROBE),
-            "Home WAN1",
-            "Orange",
+            'Home WAN1',
+            'Orange',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Primary,
             Labels::empty(),

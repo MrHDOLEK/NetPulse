@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ProbeIdTypeTest extends TestCase
 {
-    private const string UUID = "22222222-2222-4222-8222-222222222222";
+    private const string UUID = '22222222-2222-4222-8222-222222222222';
 
     private ProbeIdType $type;
     private AbstractPlatform $platform;
@@ -68,11 +68,11 @@ final class ProbeIdTypeTest extends TestCase
     {
         $this->expectException(InvalidType::class);
 
-        $this->type->convertToDatabaseValue("not-an-id", $this->platform);
+        $this->type->convertToDatabaseValue('not-an-id', $this->platform);
     }
 
     public function testHasName(): void
     {
-        $this->assertSame("probe_id", $this->type->getName());
+        $this->assertSame('probe_id', $this->type->getName());
     }
 }

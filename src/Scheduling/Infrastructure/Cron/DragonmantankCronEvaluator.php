@@ -14,7 +14,7 @@ final readonly class DragonmantankCronEvaluator implements CronEvaluator
 {
     public function matchesSince(string $expression, DateTimeImmutable $since, DateTimeImmutable $now): bool
     {
-        $previousRun = (new CronExpression($expression))->getPreviousRunDate($now, 0, true);
+        $previousRun = new CronExpression($expression)->getPreviousRunDate($now, 0, true);
 
         return $previousRun->getTimestamp() > $since->getTimestamp();
     }

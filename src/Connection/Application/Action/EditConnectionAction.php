@@ -28,35 +28,37 @@ use ValueError;
 
 use function is_string;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class EditConnectionAction extends AbstractController
 {
-    private const string CSRF_TOKEN_ID = "connection-edit";
+    private const string CSRF_TOKEN_ID = 'connection-edit';
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
         private readonly ConnectionInputMapper $inputMapper,
     ) {}
 
-    #[Route("/settings/connections/{connectionId}", name: "settings_connections_edit", methods: ["PUT"])]
+    #[Route('/settings/connections/{connectionId}', name: 'settings_connections_edit', methods: ['PUT'])]
     public function __invoke(string $connectionId, Request $request, ConnectionRequest $payload): Response
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         if (!is_string($token) || !$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, $token)) {
-            return $this->errorJson("Invalid CSRF token", Response::HTTP_FORBIDDEN);
+            return $this->errorJson('Invalid CSRF token', Response::HTTP_FORBIDDEN);
         }
 
         try {
             $id = new ConnectionId($connectionId);
             $probeId = new ProbeId($payload->probeId);
         } catch (InvalidId) {
-            return $this->errorJson("Invalid connection or probe id", Response::HTTP_BAD_REQUEST);
+            return $this->errorJson('Invalid connection or probe id', Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $draft = $this->inputMapper->assemble($payload);
-        } catch (ValueError | InvalidArgumentException | InvalidThresholds | InvalidAdaptivePolicy | InvalidSchedule | InvalidExpectedSpeed $exception) {
+        } catch (
+            ValueError|InvalidArgumentException|InvalidThresholds|InvalidAdaptivePolicy|InvalidSchedule|InvalidExpectedSpeed $exception
+        ) {
             return $this->errorJson($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
@@ -80,20 +82,20 @@ final class EditConnectionAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof NotFoundException) {
-                return $this->errorJson("Connection not found", Response::HTTP_NOT_FOUND);
+                return $this->errorJson('Connection not found', Response::HTTP_NOT_FOUND);
             }
 
             throw $exception;
         }
 
-        $response = new JsonResponse(["id" => $id->toString()], Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response = new JsonResponse(['id' => $id->toString()], Response::HTTP_OK);
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function errorJson(string $message, int $status): JsonResponse
     {
-        return new JsonResponse(["error" => $message], $status);
+        return new JsonResponse(['error' => $message], $status);
     }
 }

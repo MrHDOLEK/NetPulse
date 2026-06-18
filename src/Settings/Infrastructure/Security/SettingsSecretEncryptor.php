@@ -24,15 +24,11 @@ final readonly class SettingsSecretEncryptor
 {
     private string $keyHex;
 
-    public function __construct(
-        #[Autowire("%env(string:SETTINGS_ENCRYPTION_KEY)%")]
-        #[SensitiveParameter]
-        string $settingsKeyHex,
-        #[Autowire("%env(string:TOTP_ENCRYPTION_KEY)%")]
-        #[SensitiveParameter]
-        string $totpKeyHex,
-    ) {
-        $this->keyHex = $settingsKeyHex !== "" ? $settingsKeyHex : $totpKeyHex;
+    public function __construct(#[Autowire('%env(string:SETTINGS_ENCRYPTION_KEY)%')]
+        #[SensitiveParameter] string $settingsKeyHex, #[Autowire('%env(string:TOTP_ENCRYPTION_KEY)%')]
+        #[SensitiveParameter] string $totpKeyHex)
+    {
+        $this->keyHex = $settingsKeyHex !== '' ? $settingsKeyHex : $totpKeyHex;
     }
 
     public function canEncrypt(): bool
@@ -84,7 +80,7 @@ final readonly class SettingsSecretEncryptor
 
     private function validKey(): ?string
     {
-        if ($this->keyHex === "") {
+        if ($this->keyHex === '') {
             return null;
         }
 

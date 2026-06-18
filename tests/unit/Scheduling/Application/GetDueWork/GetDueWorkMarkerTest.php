@@ -35,11 +35,11 @@ use function array_map;
 
 final class GetDueWorkMarkerTest extends TestCase
 {
-    private const string PROBE_ID = "11111111-1111-4111-8111-111111111111";
-    private const string OTHER_PROBE_ID = "99999999-9999-4999-8999-999999999999";
-    private const string RECENT_CONNECTION = "33333333-3333-4333-8333-333333333333";
-    private const string OTHER_PROBE_CONNECTION = "66666666-6666-4666-8666-666666666666";
-    private const string NOW = "2026-06-06 12:00:00";
+    private const string PROBE_ID = '11111111-1111-4111-8111-111111111111';
+    private const string OTHER_PROBE_ID = '99999999-9999-4999-8999-999999999999';
+    private const string RECENT_CONNECTION = '33333333-3333-4333-8333-333333333333';
+    private const string OTHER_PROBE_CONNECTION = '66666666-6666-4666-8666-666666666666';
+    private const string NOW = '2026-06-06 12:00:00';
 
     public function testMarkedConnectionIsForcedDueThenConsumedOnSecondPoll(): void
     {
@@ -48,14 +48,23 @@ final class GetDueWorkMarkerTest extends TestCase
         $recent = $this->connection(self::RECENT_CONNECTION, $probeId);
 
         $lastMeasurements = new InMemoryLastMeasurementRepository(
-            new LastMeasurementRow(new ConnectionId(self::RECENT_CONNECTION), $this->ago(60), "old", HealthHistory::empty()),
+            new LastMeasurementRow(
+                new ConnectionId(self::RECENT_CONNECTION),
+                $this->ago(60),
+                'old',
+                HealthHistory::empty(),
+            ),
         );
 
         $markers = new InMemoryDueNowMarkerRepository();
         $markers->mark(new ConnectionId(self::RECENT_CONNECTION), new DateTimeImmutable(self::NOW), null);
 
         $runStates = new InMemoryRunStateRepository();
-        $runStates->upsert(new ConnectionId(self::RECENT_CONNECTION), RunPhase::Queued, new DateTimeImmutable(self::NOW));
+        $runStates->upsert(
+            new ConnectionId(self::RECENT_CONNECTION),
+            RunPhase::Queued,
+            new DateTimeImmutable(self::NOW),
+        );
 
         $handler = new GetDueWorkHandler(
             new InMemoryConnectionRepository($recent),
@@ -79,7 +88,7 @@ final class GetDueWorkMarkerTest extends TestCase
             $serverById[$task->connectionId->toString()] = $task->serverId;
         }
 
-        self::assertSame("x", $serverById[self::RECENT_CONNECTION]);
+        self::assertSame('x', $serverById[self::RECENT_CONNECTION]);
 
         self::assertSame(RunPhase::Running, $runStates->phases[self::RECENT_CONNECTION]);
 
@@ -95,11 +104,16 @@ final class GetDueWorkMarkerTest extends TestCase
         $recent = $this->connection(self::RECENT_CONNECTION, $probeId);
 
         $lastMeasurements = new InMemoryLastMeasurementRepository(
-            new LastMeasurementRow(new ConnectionId(self::RECENT_CONNECTION), $this->ago(60), "old", HealthHistory::empty()),
+            new LastMeasurementRow(
+                new ConnectionId(self::RECENT_CONNECTION),
+                $this->ago(60),
+                'old',
+                HealthHistory::empty(),
+            ),
         );
 
         $markers = new InMemoryDueNowMarkerRepository();
-        $markers->mark(new ConnectionId(self::RECENT_CONNECTION), new DateTimeImmutable(self::NOW), "99");
+        $markers->mark(new ConnectionId(self::RECENT_CONNECTION), new DateTimeImmutable(self::NOW), '99');
 
         $handler = new GetDueWorkHandler(
             new InMemoryConnectionRepository($recent),
@@ -120,7 +134,7 @@ final class GetDueWorkMarkerTest extends TestCase
             $serverById[$task->connectionId->toString()] = $task->serverId;
         }
 
-        self::assertSame("99", $serverById[self::RECENT_CONNECTION]);
+        self::assertSame('99', $serverById[self::RECENT_CONNECTION]);
     }
 
     public function testMarkerForAnotherProbeDoesNotLeakIntoThisProbesDueList(): void
@@ -130,7 +144,12 @@ final class GetDueWorkMarkerTest extends TestCase
         $recent = $this->connection(self::RECENT_CONNECTION, $probeId);
 
         $lastMeasurements = new InMemoryLastMeasurementRepository(
-            new LastMeasurementRow(new ConnectionId(self::RECENT_CONNECTION), $this->ago(60), "old", HealthHistory::empty()),
+            new LastMeasurementRow(
+                new ConnectionId(self::RECENT_CONNECTION),
+                $this->ago(60),
+                'old',
+                HealthHistory::empty(),
+            ),
         );
 
         $markers = new InMemoryDueNowMarkerRepository();
@@ -158,10 +177,7 @@ final class GetDueWorkMarkerTest extends TestCase
      */
     private function connectionIds(DueWork $dueWork): array
     {
-        return array_map(
-            static fn($task): string => $task->connectionId->toString(),
-            $dueWork->tasks->toArray(),
-        );
+        return array_map(static fn($task): string => $task->connectionId->toString(), $dueWork->tasks->toArray());
     }
 
     private function connection(string $id, ProbeId $probeId): Connection
@@ -169,12 +185,12 @@ final class GetDueWorkMarkerTest extends TestCase
         return new Connection(
             new ConnectionId($id),
             $probeId,
-            "wan",
-            "isp",
+            'wan',
+            'isp',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
             Labels::fromArray([]),
-            ServerPool::fromList("x"),
+            ServerPool::fromList('x'),
             Schedule::even(24, 0),
             true,
             Thresholds::default(),
@@ -184,13 +200,13 @@ final class GetDueWorkMarkerTest extends TestCase
 
     private function ago(int $seconds): DateTimeImmutable
     {
-        return (new DateTimeImmutable(self::NOW))->modify("-{$seconds} seconds");
+        return new DateTimeImmutable(self::NOW)->modify("-{$seconds} seconds");
     }
 }
 
 final class InMemoryDueNowMarkerRepository implements DueNowMarkerRepository
 {
-    private const string DEFAULT_PROBE = "11111111-1111-4111-8111-111111111111";
+    private const string DEFAULT_PROBE = '11111111-1111-4111-8111-111111111111';
 
     /** @var array<string, ?string> connectionId => forcedServerId (null = no pin) */
     private array $marked = [];

@@ -13,64 +13,57 @@
     "type": "project",
     "minimum-stability": "stable",
     "require": {
-        "php": "8.4.*",
+        "php": "8.5.*",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/doctrine-bundle": "2.16.*",
-        "doctrine/doctrine-migrations-bundle": "3.4.*",
-        "doctrine/orm": "3.5.*",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.5",
         "dragonmantank/cron-expression": "^3.6",
         "endroid/qr-code": "^6.1",
         "league/oauth2-client": "^2.9",
         "nelmio/api-doc-bundle": "^5.6",
         "phpdocumentor/reflection-docblock": "5.6.*",
-        "phpstan/phpdoc-parser": "2.3.*",
-        "phpstan/phpstan-symfony": "2.0.*",
         "promphp/prometheus_client_php": "^2.15",
         "ramsey/uuid": "4.7.*",
-        "scheb/2fa-backup-code": "^7.13",
-        "scheb/2fa-bundle": "^7.13",
-        "scheb/2fa-totp": "^7.13",
-        "symfony/asset": "7.3.*",
-        "symfony/asset-mapper": "7.3.*",
-        "symfony/clock": "7.3.*",
-        "symfony/console": "7.3.*",
-        "symfony/discord-notifier": "7.3.*",
-        "symfony/dotenv": "7.3.*",
-        "symfony/expression-language": "7.3.*",
-        "symfony/flex": "2.4.*",
-        "symfony/framework-bundle": "7.3.*",
-        "symfony/http-client": "7.3.*",
-        "symfony/mailer": "7.3.*",
-        "symfony/messenger": "7.3.*",
+        "scheb/2fa-backup-code": "^8.0",
+        "scheb/2fa-bundle": "^8.0",
+        "scheb/2fa-totp": "^8.0",
+        "symfony/asset": "8.1.*",
+        "symfony/asset-mapper": "8.1.*",
+        "symfony/clock": "8.1.*",
+        "symfony/console": "8.1.*",
+        "symfony/discord-notifier": "8.1.*",
+        "symfony/dotenv": "8.1.*",
+        "symfony/expression-language": "8.1.*",
+        "symfony/flex": "^2.10",
+        "symfony/framework-bundle": "8.1.*",
+        "symfony/http-client": "8.1.*",
+        "symfony/mailer": "8.1.*",
+        "symfony/messenger": "8.1.*",
         "symfony/monolog-bundle": "^4.0",
-        "symfony/notifier": "7.3.*",
-        "symfony/process": "7.3.*",
-        "symfony/property-access": "7.3.*",
-        "symfony/property-info": "7.3.*",
-        "symfony/rate-limiter": "7.3.*",
-        "symfony/runtime": "7.3.*",
-        "symfony/security-bundle": "7.3.*",
-        "symfony/serializer": "7.3.*",
-        "symfony/slack-notifier": "7.3.*",
-        "symfony/telegram-notifier": "7.3.*",
-        "symfony/translation": "7.3.*",
-        "symfony/twig-bundle": "7.3.*",
-        "symfony/validator": "7.3.*",
-        "symfony/yaml": "7.3.*",
+        "symfony/notifier": "8.1.*",
+        "symfony/process": "8.1.*",
+        "symfony/property-access": "8.1.*",
+        "symfony/property-info": "8.1.*",
+        "symfony/rate-limiter": "8.1.*",
+        "symfony/runtime": "8.1.*",
+        "symfony/security-bundle": "8.1.*",
+        "symfony/serializer": "8.1.*",
+        "symfony/slack-notifier": "8.1.*",
+        "symfony/telegram-notifier": "8.1.*",
+        "symfony/translation": "8.1.*",
+        "symfony/twig-bundle": "8.1.*",
+        "symfony/validator": "8.1.*",
+        "symfony/yaml": "8.1.*",
         "symfonycasts/tailwind-bundle": "^0.13.0"
     },
     "require-dev": {
-        "blumilksoftware/codestyle": "^5.0",
-        "dama/doctrine-test-bundle": "8.3.*",
-        "friends-of-behat/symfony-extension": "2.6.*",
-        "phpunit/phpunit": "12.3.*",
-        "qossmic/deptrac": "2.0.*",
-        "symfony/debug-bundle": "7.3.*",
-        "symfony/web-profiler-bundle": "7.3.*",
-        "symplify/config-transformer": "^12.4",
-        "symplify/easy-coding-standard": "12.3.*",
-        "zircote/swagger-php": "5.3.*"
+        "dama/doctrine-test-bundle": "^8.6",
+        "phpunit/phpunit": "^12.3",
+        "symfony/debug-bundle": "8.1.*",
+        "symfony/web-profiler-bundle": "8.1.*",
+        "zircote/swagger-php": "^5.3 || ^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -106,26 +99,33 @@
         "symfony/polyfill-php81": "*"
     },
     "scripts": {
-        "cs:fix": "./vendor/bin/php-cs-fixer fix --diff --config codestyle.php",
-        "cs:check": "./vendor/bin/php-cs-fixer fix --dry-run --diff --config codestyle.php",
+        "cs:fix": "tools/mago/vendor/bin/mago format",
+        "cs:check": "tools/mago/vendor/bin/mago format --check",
+        "lint": [
+            "tools/mago/vendor/bin/mago format --check",
+            "tools/mago/vendor/bin/mago lint"
+        ],
+        "analyze": "tools/mago/vendor/bin/mago analyze",
         "migrate": "php bin/console doctrine:migrations:migrate -n",
         "db:test": "php bin/console doctrine:migrations:migrate -n --env=test",
-        "phpstan": [
-            "php -d memory_limit=600M vendor/bin/phpstan analyse -c phpstan.neon"
-        ],
         "test": "phpunit",
-        "behat": "behat -c behat.yml -f progress",
-        "deptrac": "deptrac --config-file=deptrac.yaml --formatter=table",
+        "deptrac": "tools/deptrac/vendor/bin/deptrac --config-file=deptrac.yaml --formatter=table",
+        "tools:install": [
+            "composer install --working-dir=tools/mago",
+            "composer install --working-dir=tools/deptrac"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@tools:install"
         ],
         "post-update-cmd": [
-            "@auto-scripts"
+            "@auto-scripts",
+            "@tools:install"
         ]
     },
     "conflict": {
@@ -134,7 +134,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.3.*"
+            "require": "8.1.*"
         }
     }
 }

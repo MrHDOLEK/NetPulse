@@ -13,9 +13,9 @@ final class ServerMetricsRowCollectionTest extends TestCase
     public function testFromListRoundTrips(): void
     {
         $a = new ServerMetricsRow(
-            serverId: "12345",
-            name: "Acme Speedtest",
-            location: "Warsaw",
+            serverId: '12345',
+            name: 'Acme Speedtest',
+            location: 'Warsaw',
             avgDownloadBits: 800_000_000.0,
             avgUploadBits: 600_000_000.0,
             avgPingSeconds: 0.04,
@@ -25,9 +25,9 @@ final class ServerMetricsRowCollectionTest extends TestCase
             lastSeenUnix: 1_700_000_000,
         );
         $b = new ServerMetricsRow(
-            serverId: "67890",
-            name: "Globe CDN",
-            location: "Berlin",
+            serverId: '67890',
+            name: 'Globe CDN',
+            location: 'Berlin',
             avgDownloadBits: null,
             avgUploadBits: null,
             avgPingSeconds: null,
@@ -41,7 +41,7 @@ final class ServerMetricsRowCollectionTest extends TestCase
 
         self::assertCount(2, $collection);
         self::assertSame([$a, $b], $collection->toArray());
-        self::assertSame("12345", $collection->toArray()[0]->serverId);
+        self::assertSame('12345', $collection->toArray()[0]->serverId);
         self::assertSame(800_000_000.0, $collection->toArray()[0]->avgDownloadBits);
         self::assertNull($collection->toArray()[1]->avgPingSeconds);
         self::assertSame(2, $collection->toArray()[0]->healthyCount);
@@ -50,9 +50,9 @@ final class ServerMetricsRowCollectionTest extends TestCase
     public function testOfVariadicRoundTrips(): void
     {
         $a = new ServerMetricsRow(
-            serverId: "12345",
-            name: "Acme Speedtest",
-            location: "Warsaw",
+            serverId: '12345',
+            name: 'Acme Speedtest',
+            location: 'Warsaw',
             avgDownloadBits: 800_000_000.0,
             avgUploadBits: 600_000_000.0,
             avgPingSeconds: 0.04,

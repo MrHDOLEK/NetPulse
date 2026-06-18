@@ -23,7 +23,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class ScheduleType extends Type
 {
-    public const string NAME = "schedule";
+    public const string NAME = 'schedule';
 
     /**
      * @param array<string, mixed> $column
@@ -40,7 +40,7 @@ final class ScheduleType extends Type
         }
 
         if (!$value instanceof Schedule) {
-            throw InvalidType::new($value, self::NAME, ["null", Schedule::class]);
+            throw InvalidType::new($value, self::NAME, ['null', Schedule::class]);
         }
 
         return json_encode($this->toPayload($value), JSON_THROW_ON_ERROR);
@@ -48,7 +48,7 @@ final class ScheduleType extends Type
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?Schedule
     {
-        if ($value === null || $value === "") {
+        if ($value === null || $value === '') {
             return null;
         }
 
@@ -84,10 +84,10 @@ final class ScheduleType extends Type
     private function toPayload(Schedule $schedule): array
     {
         return [
-            "mode" => $schedule->mode()->value,
-            "cronExpressions" => $schedule->cronExpressions(),
-            "testsPerDay" => $schedule->testsPerDay(),
-            "jitterSeconds" => $schedule->jitterSeconds(),
+            'mode' => $schedule->mode()->value,
+            'cronExpressions' => $schedule->cronExpressions(),
+            'testsPerDay' => $schedule->testsPerDay(),
+            'jitterSeconds' => $schedule->jitterSeconds(),
         ];
     }
 
@@ -96,7 +96,7 @@ final class ScheduleType extends Type
      */
     private function fromPayload(string $value, array $decoded): Schedule
     {
-        $rawMode = $decoded["mode"] ?? null;
+        $rawMode = $decoded['mode'] ?? null;
 
         if (!is_string($rawMode)) {
             throw ValueNotConvertible::new($value, self::NAME);
@@ -111,8 +111,8 @@ final class ScheduleType extends Type
         return match ($mode) {
             ScheduleMode::Cron => Schedule::cron(...$this->cronExpressions($value, $decoded)),
             ScheduleMode::Even => Schedule::even(
-                $this->intField($value, $decoded, "testsPerDay"),
-                $this->intField($value, $decoded, "jitterSeconds"),
+                $this->intField($value, $decoded, 'testsPerDay'),
+                $this->intField($value, $decoded, 'jitterSeconds'),
             ),
         };
     }
@@ -124,7 +124,7 @@ final class ScheduleType extends Type
      */
     private function cronExpressions(string $value, array $decoded): array
     {
-        $raw = $decoded["cronExpressions"] ?? null;
+        $raw = $decoded['cronExpressions'] ?? null;
 
         if (!is_array($raw)) {
             throw ValueNotConvertible::new($value, self::NAME);

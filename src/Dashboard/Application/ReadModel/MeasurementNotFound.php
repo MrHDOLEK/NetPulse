@@ -13,6 +13,6 @@ final class MeasurementNotFound extends NotFoundException
 {
     public static function withId(MeasurementId $id): self
     {
-        return new self(sprintf("Measurement %s not found.", $id->toString()));
+        return new self(sprintf('Measurement %s not found.', $id->toString()));
     }
 }

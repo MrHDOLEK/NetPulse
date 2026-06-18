@@ -11,7 +11,7 @@ final class MeasurementStatusTest extends TestCase
 {
     public function testHasCompletedAndFailedCases(): void
     {
-        $this->assertSame("completed", MeasurementStatus::Completed->value);
-        $this->assertSame("failed", MeasurementStatus::Failed->value);
+        $this->assertSame('completed', MeasurementStatus::Completed->value);
+        $this->assertSame('failed', MeasurementStatus::Failed->value);
     }
 }

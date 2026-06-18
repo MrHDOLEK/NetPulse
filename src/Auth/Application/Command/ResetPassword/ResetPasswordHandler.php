@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use function sprintf;
 use function strlen;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class ResetPasswordHandler
 {
     public function __construct(
@@ -34,7 +34,7 @@ final readonly class ResetPasswordHandler
         $user = $this->users->byEmail($email);
 
         if ($user === null) {
-            throw new UserNotFound(sprintf("User %s not found.", $email->value()));
+            throw new UserNotFound(sprintf('User %s not found.', $email->value()));
         }
 
         $hash = $this->hasherFactory

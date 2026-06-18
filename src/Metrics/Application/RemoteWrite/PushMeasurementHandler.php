@@ -39,16 +39,16 @@ final readonly class PushMeasurementHandler
         try {
             $this->client->write($series);
 
-            $this->logger->debug("remote write pushed", [
-                "connection" => $connection->name(),
-                "measurement" => $message->measurementId,
+            $this->logger->debug('remote write pushed', [
+                'connection' => $connection->name(),
+                'measurement' => $message->measurementId,
             ]);
         } catch (RemoteWriteFailed $exception) {
             $this->failures->increment();
-            $this->logger->error("remote write push failed", [
-                "connection" => $connection->name(),
-                "measurement" => $message->measurementId,
-                "error" => $exception->getMessage(),
+            $this->logger->error('remote write push failed', [
+                'connection' => $connection->name(),
+                'measurement' => $message->measurementId,
+                'error' => $exception->getMessage(),
             ]);
 
             throw $exception;

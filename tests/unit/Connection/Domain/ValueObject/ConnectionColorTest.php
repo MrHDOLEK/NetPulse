@@ -11,14 +11,14 @@ final class ConnectionColorTest extends TestCase
 {
     public function testHasThreeAccents(): void
     {
-        $this->assertSame("primary", ConnectionColor::Primary->value);
-        $this->assertSame("violet", ConnectionColor::Violet->value);
-        $this->assertSame("amber", ConnectionColor::Amber->value);
+        $this->assertSame('primary', ConnectionColor::Primary->value);
+        $this->assertSame('violet', ConnectionColor::Violet->value);
+        $this->assertSame('amber', ConnectionColor::Amber->value);
     }
 
     public function testCanBeBuiltFromValue(): void
     {
-        $this->assertSame(ConnectionColor::Amber, ConnectionColor::from("amber"));
+        $this->assertSame(ConnectionColor::Amber, ConnectionColor::from('amber'));
     }
 
     public function testDefaultsToPrimary(): void

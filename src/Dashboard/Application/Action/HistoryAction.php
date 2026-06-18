@@ -30,51 +30,43 @@ final class HistoryAction extends AbstractController
         private readonly ClockInterface $clock,
     ) {}
 
-    #[Route("/history", name: "history", methods: ["GET"])]
+    #[Route('/history', name: 'history', methods: ['GET'])]
     public function __invoke(): Response
     {
-        $now = $this->clock->now()->setTimezone(new DateTimeZone("UTC"));
+        $now = $this->clock->now()->setTimezone(new DateTimeZone('UTC'));
 
-        $filter = MeasurementFilter::lastDays(
-            self::DEFAULT_WINDOW_DAYS,
-            $now,
-            null,
-            null,
-            null,
-            null,
-            null,
-        );
+        $filter = MeasurementFilter::lastDays(self::DEFAULT_WINDOW_DAYS, $now, null, null, null, null, null);
 
         $sort = MeasurementSort::CompletedAtDesc;
         $items = $this->measurements->list($filter, self::DEFAULT_LIMIT, 0, $sort);
         $total = $this->measurements->countMatching($filter);
 
-        $bootstrapItems = MeasurementListResponse::from($items, $total, self::DEFAULT_LIMIT, 0)->toArray()["items"];
+        $bootstrapItems = MeasurementListResponse::from($items, $total, self::DEFAULT_LIMIT, 0)->toArray()['items'];
 
         $bootstrap = [
-            "filters" => [
-                "since" => $filter->since->format("Y-m-d"),
-                "until" => $filter->until->format("Y-m-d"),
-                "connection" => "",
-                "server" => "",
-                "status" => "",
-                "healthy" => "",
-                "scheduled" => "",
+            'filters' => [
+                'since' => $filter->since->format('Y-m-d'),
+                'until' => $filter->until->format('Y-m-d'),
+                'connection' => '',
+                'server' => '',
+                'status' => '',
+                'healthy' => '',
+                'scheduled' => '',
             ],
-            "limit" => self::DEFAULT_LIMIT,
-            "offset" => 0,
-            "sort" => $sort->value,
-            "total" => $total,
-            "items" => $bootstrapItems,
+            'limit' => self::DEFAULT_LIMIT,
+            'offset' => 0,
+            'sort' => $sort->value,
+            'total' => $total,
+            'items' => $bootstrapItems,
         ];
 
-        return $this->render("history/index.html.twig", [
-            "connections" => $this->connections->all(),
-            "servers" => $this->servers->all(),
-            "items" => $items,
-            "total" => $total,
-            "pendingRuns" => $this->pendingRuns->pending(),
-            "bootstrap" => $bootstrap,
+        return $this->render('history/index.html.twig', [
+            'connections' => $this->connections->all(),
+            'servers' => $this->servers->all(),
+            'items' => $items,
+            'total' => $total,
+            'pendingRuns' => $this->pendingRuns->pending(),
+            'bootstrap' => $bootstrap,
         ]);
     }
 }

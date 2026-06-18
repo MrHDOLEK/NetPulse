@@ -32,10 +32,10 @@ final class DoctrineUserRepository implements UserRepository
     {
         $user = $this->entityManager
             ->createQueryBuilder()
-            ->select("user")
-            ->from(User::class, "user")
-            ->where("user.email = :email")
-            ->setParameter("email", $email, "email")
+            ->select('user')
+            ->from(User::class, 'user')
+            ->where('user.email = :email')
+            ->setParameter('email', $email, 'email')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -44,7 +44,7 @@ final class DoctrineUserRepository implements UserRepository
         }
 
         if (!$user instanceof User) {
-            throw new LogicException("Expected query to return a User instance.");
+            throw new LogicException('Expected query to return a User instance.');
         }
 
         return $user;
@@ -54,26 +54,26 @@ final class DoctrineUserRepository implements UserRepository
     {
         $count = $this->entityManager
             ->createQueryBuilder()
-            ->select("COUNT(user.id)")
-            ->from(User::class, "user")
+            ->select('COUNT(user.id)')
+            ->from(User::class, 'user')
             ->getQuery()
             ->getSingleScalarResult();
 
         if (!is_numeric($count)) {
-            throw new LogicException("Expected COUNT query to return a numeric value.");
+            throw new LogicException('Expected COUNT query to return a numeric value.');
         }
 
-        return (int)$count;
+        return (int) $count;
     }
 
     public function get(UserId $id): User
     {
         $user = $this->entityManager
             ->createQueryBuilder()
-            ->select("user")
-            ->from(User::class, "user")
-            ->where("user.id = :id")
-            ->setParameter("id", $id, "user_id")
+            ->select('user')
+            ->from(User::class, 'user')
+            ->where('user.id = :id')
+            ->setParameter('id', $id, 'user_id')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -82,7 +82,7 @@ final class DoctrineUserRepository implements UserRepository
         }
 
         if (!$user instanceof User) {
-            throw new LogicException("Expected query to return a User instance.");
+            throw new LogicException('Expected query to return a User instance.');
         }
 
         return $user;

@@ -1,9 +1,9 @@
 # Architecture
 
-NetPulse is a **PHP 8.4 / Symfony 7.3** application built with **Hexagonal architecture
+NetPulse is a **PHP 8.5 / Symfony 8.1** application built with **Hexagonal architecture
 (Ports & Adapters) + Domain-Driven Design**. The layering is not just a convention — it is
-enforced in CI by [deptrac](https://github.com/qossmic/deptrac), with **0 violations**
-required, and the whole codebase passes **PHPStan level 10**.
+enforced in CI by [Deptrac](https://github.com/deptrac/deptrac), with **0 violations**
+required, and the whole codebase is linted and statically analysed by [Mago](https://mago.carthage.software/).
 
 ## Layers and the dependency rule
 
@@ -94,10 +94,9 @@ raw request content in the Action).
 
 ## What's enforced
 
-- **deptrac** — the layer/module boundaries above, 0 violations.
-- **PHPStan level 10** — strict types everywhere (`declare(strict_types=1)`), zero errors.
-- **PHPUnit + Behat** — unit, integration and BDD suites.
-- **php-cs-fixer** — code style.
+- **Deptrac** — the layer/module boundaries above, 0 violations.
+- **Mago** — linter, formatter & static analyzer (replaced PHPStan + php-cs-fixer); strict types everywhere (`declare(strict_types=1)`). `mago analyze` is gated against `mago-baseline.toml`.
+- **PHPUnit** — unit and integration suites. (Behat is parked until its ecosystem supports Symfony 8.)
 
 CI (`Test&lint PHP codebase`) runs the same gate on every push and pull request.
 

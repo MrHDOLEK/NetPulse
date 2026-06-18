@@ -20,7 +20,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class LabelsType extends Type
 {
-    public const string NAME = "labels";
+    public const string NAME = 'labels';
 
     /**
      * @param array<string, mixed> $column
@@ -37,7 +37,7 @@ final class LabelsType extends Type
         }
 
         if (!$value instanceof Labels) {
-            throw InvalidType::new($value, self::NAME, ["null", Labels::class]);
+            throw InvalidType::new($value, self::NAME, ['null', Labels::class]);
         }
 
         return json_encode($value->all(), JSON_THROW_ON_ERROR);
@@ -45,7 +45,7 @@ final class LabelsType extends Type
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): Labels
     {
-        if ($value === null || $value === "") {
+        if ($value === null || $value === '') {
             return Labels::empty();
         }
 

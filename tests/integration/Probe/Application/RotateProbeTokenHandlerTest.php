@@ -32,20 +32,22 @@ final class RotateProbeTokenHandlerTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->commandBus = $container->get("command.bus");
+        $this->commandBus = $container->get('command.bus');
         $this->probes = $container->get(ProbeRepository::class);
         $this->hasher = $container->get(ProbeTokenHasher::class);
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->dbal = $container->get(DbalConnection::class);
 
-        $this->dbal->executeStatement("DELETE FROM connections");
-        $this->dbal->executeStatement("DELETE FROM probes");
+        $this->dbal->executeStatement('DELETE FROM connections');
+        $this->dbal->executeStatement('DELETE FROM probes');
     }
 
     public function testRotatingSurfacesTheNewPlaintextOnceAndInvalidatesTheOldToken(): void
     {
-        $created = $this->commandBus->dispatch(new CreateProbeCommand("edge-01", Labels::empty()))
-            ->last(HandledStamp::class)?->getResult();
+        $created = $this->commandBus
+            ->dispatch(new CreateProbeCommand('edge-01', Labels::empty()))
+            ->last(HandledStamp::class)
+            ?->getResult();
         self::assertInstanceOf(ProbeCreated::class, $created);
 
         $probeId = $created->probeId;
@@ -53,8 +55,10 @@ final class RotateProbeTokenHandlerTest extends KernelTestCase
 
         $this->entityManager->clear();
 
-        $rotated = $this->commandBus->dispatch(new RotateProbeTokenCommand($probeId))
-            ->last(HandledStamp::class)?->getResult();
+        $rotated = $this->commandBus
+            ->dispatch(new RotateProbeTokenCommand($probeId))
+            ->last(HandledStamp::class)
+            ?->getResult();
         self::assertInstanceOf(ProbeTokenRotated::class, $rotated);
 
         $newToken = $rotated->plaintextToken;

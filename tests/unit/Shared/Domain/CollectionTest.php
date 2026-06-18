@@ -59,16 +59,16 @@ final class CollectionTest extends TestCase
      */
     public static function provideCollections(): iterable
     {
-        yield "strings" => [StringCollectionFixture::of("a", "b", "c"), ["a", "b", "c"]];
-        yield "ints" => [IntCollectionFixture::of(1, 2, 3, 4), [1, 2, 3, 4]];
-        yield "single" => [StringCollectionFixture::of("only"), ["only"]];
+        yield 'strings' => [StringCollectionFixture::of('a', 'b', 'c'), ['a', 'b', 'c']];
+        yield 'ints' => [IntCollectionFixture::of(1, 2, 3, 4), [1, 2, 3, 4]];
+        yield 'single' => [StringCollectionFixture::of('only'), ['only']];
     }
 
     /**
      * @param Collection<int|string> $collection
      * @param list<int|string> $expected
      */
-    #[DataProvider("provideCollections")]
+    #[DataProvider('provideCollections')]
     public function testIteratesInInsertionOrder(Collection $collection, array $expected): void
     {
         self::assertSame($expected, iterator_to_array($collection));
@@ -79,7 +79,7 @@ final class CollectionTest extends TestCase
      * @param Collection<int|string> $collection
      * @param list<int|string> $expected
      */
-    #[DataProvider("provideCollections")]
+    #[DataProvider('provideCollections')]
     public function testCountsElements(Collection $collection, array $expected): void
     {
         self::assertCount(count($expected), $collection);
@@ -89,7 +89,7 @@ final class CollectionTest extends TestCase
     public function testIsEmptyReflectsContents(): void
     {
         self::assertTrue(StringCollectionFixture::of()->isEmpty());
-        self::assertFalse(StringCollectionFixture::of("x")->isEmpty());
+        self::assertFalse(StringCollectionFixture::of('x')->isEmpty());
     }
 
     public function testExposesArrayIteratorAndImplementsSplContracts(): void
@@ -105,7 +105,7 @@ final class CollectionTest extends TestCase
     {
         $reflection = new ReflectionClass(Collection::class);
 
-        foreach (["add", "remove", "set", "push", "append", "clear"] as $mutator) {
+        foreach (['add', 'remove', 'set', 'push', 'append', 'clear'] as $mutator) {
             self::assertFalse($reflection->hasMethod($mutator), "Collection must not expose mutator {$mutator}().");
         }
 

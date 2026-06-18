@@ -14,6 +14,6 @@ final class WeakPassword extends InvalidArgumentException
 
     public static function tooShort(): self
     {
-        return new self(sprintf("Password must be at least %d characters long.", self::MIN_LENGTH));
+        return new self(sprintf('Password must be at least %d characters long.', self::MIN_LENGTH));
     }
 }

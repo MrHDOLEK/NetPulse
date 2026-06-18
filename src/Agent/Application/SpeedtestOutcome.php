@@ -6,7 +6,7 @@ namespace App\Agent\Application;
 
 final readonly class SpeedtestOutcome
 {
-    public const string FAILED_TYPE = "error";
+    public const string FAILED_TYPE = 'error';
 
     /**
      * @param array<string,mixed>|null $ooklaJson decoded Ookla JSON on success, null on failure
@@ -40,12 +40,12 @@ final readonly class SpeedtestOutcome
         }
 
         $payload = [
-            "type" => self::FAILED_TYPE,
-            "message" => $this->errorMessage ?? "speedtest failed",
+            'type' => self::FAILED_TYPE,
+            'message' => $this->errorMessage ?? 'speedtest failed',
         ];
 
         if ($serverId !== null) {
-            $payload["server"] = ["id" => $serverId];
+            $payload['server'] = ['id' => $serverId];
         }
 
         return $payload;

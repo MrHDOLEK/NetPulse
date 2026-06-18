@@ -15,7 +15,7 @@ final readonly class TimeSeries
         public SampleCollection $samples,
     ) {
         foreach ($labels as $label) {
-            if ($label->name === "__name__") {
+            if ($label->name === '__name__') {
                 return;
             }
         }

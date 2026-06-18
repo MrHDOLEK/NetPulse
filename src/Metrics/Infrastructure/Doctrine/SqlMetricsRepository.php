@@ -54,9 +54,11 @@ final readonly class SqlMetricsRepository implements MetricsRepository
     public function latestPerConnection(): LatestMeasurementRowCollection
     {
         $maxCompletedPerConnection =
-            "SELECT MAX(latest.completedAt) FROM " . Measurement::class . " latest "
-            . "WHERE latest.connectionId = measurement.connectionId "
-            . "AND latest.status = :completed";
+            'SELECT MAX(latest.completedAt) FROM '
+            . Measurement::class
+            . ' latest '
+            . 'WHERE latest.connectionId = measurement.connectionId '
+            . 'AND latest.status = :completed';
 
         /**
          * @var list<array{
@@ -83,38 +85,39 @@ final readonly class SqlMetricsRepository implements MetricsRepository
          *     healthy: bool|null
          * }> $rows
          */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.probeId AS probeId",
-                "probe.name AS probeName",
-                "probe.labels AS probeLabels",
-                "measurement.connectionId AS connectionId",
-                "connection.name AS connectionName",
-                "measurement.isp AS isp",
-                "measurement.serverId AS serverId",
-                "measurement.serverName AS serverName",
-                "measurement.serverLocation AS serverLocation",
-                "measurement.status AS status",
-                "measurement.completedAt AS completedAt",
-                "measurement.downloadBits AS downloadBits",
-                "measurement.uploadBits AS uploadBits",
-                "measurement.ping AS ping",
-                "measurement.jitter AS jitter",
-                "measurement.packetLossRatio AS packetLossRatio",
-                "measurement.downloadLatencyIqm AS downloadLatencyIqm",
-                "measurement.uploadLatencyIqm AS uploadLatencyIqm",
-                "measurement.dataUsedDownload AS dataUsedDownload",
-                "measurement.dataUsedUpload AS dataUsedUpload",
-                "measurement.healthy AS healthy",
+                'measurement.probeId AS probeId',
+                'probe.name AS probeName',
+                'probe.labels AS probeLabels',
+                'measurement.connectionId AS connectionId',
+                'connection.name AS connectionName',
+                'measurement.isp AS isp',
+                'measurement.serverId AS serverId',
+                'measurement.serverName AS serverName',
+                'measurement.serverLocation AS serverLocation',
+                'measurement.status AS status',
+                'measurement.completedAt AS completedAt',
+                'measurement.downloadBits AS downloadBits',
+                'measurement.uploadBits AS uploadBits',
+                'measurement.ping AS ping',
+                'measurement.jitter AS jitter',
+                'measurement.packetLossRatio AS packetLossRatio',
+                'measurement.downloadLatencyIqm AS downloadLatencyIqm',
+                'measurement.uploadLatencyIqm AS uploadLatencyIqm',
+                'measurement.dataUsedDownload AS dataUsedDownload',
+                'measurement.dataUsedUpload AS dataUsedUpload',
+                'measurement.healthy AS healthy',
             )
-            ->from(Measurement::class, "measurement")
-            ->join(Connection::class, "connection", Join::WITH, "connection.id = measurement.connectionId")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = measurement.probeId")
-            ->where("measurement.status = :completed")
-            ->andWhere("measurement.completedAt = (" . $maxCompletedPerConnection . ")")
-            ->groupBy("measurement.connectionId")
-            ->orderBy("connection.name", "ASC")
-            ->setParameter("completed", MeasurementStatus::Completed->value)
+            ->from(Measurement::class, 'measurement')
+            ->join(Connection::class, 'connection', Join::WITH, 'connection.id = measurement.connectionId')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = measurement.probeId')
+            ->where('measurement.status = :completed')
+            ->andWhere('measurement.completedAt = (' . $maxCompletedPerConnection . ')')
+            ->groupBy('measurement.connectionId')
+            ->orderBy('connection.name', 'ASC')
+            ->setParameter('completed', MeasurementStatus::Completed->value)
             ->getQuery()
             ->getResult();
 
@@ -122,26 +125,26 @@ final readonly class SqlMetricsRepository implements MetricsRepository
 
         foreach ($rows as $row) {
             $result[] = new LatestMeasurementRow(
-                probeId: $row["probeId"]->toString(),
-                probeName: $row["probeName"],
-                connectionId: $row["connectionId"]->toString(),
-                connectionName: $row["connectionName"],
-                isp: $row["isp"],
-                serverId: $row["serverId"],
-                serverName: $row["serverName"],
-                serverLocation: $row["serverLocation"],
-                site: $row["probeLabels"]->get("site") ?? "",
-                status: $row["status"]->value,
-                completedAtUnix: $row["completedAt"]->getTimestamp(),
-                downloadBits: $row["downloadBits"],
-                uploadBits: $row["uploadBits"],
-                pingSeconds: $this->msToSeconds($row["ping"]),
-                jitterSeconds: $this->msToSeconds($row["jitter"]),
-                packetLossRatio: $row["packetLossRatio"],
-                downloadLatencyIqmSeconds: $this->msToSeconds($row["downloadLatencyIqm"]),
-                uploadLatencyIqmSeconds: $this->msToSeconds($row["uploadLatencyIqm"]),
-                dataUsedBytes: $row["dataUsedDownload"] + $row["dataUsedUpload"],
-                healthy: $row["healthy"],
+                probeId: $row['probeId']->toString(),
+                probeName: $row['probeName'],
+                connectionId: $row['connectionId']->toString(),
+                connectionName: $row['connectionName'],
+                isp: $row['isp'],
+                serverId: $row['serverId'],
+                serverName: $row['serverName'],
+                serverLocation: $row['serverLocation'],
+                site: $row['probeLabels']->get('site') ?? '',
+                status: $row['status']->value,
+                completedAtUnix: $row['completedAt']->getTimestamp(),
+                downloadBits: $row['downloadBits'],
+                uploadBits: $row['uploadBits'],
+                pingSeconds: $this->msToSeconds($row['ping']),
+                jitterSeconds: $this->msToSeconds($row['jitter']),
+                packetLossRatio: $row['packetLossRatio'],
+                downloadLatencyIqmSeconds: $this->msToSeconds($row['downloadLatencyIqm']),
+                uploadLatencyIqmSeconds: $this->msToSeconds($row['uploadLatencyIqm']),
+                dataUsedBytes: $row['dataUsedDownload'] + $row['dataUsedUpload'],
+                healthy: $row['healthy'],
             );
         }
 
@@ -151,23 +154,24 @@ final readonly class SqlMetricsRepository implements MetricsRepository
     public function runCounts(): RunCountRowCollection
     {
         /** @var list<array{probeId: ProbeId, probeName: string, connectionId: ConnectionId, connectionName: string, status: MeasurementStatus, count: int}> $rows */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.probeId AS probeId",
-                "probe.name AS probeName",
-                "measurement.connectionId AS connectionId",
-                "connection.name AS connectionName",
-                "measurement.status AS status",
-                "COUNT(measurement.id) AS count",
+                'measurement.probeId AS probeId',
+                'probe.name AS probeName',
+                'measurement.connectionId AS connectionId',
+                'connection.name AS connectionName',
+                'measurement.status AS status',
+                'COUNT(measurement.id) AS count',
             )
-            ->from(Measurement::class, "measurement")
-            ->join(Connection::class, "connection", Join::WITH, "connection.id = measurement.connectionId")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = measurement.probeId")
-            ->groupBy("measurement.probeId")
-            ->addGroupBy("measurement.connectionId")
-            ->addGroupBy("measurement.status")
-            ->orderBy("connection.name", "ASC")
-            ->addOrderBy("measurement.status", "ASC")
+            ->from(Measurement::class, 'measurement')
+            ->join(Connection::class, 'connection', Join::WITH, 'connection.id = measurement.connectionId')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = measurement.probeId')
+            ->groupBy('measurement.probeId')
+            ->addGroupBy('measurement.connectionId')
+            ->addGroupBy('measurement.status')
+            ->orderBy('connection.name', 'ASC')
+            ->addOrderBy('measurement.status', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -175,12 +179,12 @@ final readonly class SqlMetricsRepository implements MetricsRepository
 
         foreach ($rows as $row) {
             $result[] = new RunCountRow(
-                probeId: $row["probeId"]->toString(),
-                probeName: $row["probeName"],
-                connectionId: $row["connectionId"]->toString(),
-                connectionName: $row["connectionName"],
-                status: $row["status"]->value,
-                count: $row["count"],
+                probeId: $row['probeId']->toString(),
+                probeName: $row['probeName'],
+                connectionId: $row['connectionId']->toString(),
+                connectionName: $row['connectionName'],
+                status: $row['status']->value,
+                count: $row['count'],
             );
         }
 
@@ -190,17 +194,18 @@ final readonly class SqlMetricsRepository implements MetricsRepository
     public function connectionsExpected(): ExpectedRowCollection
     {
         /** @var list<array{connectionId: ConnectionId, connectionName: string, probeName: string, expectedDownloadBits: int, expectedUploadBits: int}> $rows */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "connection.id AS connectionId",
-                "connection.name AS connectionName",
-                "probe.name AS probeName",
-                "connection.expected.expectedDownloadBits AS expectedDownloadBits",
-                "connection.expected.expectedUploadBits AS expectedUploadBits",
+                'connection.id AS connectionId',
+                'connection.name AS connectionName',
+                'probe.name AS probeName',
+                'connection.expected.expectedDownloadBits AS expectedDownloadBits',
+                'connection.expected.expectedUploadBits AS expectedUploadBits',
             )
-            ->from(Connection::class, "connection")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = connection.probeId")
-            ->orderBy("connection.name", "ASC")
+            ->from(Connection::class, 'connection')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = connection.probeId')
+            ->orderBy('connection.name', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -208,11 +213,11 @@ final readonly class SqlMetricsRepository implements MetricsRepository
 
         foreach ($rows as $row) {
             $result[] = new ExpectedRow(
-                connectionId: $row["connectionId"]->toString(),
-                connectionName: $row["connectionName"],
-                probeName: $row["probeName"],
-                expectedDownloadBits: $row["expectedDownloadBits"],
-                expectedUploadBits: $row["expectedUploadBits"],
+                connectionId: $row['connectionId']->toString(),
+                connectionName: $row['connectionName'],
+                probeName: $row['probeName'],
+                expectedDownloadBits: $row['expectedDownloadBits'],
+                expectedUploadBits: $row['expectedUploadBits'],
             );
         }
 
@@ -222,20 +227,17 @@ final readonly class SqlMetricsRepository implements MetricsRepository
     public function unhealthyCounts(): UnhealthyCountRowCollection
     {
         /** @var list<array{probeName: string, connectionName: string, count: int}> $rows */
-        $rows = $this->entityManager->createQueryBuilder()
-            ->select(
-                "probe.name AS probeName",
-                "connection.name AS connectionName",
-                "COUNT(measurement.id) AS count",
-            )
-            ->from(Measurement::class, "measurement")
-            ->join(Connection::class, "connection", Join::WITH, "connection.id = measurement.connectionId")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = measurement.probeId")
-            ->where("measurement.healthy = :unhealthy")
-            ->groupBy("measurement.probeId")
-            ->addGroupBy("measurement.connectionId")
-            ->orderBy("connection.name", "ASC")
-            ->setParameter("unhealthy", false, Types::BOOLEAN)
+        $rows = $this->entityManager
+            ->createQueryBuilder()
+            ->select('probe.name AS probeName', 'connection.name AS connectionName', 'COUNT(measurement.id) AS count')
+            ->from(Measurement::class, 'measurement')
+            ->join(Connection::class, 'connection', Join::WITH, 'connection.id = measurement.connectionId')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = measurement.probeId')
+            ->where('measurement.healthy = :unhealthy')
+            ->groupBy('measurement.probeId')
+            ->addGroupBy('measurement.connectionId')
+            ->orderBy('connection.name', 'ASC')
+            ->setParameter('unhealthy', false, Types::BOOLEAN)
             ->getQuery()
             ->getResult();
 
@@ -243,9 +245,9 @@ final readonly class SqlMetricsRepository implements MetricsRepository
 
         foreach ($rows as $row) {
             $result[] = new UnhealthyCountRow(
-                probeName: $row["probeName"],
-                connectionName: $row["connectionName"],
-                count: $row["count"],
+                probeName: $row['probeName'],
+                connectionName: $row['connectionName'],
+                count: $row['count'],
             );
         }
 
@@ -271,16 +273,17 @@ final readonly class SqlMetricsRepository implements MetricsRepository
 
     public function remoteWriteFailures(): int
     {
-        $total = $this->entityManager->createQueryBuilder()
-            ->select("counter.total")
-            ->from(RemoteWriteFailureCount::class, "counter")
-            ->where("counter.id = :id")
-            ->setParameter("id", RemoteWriteFailureCount::SINGLETON_ID)
+        $total = $this->entityManager
+            ->createQueryBuilder()
+            ->select('counter.total')
+            ->from(RemoteWriteFailureCount::class, 'counter')
+            ->where('counter.id = :id')
+            ->setParameter('id', RemoteWriteFailureCount::SINGLETON_ID)
             ->getQuery()
             ->getOneOrNullResult();
 
-        if (is_array($total) && isset($total["total"]) && is_int($total["total"])) {
-            return $total["total"];
+        if (is_array($total) && isset($total['total']) && is_int($total['total'])) {
+            return $total['total'];
         }
 
         return 0;
@@ -289,17 +292,18 @@ final readonly class SqlMetricsRepository implements MetricsRepository
     public function notificationSends(): NotificationSendRowCollection
     {
         /** @var list<array{kind: string, channel: string, status: string, total: int}> $rows */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "counter.kind AS kind",
-                "counter.channel AS channel",
-                "counter.status AS status",
-                "counter.total AS total",
+                'counter.kind AS kind',
+                'counter.channel AS channel',
+                'counter.status AS status',
+                'counter.total AS total',
             )
-            ->from(NotificationSendCount::class, "counter")
-            ->orderBy("counter.kind", "ASC")
-            ->addOrderBy("counter.channel", "ASC")
-            ->addOrderBy("counter.status", "ASC")
+            ->from(NotificationSendCount::class, 'counter')
+            ->orderBy('counter.kind', 'ASC')
+            ->addOrderBy('counter.channel', 'ASC')
+            ->addOrderBy('counter.status', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -307,10 +311,10 @@ final readonly class SqlMetricsRepository implements MetricsRepository
 
         foreach ($rows as $row) {
             $result[] = new NotificationSendRow(
-                kind: $row["kind"],
-                channel: $row["channel"],
-                status: $row["status"],
-                total: $row["total"],
+                kind: $row['kind'],
+                channel: $row['channel'],
+                status: $row['status'],
+                total: $row['total'],
             );
         }
 
@@ -330,21 +334,22 @@ final readonly class SqlMetricsRepository implements MetricsRepository
          *     adaptivePolicy: AdaptivePolicy
          * }> $rows
          */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.connectionId AS connectionId",
-                "connection.name AS connectionName",
-                "probe.name AS probeName",
-                "measurement.completedAt AS completedAt",
-                "measurement.status AS status",
-                "measurement.healthy AS healthy",
-                "connection.adaptivePolicy AS adaptivePolicy",
+                'measurement.connectionId AS connectionId',
+                'connection.name AS connectionName',
+                'probe.name AS probeName',
+                'measurement.completedAt AS completedAt',
+                'measurement.status AS status',
+                'measurement.healthy AS healthy',
+                'connection.adaptivePolicy AS adaptivePolicy',
             )
-            ->from(Measurement::class, "measurement")
-            ->join(Connection::class, "connection", Join::WITH, "connection.id = measurement.connectionId")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = measurement.probeId")
-            ->orderBy("measurement.connectionId", "ASC")
-            ->addOrderBy("measurement.completedAt", "DESC")
+            ->from(Measurement::class, 'measurement')
+            ->join(Connection::class, 'connection', Join::WITH, 'connection.id = measurement.connectionId')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = measurement.probeId')
+            ->orderBy('measurement.connectionId', 'ASC')
+            ->addOrderBy('measurement.completedAt', 'DESC')
             ->getQuery()
             ->getResult();
 
@@ -360,13 +365,13 @@ final readonly class SqlMetricsRepository implements MetricsRepository
         $samples = [];
 
         foreach ($rows as $row) {
-            $key = $row["connectionId"]->toString();
+            $key = $row['connectionId']->toString();
 
             if (!array_key_exists($key, $samples)) {
-                $connectionId[$key] = $row["connectionId"];
-                $connectionName[$key] = $row["connectionName"];
-                $probeName[$key] = $row["probeName"];
-                $policy[$key] = $row["adaptivePolicy"];
+                $connectionId[$key] = $row['connectionId'];
+                $connectionName[$key] = $row['connectionName'];
+                $probeName[$key] = $row['probeName'];
+                $policy[$key] = $row['adaptivePolicy'];
                 $samples[$key] = [];
             }
 
@@ -374,7 +379,7 @@ final readonly class SqlMetricsRepository implements MetricsRepository
                 continue;
             }
 
-            $samples[$key][] = $this->toSample($row["completedAt"], $row["status"], $row["healthy"]);
+            $samples[$key][] = $this->toSample($row['completedAt'], $row['status'], $row['healthy']);
         }
 
         $windows = [];

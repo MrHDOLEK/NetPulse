@@ -24,11 +24,11 @@ final readonly class ProbeConfig
     public function toArray(): array
     {
         return [
-            "probe" => [
-                "id" => $this->probeId,
-                "enabled" => $this->probeEnabled,
+            'probe' => [
+                'id' => $this->probeId,
+                'enabled' => $this->probeEnabled,
             ],
-            "connections" => array_map(
+            'connections' => array_map(
                 static fn(ProbeConnectionConfig $connection): array => $connection->toArray(),
                 $this->connections,
             ),

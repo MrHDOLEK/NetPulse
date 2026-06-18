@@ -36,9 +36,7 @@ final readonly class UserProvider implements UserProviderInterface
     public function refreshUser(UserInterface $user): SecurityUser
     {
         if (!$user instanceof SecurityUser) {
-            throw new UnsupportedUserException(
-                sprintf('Instances of "%s" are not supported.', $user::class),
-            );
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
         }
 
         return $this->loadUserByIdentifier($user->getUserIdentifier());

@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class HealthcheckAction extends AbstractController
 {
@@ -17,42 +17,30 @@ final class HealthcheckAction extends AbstractController
         private readonly HealthCheckRunner $runner,
     ) {}
 
-    #[Route("/v1/healthcheck", name: "healthcheck.get", methods: ["GET"])]
+    #[Route('/v1/healthcheck', name: 'healthcheck.get', methods: ['GET'])]
     #[OA\Get(
-        path: "/api/v1/healthcheck",
-        description: "Readiness probe. Runs the registered dependency health checks and returns 200 when all pass, 503 otherwise.",
-        summary: "Readiness check",
-        tags: ["System"],
+        path: '/api/v1/healthcheck',
+        description: 'Readiness probe. Runs the registered dependency health checks and returns 200 when all pass, 503 otherwise.',
+        summary: 'Readiness check',
+        tags: ['System'],
         responses: [
-            new OA\Response(
-                response: 200,
-                description: "All dependencies are healthy",
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: "status", type: "string", example: "healthy"),
-                        new OA\Property(
-                            property: "checks",
-                            type: "object",
-                            example: ["database" => ["status" => "up"]],
-                        ),
-                    ],
-                    type: "object",
-                ),
-            ),
+            new OA\Response(response: 200, description: 'All dependencies are healthy', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'healthy'),
+                    new OA\Property(property: 'checks', type: 'object', example: ['database' => ['status' => 'up']]),
+                ],
+                type: 'object',
+            )),
             new OA\Response(
                 response: 503,
-                description: "At least one dependency is unhealthy",
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: "status", type: "string", example: "unhealthy"),
-                        new OA\Property(
-                            property: "checks",
-                            type: "object",
-                            example: ["database" => ["status" => "down", "error" => "connection refused"]],
-                        ),
-                    ],
-                    type: "object",
-                ),
+                description: 'At least one dependency is unhealthy',
+                content: new OA\JsonContent(properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'unhealthy'),
+                    new OA\Property(property: 'checks', type: 'object', example: ['database' => [
+                        'status' => 'down',
+                        'error' => 'connection refused',
+                    ]]),
+                ], type: 'object'),
             ),
         ],
     )]

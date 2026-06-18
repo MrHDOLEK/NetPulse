@@ -23,48 +23,44 @@ use PHPUnit\Framework\TestCase;
 
 final class ProbeConfigProviderTest extends TestCase
 {
-    private const string PROBE_ID = "22222222-2222-4222-8222-222222222222";
-    private const string CONNECTION_ID = "33333333-3333-4333-8333-333333333333";
+    private const string PROBE_ID = '22222222-2222-4222-8222-222222222222';
+    private const string CONNECTION_ID = '33333333-3333-4333-8333-333333333333';
 
     public function testBuildsConfigWithProbeStateAndConnectionList(): void
     {
-        $probe = new Probe(
-            new ProbeId(self::PROBE_ID),
-            "home",
-            Labels::empty(),
-            "hash",
-            true,
-            new DateTimeImmutable(),
-        );
+        $probe = new Probe(new ProbeId(self::PROBE_ID), 'home', Labels::empty(), 'hash', true, new DateTimeImmutable());
 
         $provider = new ProbeConfigProvider($this->connectionsFor($probe->id()));
 
         $config = $provider->forProbe($probe);
 
-        $this->assertSame([
-            "probe" => [
-                "id" => self::PROBE_ID,
-                "enabled" => true,
-            ],
-            "connections" => [
-                [
-                    "id" => self::CONNECTION_ID,
-                    "name" => "wan1",
-                    "labels" => ["link" => "wan1"],
-                    "serverPool" => ["12746"],
-                    "enabled" => true,
+        $this->assertSame(
+            [
+                'probe' => [
+                    'id' => self::PROBE_ID,
+                    'enabled' => true,
+                ],
+                'connections' => [
+                    [
+                        'id' => self::CONNECTION_ID,
+                        'name' => 'wan1',
+                        'labels' => ['link' => 'wan1'],
+                        'serverPool' => ['12746'],
+                        'enabled' => true,
+                    ],
                 ],
             ],
-        ], $config->toArray());
+            $config->toArray(),
+        );
     }
 
     public function testDisabledProbeWithNoConnectionsYieldsEmptyConnectionList(): void
     {
         $probe = new Probe(
             new ProbeId(self::PROBE_ID),
-            "home",
+            'home',
             Labels::empty(),
-            "hash",
+            'hash',
             false,
             new DateTimeImmutable(),
         );
@@ -74,7 +70,7 @@ final class ProbeConfigProviderTest extends TestCase
         $config = $provider->forProbe($probe);
 
         $this->assertFalse($config->probeEnabled);
-        $this->assertSame([], $config->toArray()["connections"]);
+        $this->assertSame([], $config->toArray()['connections']);
     }
 
     private function connectionsFor(ProbeId $owner): ConnectionRepository
@@ -82,12 +78,12 @@ final class ProbeConfigProviderTest extends TestCase
         $connection = new Connection(
             new ConnectionId(self::CONNECTION_ID),
             $owner,
-            "wan1",
-            "Orange Polska",
+            'wan1',
+            'Orange Polska',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
-            Labels::fromArray(["link" => "wan1"]),
-            ServerPool::fromList("12746"),
+            Labels::fromArray(['link' => 'wan1']),
+            ServerPool::fromList('12746'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -109,13 +105,9 @@ final class ProbeConfigProviderTest extends TestCase
                 private readonly ConnectionCollection $collection,
             ) {}
 
-            public function save(Connection $connection): void
-            {
-            }
+            public function save(Connection $connection): void {}
 
-            public function delete(Connection $connection): void
-            {
-            }
+            public function delete(Connection $connection): void {}
 
             public function get(ConnectionId $connectionId): Connection
             {

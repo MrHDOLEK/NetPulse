@@ -15,13 +15,13 @@ use function count;
 
 final class ProbeCollectionTest extends TestCase
 {
-    private const string PROBE_A = "550e8400-e29b-41d4-a716-446655440001";
-    private const string PROBE_B = "550e8400-e29b-41d4-a716-446655440002";
+    private const string PROBE_A = '550e8400-e29b-41d4-a716-446655440001';
+    private const string PROBE_B = '550e8400-e29b-41d4-a716-446655440002';
 
     public function testOfAndFromListRoundTripTheProbes(): void
     {
-        $a = $this->probe(self::PROBE_A, "edge-a");
-        $b = $this->probe(self::PROBE_B, "edge-b");
+        $a = $this->probe(self::PROBE_A, 'edge-a');
+        $b = $this->probe(self::PROBE_B, 'edge-b');
 
         $collection = ProbeCollection::of($a, $b);
 
@@ -35,8 +35,8 @@ final class ProbeCollectionTest extends TestCase
     public function testFromListAcceptsAList(): void
     {
         $collection = ProbeCollection::fromList([
-            $this->probe(self::PROBE_A, "edge-a"),
-            $this->probe(self::PROBE_B, "edge-b"),
+            $this->probe(self::PROBE_A, 'edge-a'),
+            $this->probe(self::PROBE_B, 'edge-b'),
         ]);
 
         $names = [];
@@ -45,7 +45,7 @@ final class ProbeCollectionTest extends TestCase
             $names[] = $probe->name();
         }
 
-        $this->assertSame(["edge-a", "edge-b"], $names);
+        $this->assertSame(['edge-a', 'edge-b'], $names);
     }
 
     public function testEmptyCollectionIsIterableAndEmpty(): void
@@ -63,9 +63,9 @@ final class ProbeCollectionTest extends TestCase
             new ProbeId($id),
             $name,
             Labels::empty(),
-            "hash",
+            'hash',
             true,
-            new DateTimeImmutable("2026-06-05T10:00:00+00:00"),
+            new DateTimeImmutable('2026-06-05T10:00:00+00:00'),
         );
     }
 }

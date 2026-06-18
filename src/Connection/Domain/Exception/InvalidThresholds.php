@@ -10,11 +10,11 @@ final class InvalidThresholds extends DomainException
 {
     public static function ratioOutOfRange(string $field, float $ratio): self
     {
-        return new self($field . " must be in the (0, 1] range, got " . $ratio . ".");
+        return new self($field . ' must be in the (0, 1] range, got ' . $ratio . '.');
     }
 
     public static function negativeCap(string $field, float $value): self
     {
-        return new self($field . " must be >= 0 when set, got " . $value . ".");
+        return new self($field . ' must be >= 0 when set, got ' . $value . '.');
     }
 }

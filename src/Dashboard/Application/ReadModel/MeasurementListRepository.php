@@ -8,7 +8,12 @@ use App\Dashboard\Application\ReadModel\Enum\MeasurementSort;
 
 interface MeasurementListRepository
 {
-    public function list(MeasurementFilter $filter, int $limit, int $offset, MeasurementSort $sort): MeasurementListItemCollection;
+    public function list(
+        MeasurementFilter $filter,
+        int $limit,
+        int $offset,
+        MeasurementSort $sort,
+    ): MeasurementListItemCollection;
 
     public function countMatching(MeasurementFilter $filter): int;
 }

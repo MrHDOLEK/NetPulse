@@ -42,9 +42,9 @@ interface SpyFailureCounter extends RemoteWriteFailureCounter
 
 final class PushMeasurementHandlerTest extends TestCase
 {
-    private const string MEASUREMENT_ID = "11111111-1111-4111-8111-111111111111";
-    private const string PROBE_ID = "22222222-2222-4222-8222-222222222222";
-    private const string CONNECTION_ID = "33333333-3333-4333-8333-333333333333";
+    private const string MEASUREMENT_ID = '11111111-1111-4111-8111-111111111111';
+    private const string PROBE_ID = '22222222-2222-4222-8222-222222222222';
+    private const string CONNECTION_ID = '33333333-3333-4333-8333-333333333333';
 
     public function testWritesMappedSeriesThroughClient(): void
     {
@@ -65,7 +65,7 @@ final class PushMeasurementHandlerTest extends TestCase
             $repository,
             $this->connectionRepository(),
             $this->probeRepository(),
-            new MeasurementTimeSeriesMapper(""),
+            new MeasurementTimeSeriesMapper(''),
             $client,
             $counter,
             new NullLogger(),
@@ -83,8 +83,8 @@ final class PushMeasurementHandlerTest extends TestCase
             $labels[$label->name] = $label->value;
         }
 
-        self::assertSame("home", $labels["probe"]);
-        self::assertSame("wan1", $labels["connection"]);
+        self::assertSame('home', $labels['probe']);
+        self::assertSame('wan1', $labels['connection']);
     }
 
     public function testIncrementsCounterAndRethrowsOnFailure(): void
@@ -94,7 +94,7 @@ final class PushMeasurementHandlerTest extends TestCase
         $client = new class() implements RemoteWriteClient {
             public function write(TimeSeriesCollection $series): void
             {
-                throw RemoteWriteFailed::withStatus(500, "boom");
+                throw RemoteWriteFailed::withStatus(500, 'boom');
             }
         };
 
@@ -104,7 +104,7 @@ final class PushMeasurementHandlerTest extends TestCase
             $repository,
             $this->connectionRepository(),
             $this->probeRepository(),
-            new MeasurementTimeSeriesMapper(""),
+            new MeasurementTimeSeriesMapper(''),
             $client,
             $counter,
             new NullLogger(),
@@ -112,7 +112,7 @@ final class PushMeasurementHandlerTest extends TestCase
 
         try {
             $handler(new PushMeasurementMessage(self::MEASUREMENT_ID));
-            self::fail("Expected RemoteWriteFailed to propagate for Messenger retry.");
+            self::fail('Expected RemoteWriteFailed to propagate for Messenger retry.');
         } catch (RemoteWriteFailed) {
         }
 
@@ -123,20 +123,20 @@ final class PushMeasurementHandlerTest extends TestCase
     {
         return MeasurementMother::fromOoklaArray(
             [
-                "type" => "result",
-                "timestamp" => "2026-06-05T10:00:01Z",
-                "ping" => ["jitter" => 0.5, "latency" => 12.5, "low" => 11.0, "high" => 14.0],
-                "download" => ["bandwidth" => 11_750_000, "bytes" => 50_000_000, "elapsed" => 5000],
-                "upload" => ["bandwidth" => 2_000_000, "bytes" => 10_000_000, "elapsed" => 5000],
-                "packetLoss" => 0.0,
-                "server" => ["id" => 1, "name" => "S", "location" => "L", "host" => "h", "ip" => "1.2.3.4"],
-                "result" => ["url" => "https://x"],
+                'type' => 'result',
+                'timestamp' => '2026-06-05T10:00:01Z',
+                'ping' => ['jitter' => 0.5, 'latency' => 12.5, 'low' => 11.0, 'high' => 14.0],
+                'download' => ['bandwidth' => 11_750_000, 'bytes' => 50_000_000, 'elapsed' => 5000],
+                'upload' => ['bandwidth' => 2_000_000, 'bytes' => 10_000_000, 'elapsed' => 5000],
+                'packetLoss' => 0.0,
+                'server' => ['id' => 1, 'name' => 'S', 'location' => 'L', 'host' => 'h', 'ip' => '1.2.3.4'],
+                'result' => ['url' => 'https://x'],
             ],
             self::MEASUREMENT_ID,
             self::PROBE_ID,
             self::CONNECTION_ID,
             true,
-            (new MockClock("2026-06-06T10:00:00+00:00"))->now(),
+            new MockClock('2026-06-06T10:00:00+00:00')->now(),
         );
     }
 
@@ -147,9 +147,7 @@ final class PushMeasurementHandlerTest extends TestCase
                 private readonly Measurement $measurement,
             ) {}
 
-            public function save(Measurement $measurement): void
-            {
-            }
+            public function save(Measurement $measurement): void {}
 
             public function get(MeasurementId $id): Measurement
             {
@@ -168,12 +166,12 @@ final class PushMeasurementHandlerTest extends TestCase
         $connection = new Connection(
             new ConnectionId(self::CONNECTION_ID),
             new ProbeId(self::PROBE_ID),
-            "wan1",
-            "Orange Polska",
+            'wan1',
+            'Orange Polska',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
             Labels::empty(),
-            ServerPool::fromList("12746"),
+            ServerPool::fromList('12746'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -185,13 +183,9 @@ final class PushMeasurementHandlerTest extends TestCase
                 private readonly Connection $connection,
             ) {}
 
-            public function save(Connection $connection): void
-            {
-            }
+            public function save(Connection $connection): void {}
 
-            public function delete(Connection $connection): void
-            {
-            }
+            public function delete(Connection $connection): void {}
 
             public function get(ConnectionId $connectionId): Connection
             {
@@ -224,11 +218,11 @@ final class PushMeasurementHandlerTest extends TestCase
     {
         $probe = new Probe(
             new ProbeId(self::PROBE_ID),
-            "home",
-            Labels::fromArray(["site" => "warsaw"]),
-            "hash",
+            'home',
+            Labels::fromArray(['site' => 'warsaw']),
+            'hash',
             true,
-            new DateTimeImmutable("2026-06-06T10:00:00+00:00"),
+            new DateTimeImmutable('2026-06-06T10:00:00+00:00'),
         );
 
         return new class($probe) implements ProbeRepository {
@@ -236,13 +230,9 @@ final class PushMeasurementHandlerTest extends TestCase
                 private readonly Probe $probe,
             ) {}
 
-            public function save(Probe $probe): void
-            {
-            }
+            public function save(Probe $probe): void {}
 
-            public function delete(Probe $probe): void
-            {
-            }
+            public function delete(Probe $probe): void {}
 
             public function get(ProbeId $id): Probe
             {

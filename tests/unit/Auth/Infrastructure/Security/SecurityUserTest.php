@@ -24,8 +24,8 @@ final class SecurityUserTest extends TestCase
 
         $roles = $security->getRoles();
 
-        self::assertTrue(in_array("ROLE_ADMIN", $roles, true), "stored role preserved");
-        self::assertTrue(in_array("ROLE_USER", $roles, true), "Symfony baseline guaranteed");
+        self::assertTrue(in_array('ROLE_ADMIN', $roles, true), 'stored role preserved');
+        self::assertTrue(in_array('ROLE_USER', $roles, true), 'Symfony baseline guaranteed');
         self::assertCount(2, $roles);
     }
 
@@ -33,17 +33,17 @@ final class SecurityUserTest extends TestCase
     {
         $security = new SecurityUser($this->userWithRoles(UserRole::Admin, UserRole::User));
 
-        self::assertSame(["ROLE_ADMIN", "ROLE_USER"], $security->getRoles());
+        self::assertSame(['ROLE_ADMIN', 'ROLE_USER'], $security->getRoles());
     }
 
     private function userWithRoles(UserRole ...$roles): User
     {
         return User::register(
-            new UserId("550e8400-e29b-41d4-a716-446655440000"),
-            new Email("owner@example.com"),
-            HashedPassword::fromHash("hashed-secret"),
+            new UserId('550e8400-e29b-41d4-a716-446655440000'),
+            new Email('owner@example.com'),
+            HashedPassword::fromHash('hashed-secret'),
             new UserRoleCollection($roles),
-            new DateTimeImmutable("2026-06-05T10:00:00+00:00"),
+            new DateTimeImmutable('2026-06-05T10:00:00+00:00'),
         );
     }
 }

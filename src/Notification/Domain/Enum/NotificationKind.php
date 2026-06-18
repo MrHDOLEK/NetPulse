@@ -6,7 +6,7 @@ namespace App\Notification\Domain\Enum;
 
 enum NotificationKind: string
 {
-    case Alert = "alert";
-    case Recovery = "recovery";
-    case Digest = "digest";
+    case Alert = 'alert';
+    case Recovery = 'recovery';
+    case Digest = 'digest';
 }

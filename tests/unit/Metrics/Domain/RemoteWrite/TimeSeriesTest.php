@@ -18,21 +18,16 @@ final class TimeSeriesTest extends TestCase
     public function testExposesLabelsAndSamplesInOrder(): void
     {
         $series = new TimeSeries(
-            LabelCollection::of(
-                new Label("__name__", "netpulse_download_bits_per_second"),
-                new Label("probe", "home"),
-            ),
-            SampleCollection::of(
-                new Sample(123.5, 1_717_000_000_000),
-            ),
+            LabelCollection::of(new Label('__name__', 'netpulse_download_bits_per_second'), new Label('probe', 'home')),
+            SampleCollection::of(new Sample(123.5, 1_717_000_000_000)),
         );
 
         $labels = $series->labels->toArray();
         $samples = $series->samples->toArray();
 
         self::assertCount(2, $series->labels);
-        self::assertSame("__name__", $labels[0]->name);
-        self::assertSame("netpulse_download_bits_per_second", $labels[0]->value);
+        self::assertSame('__name__', $labels[0]->name);
+        self::assertSame('netpulse_download_bits_per_second', $labels[0]->value);
         self::assertCount(1, $series->samples);
         self::assertSame(123.5, $samples[0]->value);
         self::assertSame(1_717_000_000_000, $samples[0]->timestampMs);
@@ -43,7 +38,7 @@ final class TimeSeriesTest extends TestCase
         $this->expectException(InvalidTimeSeries::class);
 
         new TimeSeries(
-            LabelCollection::of(new Label("probe", "home")),
+            LabelCollection::of(new Label('probe', 'home')),
             SampleCollection::of(new Sample(1.0, 1_717_000_000_000)),
         );
     }
@@ -52,6 +47,6 @@ final class TimeSeriesTest extends TestCase
     {
         $this->expectException(InvalidLabel::class);
 
-        new Label("", "value");
+        new Label('', 'value');
     }
 }

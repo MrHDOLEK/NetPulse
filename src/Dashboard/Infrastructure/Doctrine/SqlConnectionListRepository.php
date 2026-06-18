@@ -34,19 +34,20 @@ final readonly class SqlConnectionListRepository implements ConnectionListReposi
          *     probeName: string
          * }> $rows
          */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "connection.id AS connectionId",
-                "connection.name AS name",
-                "connection.isp AS isp",
-                "connection.color AS color",
-                "connection.expected.expectedDownloadBits AS expectedDownloadBits",
-                "probe.name AS probeName",
+                'connection.id AS connectionId',
+                'connection.name AS name',
+                'connection.isp AS isp',
+                'connection.color AS color',
+                'connection.expected.expectedDownloadBits AS expectedDownloadBits',
+                'probe.name AS probeName',
             )
-            ->from(Connection::class, "connection")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = connection.probeId")
-            ->orderBy("probe.name", "ASC")
-            ->addOrderBy("connection.name", "ASC")
+            ->from(Connection::class, 'connection')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = connection.probeId')
+            ->orderBy('probe.name', 'ASC')
+            ->addOrderBy('connection.name', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -54,12 +55,12 @@ final readonly class SqlConnectionListRepository implements ConnectionListReposi
 
         foreach ($rows as $row) {
             $items[] = new ConnectionListItem(
-                connectionId: $row["connectionId"],
-                name: $row["name"],
-                isp: $row["isp"],
-                color: $row["color"],
-                expectedDownloadBits: $row["expectedDownloadBits"],
-                probeName: $row["probeName"],
+                connectionId: $row['connectionId'],
+                name: $row['name'],
+                isp: $row['isp'],
+                color: $row['color'],
+                expectedDownloadBits: $row['expectedDownloadBits'],
+                probeName: $row['probeName'],
             );
         }
 

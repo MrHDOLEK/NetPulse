@@ -10,16 +10,6 @@ jobs:
   test-and-lint-php:
     name: Test&lint PHP codebase
     runs-on: ubuntu-24.04
-    services:
-      pgsql:
-        image: postgres:16
-        env:
-          POSTGRES_DB: dbname
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: passwd
-          PGPASSWORD: passwd
-        ports:
-          - 5432:5432
     steps:
       - uses: actions/checkout@v4
 
@@ -29,35 +19,41 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-composer-dependencies-${{ hashFiles('composer.lock') }}
+          path: |
+            vendor
+            tools/mago/vendor
+            tools/deptrac/vendor
+          key: ${{ runner.os }}-composer-dependencies-${{ hashFiles('composer.lock', 'tools/mago/composer.lock', 'tools/deptrac/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-dependencies
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: 8.5
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, intl, sockets, apcu
+
+      - name: Setup just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-suggest
 
-      - name: Run PHP linter
-        run: composer cs:check
+      - name: Install Mago & Deptrac (isolated tools)
+        run: composer run-script tools:install
 
-      - name: Run PHPSTAN
-        run: composer phpstan
+      - name: Lint (Mago)
+        run: just lint
 
-      - name: Execute Architecture tests
-        run: |
-          composer deptrac
-          
+      - name: Static analysis (Mago)
+        run: just analyze
+
+      - name: Architecture (Deptrac)
+        run: just deptrac
+
       - name: Execute tests
         run: |
           cp .env.test .env
           composer migrate
           composer test
-          
-      - name: Execute tests
-        run: |
-         composer behat

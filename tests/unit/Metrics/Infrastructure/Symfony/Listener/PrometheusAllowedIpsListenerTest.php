@@ -20,14 +20,20 @@ final class PrometheusAllowedIpsListenerTest extends TestCase
      */
     public static function provideCases(): iterable
     {
-        yield "metrics disabled returns 404" => [false, "", "/metrics", "127.0.0.1", Response::HTTP_NOT_FOUND];
-        yield "client ip outside allowlist returns 403" => [true, "10.0.0.0/8", "/metrics", "203.0.113.5", Response::HTTP_FORBIDDEN];
-        yield "client ip inside allowlist passes through" => [true, "10.0.0.0/8", "/metrics", "10.1.2.3", null];
-        yield "empty allowlist allows any ip" => [true, "", "/metrics", "203.0.113.5", null];
-        yield "non-metrics path is ignored" => [false, "10.0.0.0/8", "/api/v1", "203.0.113.5", null];
+        yield 'metrics disabled returns 404' => [false, '', '/metrics', '127.0.0.1', Response::HTTP_NOT_FOUND];
+        yield 'client ip outside allowlist returns 403' => [
+            true,
+            '10.0.0.0/8',
+            '/metrics',
+            '203.0.113.5',
+            Response::HTTP_FORBIDDEN,
+        ];
+        yield 'client ip inside allowlist passes through' => [true, '10.0.0.0/8', '/metrics', '10.1.2.3', null];
+        yield 'empty allowlist allows any ip' => [true, '', '/metrics', '203.0.113.5', null];
+        yield 'non-metrics path is ignored' => [false, '10.0.0.0/8', '/api/v1', '203.0.113.5', null];
     }
 
-    #[DataProvider("provideCases")]
+    #[DataProvider('provideCases')]
     public function testEnforcesAllowlist(
         bool $metricsEnabled,
         string $allowedIpsRaw,
@@ -35,9 +41,7 @@ final class PrometheusAllowedIpsListenerTest extends TestCase
         string $clientIp,
         ?int $expectedStatus,
     ): void {
-        $listener = new PrometheusAllowedIpsListener(
-            new PrometheusConfig($metricsEnabled, $allowedIpsRaw, 3600),
-        );
+        $listener = new PrometheusAllowedIpsListener(new PrometheusConfig($metricsEnabled, $allowedIpsRaw, 3600));
 
         $event = $this->event($path, $clientIp);
         $listener->onKernelRequest($event);
@@ -54,7 +58,7 @@ final class PrometheusAllowedIpsListenerTest extends TestCase
 
     private function event(string $path, string $clientIp): RequestEvent
     {
-        $request = Request::create($path, "GET", server: ["REMOTE_ADDR" => $clientIp]);
+        $request = Request::create($path, 'GET', server: ['REMOTE_ADDR' => $clientIp]);
 
         return new RequestEvent($this->kernel(), $request, HttpKernelInterface::MAIN_REQUEST);
     }

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 use function strlen;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class CreateAdminHandler
 {
     public function __construct(

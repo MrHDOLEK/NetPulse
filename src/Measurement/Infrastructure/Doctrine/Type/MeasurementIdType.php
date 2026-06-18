@@ -13,14 +13,14 @@ use function is_string;
 
 final class MeasurementIdType extends Type
 {
-    public const string NAME = "measurement_id";
+    public const string NAME = 'measurement_id';
 
     /**
      * @param array<string, mixed> $column
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getStringTypeDeclarationSQL(["length" => 36]);
+        return $platform->getStringTypeDeclarationSQL(['length' => 36]);
     }
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string

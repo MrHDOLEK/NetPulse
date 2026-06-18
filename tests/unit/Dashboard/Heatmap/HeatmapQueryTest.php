@@ -14,7 +14,7 @@ final class HeatmapQueryTest extends TestCase
 {
     public function testExposesReadonlyPropertiesAsConstructed(): void
     {
-        $connectionId = new ConnectionId("11111111-1111-4111-8111-111111111111");
+        $connectionId = new ConnectionId('11111111-1111-4111-8111-111111111111');
 
         $query = new HeatmapQuery(HeatmapMetric::Ping, HeatmapWindow::Quarter, $connectionId);
 

@@ -13,9 +13,9 @@ final readonly class AdaptivePolicy
         private int $recoveryHealthyCount,
         private int $maxConsecutiveFailures,
     ) {
-        $this->guardPositive("adaptiveIntervalSeconds", $adaptiveIntervalSeconds);
-        $this->guardPositive("recoveryHealthyCount", $recoveryHealthyCount);
-        $this->guardPositive("maxConsecutiveFailures", $maxConsecutiveFailures);
+        $this->guardPositive('adaptiveIntervalSeconds', $adaptiveIntervalSeconds);
+        $this->guardPositive('recoveryHealthyCount', $recoveryHealthyCount);
+        $this->guardPositive('maxConsecutiveFailures', $maxConsecutiveFailures);
     }
 
     public static function default(): self

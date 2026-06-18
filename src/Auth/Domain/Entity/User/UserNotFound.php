@@ -12,6 +12,6 @@ final class UserNotFound extends NotFoundException
 {
     public static function withId(UserId $id): self
     {
-        return new self(sprintf("User %s not found.", $id->toString()));
+        return new self(sprintf('User %s not found.', $id->toString()));
     }
 }

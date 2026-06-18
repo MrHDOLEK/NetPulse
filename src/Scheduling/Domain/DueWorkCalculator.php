@@ -67,7 +67,7 @@ final readonly class DueWorkCalculator
         if ($degraded) {
             $effective = min($this->normalIntervalSeconds($schedule, $seed), $policy->adaptiveIntervalSeconds());
 
-            return $now->getTimestamp() >= $lastAt->getTimestamp() + $effective;
+            return $now->getTimestamp() >= ($lastAt->getTimestamp() + $effective);
         }
 
         return match ($schedule->mode()) {
@@ -106,13 +106,17 @@ final readonly class DueWorkCalculator
         return false;
     }
 
-    private function isEvenDue(Schedule $schedule, ?DateTimeImmutable $lastAt, string $seed, DateTimeImmutable $now): bool
-    {
+    private function isEvenDue(
+        Schedule $schedule,
+        ?DateTimeImmutable $lastAt,
+        string $seed,
+        DateTimeImmutable $now,
+    ): bool {
         if ($lastAt === null) {
             return true;
         }
 
-        return $now->getTimestamp() >= $lastAt->getTimestamp() + $this->evenSlotSeconds($schedule, $seed);
+        return $now->getTimestamp() >= ($lastAt->getTimestamp() + $this->evenSlotSeconds($schedule, $seed));
     }
 
     private function jitter(int $jitterSeconds, string $seed): int
@@ -121,7 +125,7 @@ final readonly class DueWorkCalculator
             return 0;
         }
 
-        return (int)(crc32($seed) % ($jitterSeconds + 1));
+        return (int) (crc32($seed) % ($jitterSeconds + 1));
     }
 
     private function nextServerId(ServerPool $pool, ?string $lastServerId): ?string

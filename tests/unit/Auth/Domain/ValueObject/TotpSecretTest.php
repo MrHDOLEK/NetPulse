@@ -12,22 +12,22 @@ final class TotpSecretTest extends TestCase
 {
     public function testHoldsAndReturnsValue(): void
     {
-        $secret = new TotpSecret("JBSWY3DPEHPK3PXP");
+        $secret = new TotpSecret('JBSWY3DPEHPK3PXP');
 
-        self::assertSame("JBSWY3DPEHPK3PXP", $secret->value());
-        self::assertSame("JBSWY3DPEHPK3PXP", (string)$secret);
+        self::assertSame('JBSWY3DPEHPK3PXP', $secret->value());
+        self::assertSame('JBSWY3DPEHPK3PXP', (string) $secret);
     }
 
     public function testRejectsEmptyString(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new TotpSecret("");
+        new TotpSecret('');
     }
 
     public function testEqualsByValue(): void
     {
-        self::assertTrue((new TotpSecret("ABC123"))->equals(new TotpSecret("ABC123")));
-        self::assertFalse((new TotpSecret("ABC123"))->equals(new TotpSecret("XYZ789")));
+        self::assertTrue(new TotpSecret('ABC123')->equals(new TotpSecret('ABC123')));
+        self::assertFalse(new TotpSecret('ABC123')->equals(new TotpSecret('XYZ789')));
     }
 }

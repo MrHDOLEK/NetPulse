@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ConnectionIdTypeTest extends TestCase
 {
-    private const string UUID = "44444444-4444-7444-8444-444444444444";
+    private const string UUID = '44444444-4444-7444-8444-444444444444';
 
     private ConnectionIdType $type;
     private AbstractPlatform $platform;
@@ -61,11 +61,11 @@ final class ConnectionIdTypeTest extends TestCase
     {
         $this->expectException(InvalidType::class);
 
-        $this->type->convertToDatabaseValue("not-an-id", $this->platform);
+        $this->type->convertToDatabaseValue('not-an-id', $this->platform);
     }
 
     public function testHasName(): void
     {
-        $this->assertSame("connection_id", $this->type->getName());
+        $this->assertSame('connection_id', $this->type->getName());
     }
 }

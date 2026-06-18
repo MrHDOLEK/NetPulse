@@ -12,14 +12,14 @@ final class HeatmapWindowTest extends TestCase
 {
     public function testFromParamMapsBackingValues(): void
     {
-        self::assertSame(HeatmapWindow::Month, HeatmapWindow::fromParam("30d"));
-        self::assertSame(HeatmapWindow::Quarter, HeatmapWindow::fromParam("90d"));
+        self::assertSame(HeatmapWindow::Month, HeatmapWindow::fromParam('30d'));
+        self::assertSame(HeatmapWindow::Quarter, HeatmapWindow::fromParam('90d'));
     }
 
     public function testFromParamRejectsUnknown(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        HeatmapWindow::fromParam("24h");
+        HeatmapWindow::fromParam('24h');
     }
 
     public function testWindowSeconds(): void

@@ -24,51 +24,53 @@ final class PrometheusRemoteWriteClientTest extends TestCase
     {
         $captured = [];
 
-        $mock = new MockHttpClient(function (string $method, string $url, array $options) use (&$captured): MockResponse {
-            $captured["method"] = $method;
-            $captured["url"] = $url;
-            $captured["headers"] = $options["normalized_headers"] ?? $options["headers"] ?? [];
-            $captured["body"] = $options["body"] ?? "";
+        $mock = new MockHttpClient(function (string $method, string $url, array $options) use (
+            &$captured,
+        ): MockResponse {
+            $captured['method'] = $method;
+            $captured['url'] = $url;
+            $captured['headers'] = $options['normalized_headers'] ?? $options['headers'] ?? [];
+            $captured['body'] = $options['body'] ?? '';
 
-            return new MockResponse("", ["http_code" => 204]);
+            return new MockResponse('', ['http_code' => 204]);
         });
 
         $config = new RemoteWriteConfig(
             enabled: true,
-            url: "https://metrics.example.com/api/v1/write",
-            auth: "basic:user:pass",
-            extraLabels: "env=prod",
+            url: 'https://metrics.example.com/api/v1/write',
+            auth: 'basic:user:pass',
+            extraLabels: 'env=prod',
         );
 
         $client = new PrometheusRemoteWriteClient($mock, new RemoteWriteEncoder(), $config);
 
         $client->write(TimeSeriesCollection::of(
             new TimeSeries(
-                LabelCollection::of(new Label("__name__", "netpulse_up"), new Label("probe", "home")),
+                LabelCollection::of(new Label('__name__', 'netpulse_up'), new Label('probe', 'home')),
                 SampleCollection::of(new Sample(1.0, 1_717_000_000_000)),
             ),
         ));
 
-        self::assertSame("POST", $captured["method"]);
-        self::assertSame("https://metrics.example.com/api/v1/write", $captured["url"]);
+        self::assertSame('POST', $captured['method']);
+        self::assertSame('https://metrics.example.com/api/v1/write', $captured['url']);
 
-        $headerBlob = strtolower(implode("\n", $this->flattenHeaders($captured["headers"])));
-        self::assertStringContainsString("content-encoding: snappy", $headerBlob);
-        self::assertStringContainsString("x-prometheus-remote-write-version: 0.1.0", $headerBlob);
-        self::assertStringContainsString("content-type: application/x-protobuf", $headerBlob);
-        self::assertStringContainsString("authorization: basic ", $headerBlob);
-        self::assertNotSame("", $captured["body"]);
+        $headerBlob = strtolower(implode("\n", $this->flattenHeaders($captured['headers'])));
+        self::assertStringContainsString('content-encoding: snappy', $headerBlob);
+        self::assertStringContainsString('x-prometheus-remote-write-version: 0.1.0', $headerBlob);
+        self::assertStringContainsString('content-type: application/x-protobuf', $headerBlob);
+        self::assertStringContainsString('authorization: basic ', $headerBlob);
+        self::assertNotSame('', $captured['body']);
     }
 
     public function testThrowsRemoteWriteFailedOnNon2xx(): void
     {
-        $mock = new MockHttpClient(static fn(): MockResponse => new MockResponse("boom", ["http_code" => 500]));
+        $mock = new MockHttpClient(static fn(): MockResponse => new MockResponse('boom', ['http_code' => 500]));
 
         $config = new RemoteWriteConfig(
             enabled: true,
-            url: "https://metrics.example.com/api/v1/write",
+            url: 'https://metrics.example.com/api/v1/write',
             auth: null,
-            extraLabels: "",
+            extraLabels: '',
         );
 
         $client = new PrometheusRemoteWriteClient($mock, new RemoteWriteEncoder(), $config);
@@ -77,7 +79,7 @@ final class PrometheusRemoteWriteClientTest extends TestCase
 
         $client->write(TimeSeriesCollection::of(
             new TimeSeries(
-                LabelCollection::of(new Label("__name__", "netpulse_up")),
+                LabelCollection::of(new Label('__name__', 'netpulse_up')),
                 SampleCollection::of(new Sample(1.0, 1)),
             ),
         ));
@@ -87,29 +89,31 @@ final class PrometheusRemoteWriteClientTest extends TestCase
     {
         $captured = [];
 
-        $mock = new MockHttpClient(function (string $method, string $url, array $options) use (&$captured): MockResponse {
-            $captured["headers"] = $options["normalized_headers"] ?? $options["headers"] ?? [];
+        $mock = new MockHttpClient(function (string $method, string $url, array $options) use (
+            &$captured,
+        ): MockResponse {
+            $captured['headers'] = $options['normalized_headers'] ?? $options['headers'] ?? [];
 
-            return new MockResponse("", ["http_code" => 200]);
+            return new MockResponse('', ['http_code' => 200]);
         });
 
         $config = new RemoteWriteConfig(
             enabled: true,
-            url: "https://metrics.example.com/api/v1/write",
-            auth: "bearer:secret-token",
-            extraLabels: "",
+            url: 'https://metrics.example.com/api/v1/write',
+            auth: 'bearer:secret-token',
+            extraLabels: '',
         );
 
         $client = new PrometheusRemoteWriteClient($mock, new RemoteWriteEncoder(), $config);
         $client->write(TimeSeriesCollection::of(
             new TimeSeries(
-                LabelCollection::of(new Label("__name__", "netpulse_up")),
+                LabelCollection::of(new Label('__name__', 'netpulse_up')),
                 SampleCollection::of(new Sample(1.0, 1)),
             ),
         ));
 
-        $headerBlob = strtolower(implode("\n", $this->flattenHeaders($captured["headers"])));
-        self::assertStringContainsString("authorization: bearer secret-token", $headerBlob);
+        $headerBlob = strtolower(implode("\n", $this->flattenHeaders($captured['headers'])));
+        self::assertStringContainsString('authorization: bearer secret-token', $headerBlob);
     }
 
     /**
@@ -124,13 +128,13 @@ final class PrometheusRemoteWriteClientTest extends TestCase
         foreach ($headers as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $item) {
-                    $flat[] = is_string($key) ? "{$key}: {$item}" : (string)$item;
+                    $flat[] = is_string($key) ? "{$key}: {$item}" : (string) $item;
                 }
 
                 continue;
             }
 
-            $flat[] = is_string($key) ? "{$key}: {$value}" : (string)$value;
+            $flat[] = is_string($key) ? "{$key}: {$value}" : (string) $value;
         }
 
         return $flat;

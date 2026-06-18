@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-#[AutoconfigureTag("controller.argument_value_resolver", ["priority" => -40])]
+#[AutoconfigureTag('controller.argument_value_resolver', ['priority' => -40])]
 final class ProbeTokenResolver implements ValueResolverInterface
 {
     public function __construct(
@@ -40,7 +40,7 @@ final class ProbeTokenResolver implements ValueResolverInterface
         $probe = $this->authenticate($request);
         $this->guardConnectionOwnership($request, $probe);
 
-        $request->attributes->set("_probe", $probe);
+        $request->attributes->set('_probe', $probe);
 
         yield $probe;
     }
@@ -49,8 +49,8 @@ final class ProbeTokenResolver implements ValueResolverInterface
     {
         $token = $this->extractToken($request);
 
-        $probeIdAttribute = $request->attributes->get("probeId");
-        $probeId = new ProbeId(is_string($probeIdAttribute) ? $probeIdAttribute : "");
+        $probeIdAttribute = $request->attributes->get('probeId');
+        $probeId = new ProbeId(is_string($probeIdAttribute) ? $probeIdAttribute : '');
 
         $probe = $this->probes->get($probeId);
 
@@ -67,15 +67,15 @@ final class ProbeTokenResolver implements ValueResolverInterface
 
     private function extractToken(Request $request): string
     {
-        $header = $request->headers->get("Authorization");
+        $header = $request->headers->get('Authorization');
 
-        if ($header === null || !str_starts_with($header, "Bearer ")) {
+        if ($header === null || !str_starts_with($header, 'Bearer ')) {
             throw new InvalidProbeToken();
         }
 
         $token = trim(substr($header, 7));
 
-        if ($token === "") {
+        if ($token === '') {
             throw new InvalidProbeToken();
         }
 
@@ -101,16 +101,16 @@ final class ProbeTokenResolver implements ValueResolverInterface
     {
         $content = $request->getContent();
 
-        if ($content === "") {
+        if ($content === '') {
             return null;
         }
 
         $decoded = json_decode($content, true);
 
-        if (!is_array($decoded) || !isset($decoded["connectionId"]) || !is_string($decoded["connectionId"])) {
+        if (!is_array($decoded) || !isset($decoded['connectionId']) || !is_string($decoded['connectionId'])) {
             return null;
         }
 
-        return $decoded["connectionId"];
+        return $decoded['connectionId'];
     }
 }

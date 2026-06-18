@@ -21,12 +21,12 @@ use function sprintf;
 
 final class HeatmapApiTest extends KernelTestCase
 {
-    private const string CSRF_TOKEN_ID = "authenticate";
-    private const string CSRF_RAW_TOKEN = "phpunit-login-token";
-    private const string ADMIN_EMAIL = "admin@example.com";
-    private const string ADMIN_PASSWORD = "correct-horse-battery";
-    private const string PROBE = "11111111-1111-1111-1111-111111111111";
-    private const string CONN = "aaaaaaaa-0000-0000-0000-000000000001";
+    private const string CSRF_TOKEN_ID = 'authenticate';
+    private const string CSRF_RAW_TOKEN = 'phpunit-login-token';
+    private const string ADMIN_EMAIL = 'admin@example.com';
+    private const string ADMIN_PASSWORD = 'correct-horse-battery';
+    private const string PROBE = '11111111-1111-1111-1111-111111111111';
+    private const string CONN = 'aaaaaaaa-0000-0000-0000-000000000001';
 
     private DbalConnection $db;
     private MessageBusInterface $commandBus;
@@ -38,7 +38,7 @@ final class HeatmapApiTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->db = $container->get("doctrine.dbal.default_connection");
+        $this->db = $container->get('doctrine.dbal.default_connection');
         $this->commandBus = $container->get(MessageBusInterface::class);
 
         $this->session = new Session(new MockArraySessionStorage());
@@ -50,32 +50,32 @@ final class HeatmapApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/heatmap?metric=download&window=30d&connection=%s", self::CONN));
+        $response = $this->get(sprintf('/dashboard/heatmap?metric=download&window=30d&connection=%s', self::CONN));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertStringContainsString("application/json", (string)$response->headers->get("Content-Type"));
-        self::assertStringContainsString("no-cache", (string)$response->headers->get("Cache-Control"));
+        self::assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+        self::assertStringContainsString('no-cache', (string) $response->headers->get('Cache-Control'));
 
         $payload = $this->decode($response);
 
-        self::assertSame("download", $payload["metric"]);
-        self::assertSame("30d", $payload["window"]);
-        self::assertSame(self::CONN, $payload["connectionId"]);
-        self::assertSame("Mbps", $payload["unit"]);
+        self::assertSame('download', $payload['metric']);
+        self::assertSame('30d', $payload['window']);
+        self::assertSame(self::CONN, $payload['connectionId']);
+        self::assertSame('Mbps', $payload['unit']);
 
-        self::assertArrayHasKey("scale", $payload);
-        self::assertArrayHasKey("min", $payload["scale"]);
-        self::assertArrayHasKey("max", $payload["scale"]);
+        self::assertArrayHasKey('scale', $payload);
+        self::assertArrayHasKey('min', $payload['scale']);
+        self::assertArrayHasKey('max', $payload['scale']);
 
-        self::assertArrayHasKey("legend", $payload);
-        self::assertNotEmpty($payload["legend"]);
+        self::assertArrayHasKey('legend', $payload);
+        self::assertNotEmpty($payload['legend']);
 
-        self::assertArrayHasKey("cells", $payload);
-        self::assertCount(168, $payload["cells"]);
+        self::assertArrayHasKey('cells', $payload);
+        self::assertCount(168, $payload['cells']);
 
-        $cell = $payload["cells"][0];
+        $cell = $payload['cells'][0];
 
-        foreach (["dow", "hour", "value", "valueLabel", "samples", "attempts", "bgStyle", "aria"] as $key) {
+        foreach (['dow', 'hour', 'value', 'valueLabel', 'samples', 'attempts', 'bgStyle', 'aria'] as $key) {
             self::assertArrayHasKey($key, $cell);
         }
     }
@@ -85,7 +85,7 @@ final class HeatmapApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/heatmap?metric=nope&window=30d&connection=%s", self::CONN));
+        $response = $this->get(sprintf('/dashboard/heatmap?metric=nope&window=30d&connection=%s', self::CONN));
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -95,7 +95,7 @@ final class HeatmapApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/heatmap?metric=download&window=24h&connection=%s", self::CONN));
+        $response = $this->get(sprintf('/dashboard/heatmap?metric=download&window=24h&connection=%s', self::CONN));
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -105,7 +105,7 @@ final class HeatmapApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get("/dashboard/heatmap?metric=download&window=30d&connection=not-a-uuid");
+        $response = $this->get('/dashboard/heatmap?metric=download&window=30d&connection=not-a-uuid');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -115,7 +115,7 @@ final class HeatmapApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get("/dashboard/heatmap?metric=download&window=30d");
+        $response = $this->get('/dashboard/heatmap?metric=download&window=30d');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -124,10 +124,10 @@ final class HeatmapApiTest extends KernelTestCase
     {
         $this->seedWorld();
 
-        $response = $this->get(sprintf("/dashboard/heatmap?metric=download&window=30d&connection=%s", self::CONN));
+        $response = $this->get(sprintf('/dashboard/heatmap?metric=download&window=30d&connection=%s', self::CONN));
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/login", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/login', (string) $response->headers->get('Location'));
     }
 
     /**
@@ -135,7 +135,7 @@ final class HeatmapApiTest extends KernelTestCase
      */
     private function decode(Response $response): array
     {
-        $decoded = json_decode((string)$response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $decoded = json_decode((string) $response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($decoded);
 
         return $decoded;
@@ -151,27 +151,24 @@ final class HeatmapApiTest extends KernelTestCase
 
     private function login(): void
     {
-        $this->session->set(
-            SessionTokenStorage::SESSION_NAMESPACE . "/" . self::CSRF_TOKEN_ID,
-            self::CSRF_RAW_TOKEN,
-        );
+        $this->session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . self::CSRF_TOKEN_ID, self::CSRF_RAW_TOKEN);
 
-        $request = Request::create("/login", "POST", [
-            "_username" => self::ADMIN_EMAIL,
-            "_password" => self::ADMIN_PASSWORD,
-            "_csrf_token" => self::CSRF_RAW_TOKEN,
+        $request = Request::create('/login', 'POST', [
+            '_username' => self::ADMIN_EMAIL,
+            '_password' => self::ADMIN_PASSWORD,
+            '_csrf_token' => self::CSRF_RAW_TOKEN,
         ]);
         $this->attachSession($request);
 
-        self::getContainer()->get("kernel")->handle($request);
+        self::getContainer()->get('kernel')->handle($request);
     }
 
     private function get(string $path): Response
     {
-        $request = Request::create($path, "GET");
+        $request = Request::create($path, 'GET');
         $this->attachSession($request);
 
-        return self::getContainer()->get("kernel")->handle($request);
+        return self::getContainer()->get('kernel')->handle($request);
     }
 
     private function attachSession(Request $request): void
@@ -182,42 +179,57 @@ final class HeatmapApiTest extends KernelTestCase
 
     private function seedMeasurements(): void
     {
-        $now = (new DateTimeImmutable("now", new DateTimeZone("UTC")))->getTimestamp();
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'))->getTimestamp();
 
-        $this->insertMeasurement("completed", $now - 3 * 3600, 920_000_000, 12.0, true);
-        $this->insertMeasurement("completed", $now - 2 * 3600, 940_000_000, 11.0, true);
-        $this->insertMeasurement("completed", $now - 1 * 3600, 955_000_000, 9.5, true);
-        $this->insertMeasurement("failed", $now - 30 * 60, null, null, false);
+        $this->insertMeasurement('completed', $now - (3 * 3600), 920_000_000, 12.0, true);
+        $this->insertMeasurement('completed', $now - (2 * 3600), 940_000_000, 11.0, true);
+        $this->insertMeasurement('completed', $now - (1 * 3600), 955_000_000, 9.5, true);
+        $this->insertMeasurement('failed', $now - (30 * 60), null, null, false);
     }
 
     private function insertProbe(): void
     {
-        $this->db->insert("probes", [
-            "id" => self::PROBE,
-            "name" => "home",
-            "labels" => json_encode([], JSON_THROW_ON_ERROR),
-            "token_hash" => "x",
-            "enabled" => 1,
-            "created_at" => "2026-06-05 10:00:00",
+        $this->db->insert('probes', [
+            'id' => self::PROBE,
+            'name' => 'home',
+            'labels' => json_encode([], JSON_THROW_ON_ERROR),
+            'token_hash' => 'x',
+            'enabled' => 1,
+            'created_at' => '2026-06-05 10:00:00',
         ]);
     }
 
     private function insertConnection(): void
     {
-        $this->db->insert("connections", [
-            "id" => self::CONN,
-            "probe_id" => self::PROBE,
-            "name" => "Fibre WAN Primary",
-            "isp" => "Acme ISP",
-            "expected_download_bits" => 1_000_000_000,
-            "expected_upload_bits" => 500_000_000,
-            "color" => "primary",
-            "labels" => json_encode([], JSON_THROW_ON_ERROR),
-            "server_pool" => json_encode([], JSON_THROW_ON_ERROR),
-            "schedule" => json_encode(["mode" => "even", "cronExpressions" => [], "testsPerDay" => 24, "jitterSeconds" => 120], JSON_THROW_ON_ERROR),
-            "thresholds" => json_encode(["minDownloadRatio" => 0.7, "minUploadRatio" => 0.7, "maxPingMs" => 100, "maxJitterMs" => 50, "maxPacketLossRatio" => 0.05], JSON_THROW_ON_ERROR),
-            "adaptive_policy" => json_encode(["adaptiveIntervalSeconds" => 300, "recoveryHealthyCount" => 3, "maxConsecutiveFailures" => 5], JSON_THROW_ON_ERROR),
-            "enabled" => 1,
+        $this->db->insert('connections', [
+            'id' => self::CONN,
+            'probe_id' => self::PROBE,
+            'name' => 'Fibre WAN Primary',
+            'isp' => 'Acme ISP',
+            'expected_download_bits' => 1_000_000_000,
+            'expected_upload_bits' => 500_000_000,
+            'color' => 'primary',
+            'labels' => json_encode([], JSON_THROW_ON_ERROR),
+            'server_pool' => json_encode([], JSON_THROW_ON_ERROR),
+            'schedule' => json_encode([
+                'mode' => 'even',
+                'cronExpressions' => [],
+                'testsPerDay' => 24,
+                'jitterSeconds' => 120,
+            ], JSON_THROW_ON_ERROR),
+            'thresholds' => json_encode([
+                'minDownloadRatio' => 0.7,
+                'minUploadRatio' => 0.7,
+                'maxPingMs' => 100,
+                'maxJitterMs' => 50,
+                'maxPacketLossRatio' => 0.05,
+            ], JSON_THROW_ON_ERROR),
+            'adaptive_policy' => json_encode([
+                'adaptiveIntervalSeconds' => 300,
+                'recoveryHealthyCount' => 3,
+                'maxConsecutiveFailures' => 5,
+            ], JSON_THROW_ON_ERROR),
+            'enabled' => 1,
         ]);
     }
 
@@ -228,35 +240,39 @@ final class HeatmapApiTest extends KernelTestCase
         ?float $pingMs,
         ?bool $healthy,
     ): void {
-        $completedAt = (new DateTimeImmutable("@" . $completedAtUnix))
-            ->setTimezone(new DateTimeZone("UTC"))
-            ->format("Y-m-d H:i:s");
+        $completedAt = new DateTimeImmutable('@' . $completedAtUnix)
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format('Y-m-d H:i:s');
 
-        $this->db->insert("measurements", [
-            "id" => sprintf("eeeeeeee-0000-0000-0000-%012d", ++$this->measurementSeq),
-            "probe_id" => self::PROBE,
-            "connection_id" => self::CONN,
-            "status" => $status,
-            "scheduled" => 1,
-            "started_at" => $completedAt,
-            "completed_at" => $completedAt,
-            "server_id" => "12345",
-            "server_name" => "Acme Speedtest",
-            "server_location" => "Warsaw",
-            "server_host" => "speedtest.acme.example:8080",
-            "isp" => "Acme ISP",
-            "download_bits" => $downloadBits,
-            "upload_bits" => $downloadBits,
-            "ping" => $pingMs,
-            "packet_loss_ratio" => null,
-            "data_used_download" => 0,
-            "data_used_upload" => 0,
-            "download_elapsed" => 4000,
-            "upload_elapsed" => 4000,
-            "raw_payload" => json_encode([], JSON_THROW_ON_ERROR),
-            "healthy" => $healthy,
-        ], [
-            "healthy" => Types::BOOLEAN,
-        ]);
+        $this->db->insert(
+            'measurements',
+            [
+                'id' => sprintf('eeeeeeee-0000-0000-0000-%012d', ++$this->measurementSeq),
+                'probe_id' => self::PROBE,
+                'connection_id' => self::CONN,
+                'status' => $status,
+                'scheduled' => 1,
+                'started_at' => $completedAt,
+                'completed_at' => $completedAt,
+                'server_id' => '12345',
+                'server_name' => 'Acme Speedtest',
+                'server_location' => 'Warsaw',
+                'server_host' => 'speedtest.acme.example:8080',
+                'isp' => 'Acme ISP',
+                'download_bits' => $downloadBits,
+                'upload_bits' => $downloadBits,
+                'ping' => $pingMs,
+                'packet_loss_ratio' => null,
+                'data_used_download' => 0,
+                'data_used_upload' => 0,
+                'download_elapsed' => 4000,
+                'upload_elapsed' => 4000,
+                'raw_payload' => json_encode([], JSON_THROW_ON_ERROR),
+                'healthy' => $healthy,
+            ],
+            [
+                'healthy' => Types::BOOLEAN,
+            ],
+        );
     }
 }

@@ -20,8 +20,8 @@ final readonly class HashedPassword implements Stringable
 
     public static function fromHash(string $hash): self
     {
-        if ($hash === "") {
-            throw new InvalidArgumentException("Hashed password must not be empty.");
+        if ($hash === '') {
+            throw new InvalidArgumentException('Hashed password must not be empty.');
         }
 
         return new self($hash);

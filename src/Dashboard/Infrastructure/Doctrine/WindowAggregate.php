@@ -39,6 +39,6 @@ final readonly class WindowAggregate
             return 0.0;
         }
 
-        return $this->healthyCount / $this->testsRun * 100.0;
+        return ($this->healthyCount / $this->testsRun) * 100.0;
     }
 }

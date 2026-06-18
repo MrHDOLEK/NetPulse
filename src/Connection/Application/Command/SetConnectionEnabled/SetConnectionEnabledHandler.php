@@ -8,7 +8,7 @@ use App\Connection\Domain\ConnectionRepository;
 use App\Connection\Domain\Exception\ConnectionNotFound;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class SetConnectionEnabledHandler
 {
     public function __construct(

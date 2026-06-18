@@ -38,8 +38,8 @@ final readonly class SecurityUser implements UserInterface, PasswordAuthenticate
     {
         $roles = $this->user->roles()->toStringArray();
 
-        if (!in_array("ROLE_USER", $roles, true)) {
-            $roles[] = "ROLE_USER";
+        if (!in_array('ROLE_USER', $roles, true)) {
+            $roles[] = 'ROLE_USER';
         }
 
         return array_values(array_unique($roles));
@@ -50,9 +50,7 @@ final readonly class SecurityUser implements UserInterface, PasswordAuthenticate
         return $this->user->password()->value();
     }
 
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     public function isTotpAuthenticationEnabled(): bool
     {

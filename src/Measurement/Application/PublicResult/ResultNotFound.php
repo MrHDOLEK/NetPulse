@@ -6,6 +6,4 @@ namespace App\Measurement\Application\PublicResult;
 
 use RuntimeException;
 
-final class ResultNotFound extends RuntimeException
-{
-}
+final class ResultNotFound extends RuntimeException {}

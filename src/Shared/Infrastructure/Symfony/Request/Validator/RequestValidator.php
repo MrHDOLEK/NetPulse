@@ -29,10 +29,10 @@ final class RequestValidator
 
         /** @var ConstraintViolation $violation */
         foreach ($violations as $violation) {
-            $violationMessage = (string)$violation->getMessage();
+            $violationMessage = (string) $violation->getMessage();
 
-            if (!str_contains($violationMessage, "VALIDATION")) {
-                $violationMessage = "VALIDATION.UNKNOWN";
+            if (!str_contains($violationMessage, 'VALIDATION')) {
+                $violationMessage = 'VALIDATION.UNKNOWN';
             }
 
             $errors[$violation->getPropertyPath()][] = $violationMessage;

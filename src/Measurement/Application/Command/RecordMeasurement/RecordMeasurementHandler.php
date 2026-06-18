@@ -18,14 +18,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class RecordMeasurementHandler
 {
     public function __construct(
         private MeasurementRepository $measurements,
         private ConnectionRepository $connections,
         private IdGeneratorInterface $idGenerator,
-        #[Autowire(service: "event.bus")]
+        #[Autowire(service: 'event.bus')]
         private MessageBusInterface $eventBus,
         private ClockInterface $clock,
         private OoklaResultMapper $mapper,
@@ -54,27 +54,20 @@ final readonly class RecordMeasurementHandler
             $command->rawPayload,
         );
 
-        $verdict = $this->healthEvaluator->evaluate(
-            $measurement,
-            $connection->thresholds(),
-            $connection->expected(),
-        );
+        $verdict = $this->healthEvaluator->evaluate($measurement, $connection->thresholds(), $connection->expected());
         $measurement->markHealth($verdict->isHealthy());
 
         $this->measurements->save($measurement);
 
-        $this->logger->info("measurement recorded", [
-            "probe" => $command->probeId->toString(),
-            "connection" => $command->connectionId->toString(),
-            "status" => $measurement->status()->value,
-            "healthy" => $verdict->isHealthy(),
+        $this->logger->info('measurement recorded', [
+            'probe' => $command->probeId->toString(),
+            'connection' => $command->connectionId->toString(),
+            'status' => $measurement->status()->value,
+            'healthy' => $verdict->isHealthy(),
         ]);
 
-        $this->eventBus->dispatch(new MeasurementRecorded(
-            $measurementId,
-            $command->probeId,
-            $command->connectionId,
-            $now,
-        ));
+        $this->eventBus->dispatch(
+            new MeasurementRecorded($measurementId, $command->probeId, $command->connectionId, $now),
+        );
     }
 }

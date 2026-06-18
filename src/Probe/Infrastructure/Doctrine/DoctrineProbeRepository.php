@@ -47,10 +47,10 @@ final class DoctrineProbeRepository implements ProbeRepository
     {
         $probe = $this->entityManager
             ->createQueryBuilder()
-            ->select("probe")
-            ->from(Probe::class, "probe")
-            ->where("probe.id = :id")
-            ->setParameter("id", $id, "probe_id")
+            ->select('probe')
+            ->from(Probe::class, 'probe')
+            ->where('probe.id = :id')
+            ->setParameter('id', $id, 'probe_id')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -59,7 +59,7 @@ final class DoctrineProbeRepository implements ProbeRepository
         }
 
         if (!$probe instanceof Probe) {
-            throw new LogicException("Expected query to return a Probe instance.");
+            throw new LogicException('Expected query to return a Probe instance.');
         }
 
         return $probe;
@@ -70,9 +70,9 @@ final class DoctrineProbeRepository implements ProbeRepository
         /** @var list<Probe> $probes */
         $probes = $this->entityManager
             ->createQueryBuilder()
-            ->select("probe")
-            ->from(Probe::class, "probe")
-            ->orderBy("probe.createdAt", "DESC")
+            ->select('probe')
+            ->from(Probe::class, 'probe')
+            ->orderBy('probe.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
 

@@ -8,7 +8,7 @@ use RuntimeException;
 
 final class ValidationError extends RuntimeException
 {
-    public const GENERAL = "general";
+    public const GENERAL = 'general';
 
     /**
      * @param array<mixed> $errors
@@ -17,7 +17,7 @@ final class ValidationError extends RuntimeException
         /** @var array<mixed> */
         private array $errors,
     ) {
-        parent::__construct("Request is invalid.", 400);
+        parent::__construct('Request is invalid.', 400);
     }
 
     /**

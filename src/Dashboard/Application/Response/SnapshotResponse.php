@@ -36,10 +36,10 @@ final readonly class SnapshotResponse
     public function toArray(): array
     {
         return [
-            "connections" => $this->connections,
-            "prometheus" => [
-                "status" => "scraping",
-                "endpoint" => "/metrics",
+            'connections' => $this->connections,
+            'prometheus' => [
+                'status' => 'scraping',
+                'endpoint' => '/metrics',
             ],
         ];
     }
@@ -50,16 +50,16 @@ final readonly class SnapshotResponse
     private static function snapshot(ConnectionOverview $connection): array
     {
         return [
-            "connectionId" => $connection->connectionId->toString(),
-            "name" => $connection->name,
-            "status" => $connection->status->value,
-            "downloadBits" => $connection->downloadBits,
-            "uploadBits" => $connection->uploadBits,
-            "pingSeconds" => $connection->pingSeconds,
-            "packetLossRatio" => $connection->packetLossRatio,
-            "uptimePct" => $connection->uptimePct,
-            "latestHealthy" => $connection->latestHealthy,
-            "completedAtUnix" => $connection->completedAtUnix,
+            'connectionId' => $connection->connectionId->toString(),
+            'name' => $connection->name,
+            'status' => $connection->status->value,
+            'downloadBits' => $connection->downloadBits,
+            'uploadBits' => $connection->uploadBits,
+            'pingSeconds' => $connection->pingSeconds,
+            'packetLossRatio' => $connection->packetLossRatio,
+            'uptimePct' => $connection->uptimePct,
+            'latestHealthy' => $connection->latestHealthy,
+            'completedAtUnix' => $connection->completedAtUnix,
         ];
     }
 }

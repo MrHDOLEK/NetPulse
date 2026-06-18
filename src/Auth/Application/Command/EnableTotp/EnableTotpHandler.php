@@ -9,7 +9,7 @@ use App\Auth\Domain\UserRepository;
 use App\Auth\Domain\ValueObject\TotpSecret;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class EnableTotpHandler
 {
     public function __construct(

@@ -45,11 +45,11 @@ final readonly class SettingsNotificationSettingsProvider implements Notificatio
     {
         $raw = trim($this->settings->getString(SettingKey::NotifyThreshold));
 
-        if ($raw === "" || !ctype_digit($raw)) {
+        if ($raw === '' || !ctype_digit($raw)) {
             return self::DEFAULT_THRESHOLD;
         }
 
-        return max(self::MIN_THRESHOLD, (int)$raw);
+        return max(self::MIN_THRESHOLD, (int) $raw);
     }
 
     /**
@@ -57,13 +57,13 @@ final readonly class SettingsNotificationSettingsProvider implements Notificatio
      */
     private function csv(string $value): array
     {
-        if (trim($value) === "") {
+        if (trim($value) === '') {
             return [];
         }
 
         return array_values(array_filter(
-            array_map(static fn(string $item): string => trim($item), explode(",", $value)),
-            static fn(string $item): bool => $item !== "",
+            array_map(static fn(string $item): string => trim($item), explode(',', $value)),
+            static fn(string $item): bool => $item !== '',
         ));
     }
 }

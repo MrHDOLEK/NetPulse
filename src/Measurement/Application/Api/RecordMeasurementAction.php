@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class RecordMeasurementAction extends AbstractController
 {
@@ -22,18 +22,20 @@ final class RecordMeasurementAction extends AbstractController
         private readonly RequestValidator $requestValidator,
     ) {}
 
-    #[Route("/v1/probes/{probeId}/results", name: "measurement.record", methods: ["POST"])]
+    #[Route('/v1/probes/{probeId}/results', name: 'measurement.record', methods: ['POST'])]
     public function __invoke(Probe $probe, RecordMeasurementRequest $request): Response
     {
         $this->requestValidator->validate($request);
 
-        $this->commandBus->dispatch(new RecordMeasurementCommand(
-            $probe->id(),
-            new ConnectionId($request->connectionId),
-            $request->ookla,
-            $request->scheduled,
-            $request->raw,
-        ));
+        $this->commandBus->dispatch(
+            new RecordMeasurementCommand(
+                $probe->id(),
+                new ConnectionId($request->connectionId),
+                $request->ookla,
+                $request->scheduled,
+                $request->raw,
+            ),
+        );
 
         return new JsonResponse(null, Response::HTTP_CREATED);
     }

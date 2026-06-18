@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class SetProbeEnabledHandlerTest extends KernelTestCase
 {
-    private const string PROBE = "cccccccc-cccc-7ccc-8ccc-cccccccccccc";
+    private const string PROBE = 'cccccccc-cccc-7ccc-8ccc-cccccccccccc';
 
     private MessageBusInterface $commandBus;
     private ProbeRepository $probes;
@@ -29,13 +29,13 @@ final class SetProbeEnabledHandlerTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->commandBus = $container->get("command.bus");
+        $this->commandBus = $container->get('command.bus');
         $this->probes = $container->get(ProbeRepository::class);
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->dbal = $container->get(DbalConnection::class);
 
-        $this->dbal->executeStatement("DELETE FROM connections");
-        $this->dbal->executeStatement("DELETE FROM probes");
+        $this->dbal->executeStatement('DELETE FROM connections');
+        $this->dbal->executeStatement('DELETE FROM probes');
     }
 
     public function testDisablesThenReEnablesAProbe(): void
@@ -57,11 +57,11 @@ final class SetProbeEnabledHandlerTest extends KernelTestCase
     {
         return new Probe(
             new ProbeId(self::PROBE),
-            "edge-01",
+            'edge-01',
             Labels::empty(),
-            "hash",
+            'hash',
             $enabled,
-            new DateTimeImmutable("2026-01-01T00:00:00+00:00"),
+            new DateTimeImmutable('2026-01-01T00:00:00+00:00'),
         );
     }
 }

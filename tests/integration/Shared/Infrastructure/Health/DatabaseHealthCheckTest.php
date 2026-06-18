@@ -14,12 +14,12 @@ final class DatabaseHealthCheckTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $connection = self::getContainer()->get("doctrine.dbal.default_connection");
+        $connection = self::getContainer()->get('doctrine.dbal.default_connection');
         self::assertInstanceOf(Connection::class, $connection);
 
         $check = new DatabaseHealthCheck($connection);
 
-        self::assertSame("database", $check->name());
+        self::assertSame('database', $check->name());
 
         $result = $check->check();
 

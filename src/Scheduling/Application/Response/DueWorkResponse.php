@@ -26,14 +26,11 @@ final readonly class DueWorkResponse
     public function toArray(): array
     {
         return [
-            "tasks" => array_map(
-                static fn(DueTask $task): array => [
-                    "connectionId" => $task->connectionId->toString(),
-                    "serverId" => $task->serverId,
-                ],
-                $this->dueWork->tasks->toArray(),
-            ),
-            "pollAfterSeconds" => $this->dueWork->pollAfterSeconds,
+            'tasks' => array_map(static fn(DueTask $task): array => [
+                'connectionId' => $task->connectionId->toString(),
+                'serverId' => $task->serverId,
+            ], $this->dueWork->tasks->toArray()),
+            'pollAfterSeconds' => $this->dueWork->pollAfterSeconds,
         ];
     }
 }

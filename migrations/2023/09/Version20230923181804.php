@@ -11,14 +11,10 @@ final class Version20230923181804 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return "Blank migration";
+        return 'Blank migration';
     }
 
-    public function up(Schema $schema): void
-    {
-    }
+    public function up(Schema $schema): void {}
 
-    public function down(Schema $schema): void
-    {
-    }
+    public function down(Schema $schema): void {}
 }

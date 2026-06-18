@@ -6,6 +6,4 @@ namespace App\Measurement\Domain\ValueObject;
 
 use App\Shared\Domain\Id;
 
-final readonly class MeasurementId extends Id
-{
-}
+final readonly class MeasurementId extends Id {}

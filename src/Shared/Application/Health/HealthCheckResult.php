@@ -37,12 +37,12 @@ final readonly class HealthCheckResult
     public function toArray(): array
     {
         if ($this->healthy) {
-            return ["status" => "up"];
+            return ['status' => 'up'];
         }
 
         return [
-            "status" => "down",
-            "error" => $this->error ?? "",
+            'status' => 'down',
+            'error' => $this->error ?? '',
         ];
     }
 }

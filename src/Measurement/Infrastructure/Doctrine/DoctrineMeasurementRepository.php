@@ -29,7 +29,7 @@ final class DoctrineMeasurementRepository implements MeasurementRepository
         $measurement = $this->find($id);
 
         if ($measurement === null) {
-            throw new MeasurementNotFound(sprintf("Measurement %s not found.", $id->toString()));
+            throw new MeasurementNotFound(sprintf('Measurement %s not found.', $id->toString()));
         }
 
         return $measurement;

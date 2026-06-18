@@ -23,7 +23,7 @@ use const SODIUM_CRYPTO_SECRETBOX_NONCEBYTES;
 final readonly class TotpSecretEncryptor
 {
     public function __construct(
-        #[Autowire("%env(string:TOTP_ENCRYPTION_KEY)%")]
+        #[Autowire('%env(string:TOTP_ENCRYPTION_KEY)%')]
         #[SensitiveParameter]
         private string $keyHex,
     ) {}
@@ -43,11 +43,11 @@ final readonly class TotpSecretEncryptor
         try {
             $raw = sodium_hex2bin($hex);
         } catch (SodiumException) {
-            throw new RuntimeException("TOTP secret decryption failed.");
+            throw new RuntimeException('TOTP secret decryption failed.');
         }
 
         if (strlen($raw) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES) {
-            throw new RuntimeException("TOTP secret decryption failed.");
+            throw new RuntimeException('TOTP secret decryption failed.');
         }
 
         $nonce = substr($raw, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
@@ -56,7 +56,7 @@ final readonly class TotpSecretEncryptor
         $plain = sodium_crypto_secretbox_open($cipher, $nonce, $key);
 
         if ($plain === false) {
-            throw new RuntimeException("TOTP secret decryption failed.");
+            throw new RuntimeException('TOTP secret decryption failed.');
         }
 
         return $plain;
@@ -64,20 +64,20 @@ final readonly class TotpSecretEncryptor
 
     private function key(): string
     {
-        if ($this->keyHex === "") {
+        if ($this->keyHex === '') {
             throw new RuntimeException(
-                "TOTP_ENCRYPTION_KEY is not set. Generate one with: php -r \"echo bin2hex(random_bytes(32));\".",
+                'TOTP_ENCRYPTION_KEY is not set. Generate one with: php -r "echo bin2hex(random_bytes(32));".',
             );
         }
 
         try {
             $key = sodium_hex2bin($this->keyHex);
         } catch (SodiumException) {
-            throw new RuntimeException("TOTP_ENCRYPTION_KEY must be a 64-character hex string (32 bytes).");
+            throw new RuntimeException('TOTP_ENCRYPTION_KEY must be a 64-character hex string (32 bytes).');
         }
 
         if (strlen($key) !== SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-            throw new RuntimeException("TOTP_ENCRYPTION_KEY must be a 64-character hex string (32 bytes).");
+            throw new RuntimeException('TOTP_ENCRYPTION_KEY must be a 64-character hex string (32 bytes).');
         }
 
         return $key;

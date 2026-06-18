@@ -19,9 +19,11 @@ final readonly class OoklaResult
 
     public function isCompleted(): bool
     {
-        return $this->type === "result"
+        return (
+            $this->type === 'result'
             && $this->download?->bandwidth !== null
             && $this->upload?->bandwidth !== null
-            && $this->ping?->latency !== null;
+            && $this->ping?->latency !== null
+        );
     }
 }

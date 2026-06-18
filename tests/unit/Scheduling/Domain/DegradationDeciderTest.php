@@ -21,73 +21,67 @@ final class DegradationDeciderTest extends TestCase
     {
         $policy = AdaptivePolicy::of(300, 3, 4);
 
-        yield "empty history is not degraded" => [HealthHistory::empty(), $policy, false];
+        yield 'empty history is not degraded' => [HealthHistory::empty(), $policy, false];
 
-        yield "newest healthy is not degraded" => [
+        yield 'newest healthy is not degraded' => [
             self::history(self::healthy(0), self::unhealthy(1)),
             $policy,
             false,
         ];
 
-        yield "newest unhealthy is degraded" => [
+        yield 'newest unhealthy is degraded' => [
             self::history(self::unhealthy(0), self::healthy(1)),
             $policy,
             true,
         ];
 
-        yield "newest failed is degraded" => [
+        yield 'newest failed is degraded' => [
             self::history(self::failed(0), self::healthy(1)),
             $policy,
             true,
         ];
 
-        yield "newest healthy null verdict is not degraded" => [
+        yield 'newest healthy null verdict is not degraded' => [
             self::history(self::nullVerdict(0)),
             $policy,
             false,
         ];
 
-        yield "recovery: newest 3 healthy overrides older bad" => [
-            self::history(
-                self::healthy(0),
-                self::healthy(1),
-                self::healthy(2),
-                self::failed(3),
-                self::unhealthy(4),
-            ),
+        yield 'recovery: newest 3 healthy overrides older bad' => [
+            self::history(self::healthy(0), self::healthy(1), self::healthy(2), self::failed(3), self::unhealthy(4)),
             $policy,
             false,
         ];
 
-        yield "two healthy then unhealthy newest is degraded" => [
+        yield 'two healthy then unhealthy newest is degraded' => [
             self::history(self::unhealthy(0), self::healthy(1), self::healthy(2)),
             $policy,
             true,
         ];
 
-        yield "backoff: newest 4 failed is not degraded" => [
+        yield 'backoff: newest 4 failed is not degraded' => [
             self::history(self::failed(0), self::failed(1), self::failed(2), self::failed(3), self::healthy(4)),
             $policy,
             false,
         ];
 
-        yield "below backoff: 3 failed still degraded" => [
+        yield 'below backoff: 3 failed still degraded' => [
             self::history(self::failed(0), self::failed(1), self::failed(2), self::healthy(3)),
             $policy,
             true,
         ];
 
-        yield "mixed bad newest run is degraded" => [
+        yield 'mixed bad newest run is degraded' => [
             self::history(self::failed(0), self::unhealthy(1), self::failed(2), self::failed(3)),
             $policy,
             true,
         ];
     }
 
-    #[DataProvider("provideHistories")]
+    #[DataProvider('provideHistories')]
     public function testIsDegraded(HealthHistory $history, AdaptivePolicy $policy, bool $expected): void
     {
-        self::assertSame($expected, (new DegradationDecider())->isDegraded($history, $policy));
+        self::assertSame($expected, new DegradationDecider()->isDegraded($history, $policy));
     }
 
     private static function history(HealthSample ...$samples): HealthHistory
@@ -117,6 +111,6 @@ final class DegradationDeciderTest extends TestCase
 
     private static function at(int $index): DateTimeImmutable
     {
-        return (new DateTimeImmutable("2026-06-06 12:00:00"))->modify("-" . ($index * 60) . " seconds");
+        return new DateTimeImmutable('2026-06-06 12:00:00')->modify('-' . ($index * 60) . ' seconds');
     }
 }

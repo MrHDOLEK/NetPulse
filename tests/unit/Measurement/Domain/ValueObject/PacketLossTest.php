@@ -16,9 +16,9 @@ final class PacketLossTest extends TestCase
      */
     public static function provideValidRatios(): iterable
     {
-        yield "lower boundary" => [0.0];
-        yield "mid range" => [0.25];
-        yield "upper boundary" => [1.0];
+        yield 'lower boundary' => [0.0];
+        yield 'mid range' => [0.25];
+        yield 'upper boundary' => [1.0];
     }
 
     /**
@@ -26,17 +26,17 @@ final class PacketLossTest extends TestCase
      */
     public static function provideInvalidRatios(): iterable
     {
-        yield "above one" => [1.5];
-        yield "negative" => [-0.1];
+        yield 'above one' => [1.5];
+        yield 'negative' => [-0.1];
     }
 
-    #[DataProvider("provideValidRatios")]
+    #[DataProvider('provideValidRatios')]
     public function testStoresValidRatio(float $ratio): void
     {
-        $this->assertSame($ratio, (new PacketLoss($ratio))->ratio);
+        $this->assertSame($ratio, new PacketLoss($ratio)->ratio);
     }
 
-    #[DataProvider("provideInvalidRatios")]
+    #[DataProvider('provideInvalidRatios')]
     public function testRejectsOutOfRangeRatio(float $ratio): void
     {
         $this->expectException(InvalidPacketLoss::class);

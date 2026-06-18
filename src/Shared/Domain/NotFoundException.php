@@ -6,6 +6,4 @@ namespace App\Shared\Domain;
 
 use RuntimeException;
 
-class NotFoundException extends RuntimeException
-{
-}
+class NotFoundException extends RuntimeException {}

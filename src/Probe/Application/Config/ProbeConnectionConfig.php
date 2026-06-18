@@ -24,11 +24,11 @@ final readonly class ProbeConnectionConfig
     public function toArray(): array
     {
         return [
-            "id" => $this->id,
-            "name" => $this->name,
-            "labels" => $this->labels,
-            "serverPool" => $this->serverPool,
-            "enabled" => $this->enabled,
+            'id' => $this->id,
+            'name' => $this->name,
+            'labels' => $this->labels,
+            'serverPool' => $this->serverPool,
+            'enabled' => $this->enabled,
         ];
     }
 }

@@ -7,7 +7,7 @@ namespace App\Probe\Application\Command\SetProbeEnabled;
 use App\Probe\Domain\ProbeRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class SetProbeEnabledHandler
 {
     public function __construct(

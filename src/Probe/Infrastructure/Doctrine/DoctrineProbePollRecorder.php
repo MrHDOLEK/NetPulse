@@ -21,16 +21,13 @@ final readonly class DoctrineProbePollRecorder implements ProbePollRecorder
 
     public function recordPoll(ProbeId $probeId, DateTimeImmutable $now): void
     {
-        $cutoff = $now->modify("-" . self::DEBOUNCE_SECONDS . " seconds")->format("Y-m-d H:i:s");
+        $cutoff = $now->modify('-' . self::DEBOUNCE_SECONDS . ' seconds')->format('Y-m-d H:i:s');
 
-        $this->connection->executeStatement(
-            "UPDATE probes SET last_poll_at = :now "
-            . "WHERE id = :probeId AND (last_poll_at IS NULL OR last_poll_at <= :cutoff)",
-            [
-                "now" => $now->format("Y-m-d H:i:s"),
-                "probeId" => $probeId->toString(),
-                "cutoff" => $cutoff,
-            ],
-        );
+        $this->connection->executeStatement('UPDATE probes SET last_poll_at = :now '
+        . 'WHERE id = :probeId AND (last_poll_at IS NULL OR last_poll_at <= :cutoff)', [
+            'now' => $now->format('Y-m-d H:i:s'),
+            'probeId' => $probeId->toString(),
+            'cutoff' => $cutoff,
+        ]);
     }
 }

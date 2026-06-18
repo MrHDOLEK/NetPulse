@@ -12,11 +12,11 @@ final readonly class PrometheusConfig
     private array $allowedCidrs;
 
     public function __construct(
-        #[Autowire("%netpulse.prometheus.metrics_enabled%")]
+        #[Autowire('%netpulse.prometheus.metrics_enabled%')]
         private bool $metricsEnabled,
-        #[Autowire("%netpulse.prometheus.allowed_ips%")]
+        #[Autowire('%netpulse.prometheus.allowed_ips%')]
         string $allowedIpsRaw,
-        #[Autowire("%netpulse.prometheus.freshness_window%")]
+        #[Autowire('%netpulse.prometheus.freshness_window%')]
         private int $freshnessWindowSeconds,
     ) {
         $this->allowedCidrs = $this->parseCidrs($allowedIpsRaw);
@@ -45,13 +45,13 @@ final readonly class PrometheusConfig
      */
     private function parseCidrs(string $raw): array
     {
-        $parts = explode(",", $raw);
+        $parts = explode(',', $raw);
         $cidrs = [];
 
         foreach ($parts as $part) {
             $trimmed = trim($part);
 
-            if ($trimmed !== "") {
+            if ($trimmed !== '') {
                 $cidrs[] = $trimmed;
             }
         }

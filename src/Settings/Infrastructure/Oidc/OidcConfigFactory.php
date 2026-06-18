@@ -23,8 +23,8 @@ final readonly class OidcConfigFactory
         $userInfoUrl = $this->settings->getString(SettingKey::OidcUserInfoUrl);
 
         if ($this->hasEnableToggle() && !$this->settings->getBool(SettingKey::OidcEnabled)) {
-            $clientId = "";
-            $clientSecret = "";
+            $clientId = '';
+            $clientSecret = '';
         }
 
         return new OidcConfig(

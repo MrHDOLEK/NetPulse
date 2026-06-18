@@ -18,27 +18,25 @@ final class ProbeHealthAction extends AbstractController
 {
     public function __construct(
         private readonly ClockInterface $clock,
-        #[Autowire("%env(int:AGENT_POLL_INTERVAL)%")]
+        #[Autowire('%env(int:AGENT_POLL_INTERVAL)%')]
         private readonly int $pollInterval,
     ) {}
 
-    #[Route("/v1/probes/{probeId}/health", name: "probe.health", methods: ["GET"])]
+    #[Route('/v1/probes/{probeId}/health', name: 'probe.health', methods: ['GET'])]
     public function __invoke(Probe $probe): Response
     {
         $lastPoll = $probe->lastPollAt();
-        $secondsSince = $lastPoll === null
-            ? null
-            : $this->clock->now()->getTimestamp() - $lastPoll->getTimestamp();
+        $secondsSince = $lastPoll === null ? null : $this->clock->now()->getTimestamp() - $lastPoll->getTimestamp();
 
         $staleAfter = max(180, $this->pollInterval * 3);
         $healthy = $secondsSince !== null && $secondsSince <= $staleAfter;
 
         return new JsonResponse(
             [
-                "healthy" => $healthy,
-                "lastPollAtUnix" => $lastPoll?->getTimestamp(),
-                "secondsSincePoll" => $secondsSince,
-                "staleAfterSeconds" => $staleAfter,
+                'healthy' => $healthy,
+                'lastPollAtUnix' => $lastPoll?->getTimestamp(),
+                'secondsSincePoll' => $secondsSince,
+                'staleAfterSeconds' => $staleAfter,
             ],
             $healthy ? Response::HTTP_OK : Response::HTTP_SERVICE_UNAVAILABLE,
         );

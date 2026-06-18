@@ -17,17 +17,17 @@ final class ScheduleTest extends TestCase
      */
     public static function provideInvalidEven(): iterable
     {
-        yield "zero tests per day" => [0, 120];
-        yield "negative tests per day" => [-1, 120];
-        yield "negative jitter" => [24, -1];
+        yield 'zero tests per day' => [0, 120];
+        yield 'negative tests per day' => [-1, 120];
+        yield 'negative jitter' => [24, -1];
     }
 
     public function testCronKeepsExpressionsInOrder(): void
     {
-        $schedule = Schedule::cron("*/30 * * * *", "0 9 * * 1");
+        $schedule = Schedule::cron('*/30 * * * *', '0 9 * * 1');
 
         self::assertSame(ScheduleMode::Cron, $schedule->mode());
-        self::assertSame(["*/30 * * * *", "0 9 * * 1"], $schedule->cronExpressions());
+        self::assertSame(['*/30 * * * *', '0 9 * * 1'], $schedule->cronExpressions());
     }
 
     public function testEvenCarriesTestsPerDayAndJitter(): void
@@ -55,7 +55,7 @@ final class ScheduleTest extends TestCase
         Schedule::cron();
     }
 
-    #[DataProvider("provideInvalidEven")]
+    #[DataProvider('provideInvalidEven')]
     public function testEvenRejectsInvalidValues(int $testsPerDay, int $jitterSeconds): void
     {
         $this->expectException(InvalidSchedule::class);

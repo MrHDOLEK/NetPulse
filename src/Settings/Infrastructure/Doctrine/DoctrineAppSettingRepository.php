@@ -22,10 +22,10 @@ final class DoctrineAppSettingRepository implements AppSettingRepository
     {
         $setting = $this->entityManager
             ->createQueryBuilder()
-            ->select("setting")
-            ->from(AppSetting::class, "setting")
-            ->where("setting.key = :key")
-            ->setParameter("key", $key, "setting_key")
+            ->select('setting')
+            ->from(AppSetting::class, 'setting')
+            ->where('setting.key = :key')
+            ->setParameter('key', $key, 'setting_key')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -34,7 +34,7 @@ final class DoctrineAppSettingRepository implements AppSettingRepository
         }
 
         if (!$setting instanceof AppSetting) {
-            throw new LogicException("Expected query to return an AppSetting instance.");
+            throw new LogicException('Expected query to return an AppSetting instance.');
         }
 
         return $setting;
@@ -51,8 +51,8 @@ final class DoctrineAppSettingRepository implements AppSettingRepository
         /** @var list<AppSetting> $settings */
         $settings = $this->entityManager
             ->createQueryBuilder()
-            ->select("setting")
-            ->from(AppSetting::class, "setting")
+            ->select('setting')
+            ->from(AppSetting::class, 'setting')
             ->getQuery()
             ->getResult();
 

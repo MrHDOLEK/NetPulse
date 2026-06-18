@@ -17,13 +17,13 @@ final readonly class DatabaseHealthCheck implements HealthCheck
 
     public function name(): string
     {
-        return "database";
+        return 'database';
     }
 
     public function check(): HealthCheckResult
     {
         try {
-            $this->connection->executeQuery("SELECT 1");
+            $this->connection->executeQuery('SELECT 1');
 
             return HealthCheckResult::up();
         } catch (Exception $exception) {

@@ -11,18 +11,18 @@ Stand up NetPulse with Docker, create the first admin, wire a probe to a connect
 
 ## Install
 
-Clone the repository and bring the stack up:
+Clone the repository and bring the stack up. The task runner is [`just`](https://github.com/casey/just) (`brew install just`, or use the Nix shell which provides it):
 
 ```bash
 git clone https://github.com/MrHDOLEK/NetPulse.git && cd NetPulse
-make install   # builds the image, starts containers, runs composer install
-make start     # docker compose up -d
+just install   # builds the image, starts containers, runs composer install
+just start     # docker compose up -d
 ```
 
-`make install` does the heavy lifting once; `make start` is the day-to-day "bring it up" command. Run `make help` to list every available target.
+`just install` does the heavy lifting once; `just start` is the day-to-day "bring it up" command. Run `just` to list every recipe.
 
 ::: tip Platform notes
-- On Linux the Makefile uses `docker compose`; on macOS it uses `docker-compose`. The Makefile **auto-detects** which is present, so the same `make` commands work either way.
+- On Linux the Justfile uses `docker compose`; on macOS it uses `docker-compose`. The Justfile **auto-detects** which is present, so the same `just` commands work either way.
 - If you hit permission errors talking to the Docker daemon, prefix the command with `sudo`.
 :::
 

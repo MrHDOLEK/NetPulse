@@ -14,25 +14,21 @@ final readonly class RemoteWriteConfig
     public array $extraLabels;
 
     public function __construct(
-        #[Autowire("%netpulse.remote_write.enabled%")]
+        #[Autowire('%netpulse.remote_write.enabled%')]
         public bool $enabled,
-        #[Autowire("%netpulse.remote_write.url%")]
+        #[Autowire('%netpulse.remote_write.url%')]
         public string $url,
-        #[Autowire("%netpulse.remote_write.auth%")]
+        #[Autowire('%netpulse.remote_write.auth%')]
         ?string $auth,
-        #[Autowire("%netpulse.remote_write.extra_labels%")]
+        #[Autowire('%netpulse.remote_write.extra_labels%')]
         string $extraLabels,
     ) {
-        $this->auth = ($auth === null || $auth === "") ? null : $auth;
+        $this->auth = $auth === null || $auth === '' ? null : $auth;
         $this->extraLabels = self::parseExtraLabels($extraLabels);
     }
 
-    public static function fromRaw(
-        bool $enabled,
-        string $url,
-        ?string $auth,
-        string $extraLabelsRaw,
-    ): self {
+    public static function fromRaw(bool $enabled, string $url, ?string $auth, string $extraLabelsRaw): self
+    {
         return new self($enabled, $url, $auth, $extraLabelsRaw);
     }
 
@@ -43,10 +39,10 @@ final readonly class RemoteWriteConfig
     {
         $extraLabels = [];
 
-        foreach (array_filter(explode(",", $raw)) as $pair) {
-            $parts = explode("=", $pair, 2);
+        foreach (array_filter(explode(',', $raw)) as $pair) {
+            $parts = explode('=', $pair, 2);
 
-            if (count($parts) === 2 && trim($parts[0]) !== "") {
+            if (count($parts) === 2 && trim($parts[0]) !== '') {
                 $extraLabels[trim($parts[0])] = trim($parts[1]);
             }
         }

@@ -22,7 +22,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class ThresholdsType extends Type
 {
-    public const string NAME = "thresholds";
+    public const string NAME = 'thresholds';
 
     /**
      * @param array<string, mixed> $column
@@ -39,7 +39,7 @@ final class ThresholdsType extends Type
         }
 
         if (!$value instanceof Thresholds) {
-            throw InvalidType::new($value, self::NAME, ["null", Thresholds::class]);
+            throw InvalidType::new($value, self::NAME, ['null', Thresholds::class]);
         }
 
         return json_encode($this->toPayload($value), JSON_THROW_ON_ERROR);
@@ -47,7 +47,7 @@ final class ThresholdsType extends Type
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?Thresholds
     {
-        if ($value === null || $value === "") {
+        if ($value === null || $value === '') {
             return null;
         }
 
@@ -70,11 +70,11 @@ final class ThresholdsType extends Type
         }
 
         return Thresholds::of(
-            $this->floatField($value, $decoded, "minDownloadRatio"),
-            $this->floatField($value, $decoded, "minUploadRatio"),
-            $this->nullableFloatField($value, $decoded, "maxPingMs"),
-            $this->nullableFloatField($value, $decoded, "maxJitterMs"),
-            $this->nullableFloatField($value, $decoded, "maxPacketLossRatio"),
+            $this->floatField($value, $decoded, 'minDownloadRatio'),
+            $this->floatField($value, $decoded, 'minUploadRatio'),
+            $this->nullableFloatField($value, $decoded, 'maxPingMs'),
+            $this->nullableFloatField($value, $decoded, 'maxJitterMs'),
+            $this->nullableFloatField($value, $decoded, 'maxPacketLossRatio'),
         );
     }
 
@@ -89,11 +89,11 @@ final class ThresholdsType extends Type
     private function toPayload(Thresholds $thresholds): array
     {
         return [
-            "minDownloadRatio" => $thresholds->minDownloadRatio(),
-            "minUploadRatio" => $thresholds->minUploadRatio(),
-            "maxPingMs" => $thresholds->maxPingMs(),
-            "maxJitterMs" => $thresholds->maxJitterMs(),
-            "maxPacketLossRatio" => $thresholds->maxPacketLossRatio(),
+            'minDownloadRatio' => $thresholds->minDownloadRatio(),
+            'minUploadRatio' => $thresholds->minUploadRatio(),
+            'maxPingMs' => $thresholds->maxPingMs(),
+            'maxJitterMs' => $thresholds->maxJitterMs(),
+            'maxPacketLossRatio' => $thresholds->maxPacketLossRatio(),
         ];
     }
 
@@ -105,7 +105,7 @@ final class ThresholdsType extends Type
         $raw = $decoded[$field] ?? null;
 
         if (is_int($raw)) {
-            return (float)$raw;
+            return (float) $raw;
         }
 
         if (!is_float($raw)) {
@@ -127,7 +127,7 @@ final class ThresholdsType extends Type
         }
 
         if (is_int($raw)) {
-            return (float)$raw;
+            return (float) $raw;
         }
 
         if (!is_float($raw)) {

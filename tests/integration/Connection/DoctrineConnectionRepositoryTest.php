@@ -25,8 +25,8 @@ use function sort;
 
 final class DoctrineConnectionRepositoryTest extends KernelTestCase
 {
-    private const string PROBE_A = "aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa";
-    private const string PROBE_B = "bbbbbbbb-bbbb-7bbb-8bbb-bbbbbbbbbbbb";
+    private const string PROBE_A = 'aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa';
+    private const string PROBE_B = 'bbbbbbbb-bbbb-7bbb-8bbb-bbbbbbbbbbbb';
 
     private ConnectionRepository $repository;
     private EntityManagerInterface $entityManager;
@@ -42,8 +42,8 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
 
     public function testSavesAndReturnsByIdentity(): void
     {
-        $id = "10000000-0000-7000-8000-000000000001";
-        $connection = $this->connection($id, self::PROBE_A, "Home WAN1");
+        $id = '10000000-0000-7000-8000-000000000001';
+        $connection = $this->connection($id, self::PROBE_A, 'Home WAN1');
 
         $this->repository->save($connection);
         $this->entityManager->clear();
@@ -52,16 +52,16 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
 
         $this->assertSame($id, $loaded->id()->toString());
         $this->assertSame(self::PROBE_A, $loaded->probeId()->toString());
-        $this->assertSame("Home WAN1", $loaded->name());
-        $this->assertSame("Orange", $loaded->isp());
+        $this->assertSame('Home WAN1', $loaded->name());
+        $this->assertSame('Orange', $loaded->isp());
         $this->assertSame(300_000_000, $loaded->expected()->expectedDownloadBits);
         $this->assertSame(50_000_000, $loaded->expected()->expectedUploadBits);
         $this->assertSame(ConnectionColor::Amber, $loaded->color());
         $this->assertInstanceOf(Labels::class, $loaded->labels());
-        $this->assertSame(["site" => "home", "link" => "wan1"], $loaded->labels()->all());
-        $this->assertSame("home", $loaded->labels()->get("site"));
+        $this->assertSame(['site' => 'home', 'link' => 'wan1'], $loaded->labels()->all());
+        $this->assertSame('home', $loaded->labels()->get('site'));
         $this->assertInstanceOf(ServerPool::class, $loaded->serverPool());
-        $this->assertSame(["frankfurt.example.net:8080", "warsaw.example.net:8080"], $loaded->serverPool()->all());
+        $this->assertSame(['frankfurt.example.net:8080', 'warsaw.example.net:8080'], $loaded->serverPool()->all());
         $this->assertSame(ScheduleMode::Even, $loaded->schedule()->mode());
         $this->assertSame(24, $loaded->schedule()->testsPerDay());
         $this->assertSame(120, $loaded->schedule()->jitterSeconds());
@@ -78,17 +78,17 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
 
     public function testRoundTripsACronSchedule(): void
     {
-        $id = "10000000-0000-7000-8000-000000000002";
+        $id = '10000000-0000-7000-8000-000000000002';
         $connection = new Connection(
             new ConnectionId($id),
             new ProbeId(self::PROBE_A),
-            "Cron WAN",
-            "Orange",
+            'Cron WAN',
+            'Orange',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Amber,
-            Labels::fromArray(["site" => "home"]),
-            ServerPool::fromArray(["frankfurt.example.net:8080"]),
-            Schedule::cron("*/30 * * * *", "0 9 * * 1"),
+            Labels::fromArray(['site' => 'home']),
+            ServerPool::fromArray(['frankfurt.example.net:8080']),
+            Schedule::cron('*/30 * * * *', '0 9 * * 1'),
             true,
             Thresholds::default(),
             AdaptivePolicy::default(),
@@ -100,26 +100,26 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
         $loaded = $this->repository->get(new ConnectionId($id));
 
         $this->assertSame(ScheduleMode::Cron, $loaded->schedule()->mode());
-        $this->assertSame(["*/30 * * * *", "0 9 * * 1"], $loaded->schedule()->cronExpressions());
+        $this->assertSame(['*/30 * * * *', '0 9 * * 1'], $loaded->schedule()->cronExpressions());
     }
 
     public function testFindReturnsNullWhenAbsent(): void
     {
-        $this->assertNull($this->repository->find(new ConnectionId("10000000-0000-7000-8000-0000000000ff")));
+        $this->assertNull($this->repository->find(new ConnectionId('10000000-0000-7000-8000-0000000000ff')));
     }
 
     public function testGetThrowsNotFoundWhenAbsent(): void
     {
         $this->expectException(NotFoundException::class);
 
-        $this->repository->get(new ConnectionId("10000000-0000-7000-8000-0000000000fe"));
+        $this->repository->get(new ConnectionId('10000000-0000-7000-8000-0000000000fe'));
     }
 
     public function testByProbeReturnsOnlyThatProbesConnections(): void
     {
-        $this->repository->save($this->connection("10000000-0000-7000-8000-00000000000a", self::PROBE_A, "A1"));
-        $this->repository->save($this->connection("10000000-0000-7000-8000-00000000000b", self::PROBE_A, "A2"));
-        $this->repository->save($this->connection("10000000-0000-7000-8000-00000000000c", self::PROBE_B, "B1"));
+        $this->repository->save($this->connection('10000000-0000-7000-8000-00000000000a', self::PROBE_A, 'A1'));
+        $this->repository->save($this->connection('10000000-0000-7000-8000-00000000000b', self::PROBE_A, 'A2'));
+        $this->repository->save($this->connection('10000000-0000-7000-8000-00000000000c', self::PROBE_B, 'B1'));
         $this->entityManager->clear();
 
         $forA = $this->repository->byProbe(new ProbeId(self::PROBE_A));
@@ -129,13 +129,13 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
         $names = array_map(static fn(Connection $c): string => $c->name(), $forA->toArray());
         sort($names);
 
-        $this->assertSame(["A1", "A2"], $names);
+        $this->assertSame(['A1', 'A2'], $names);
     }
 
     public function testDeleteRemovesTheConnection(): void
     {
-        $id = "10000000-0000-7000-8000-0000000000d0";
-        $connection = $this->connection($id, self::PROBE_A, "ToDelete");
+        $id = '10000000-0000-7000-8000-0000000000d0';
+        $connection = $this->connection($id, self::PROBE_A, 'ToDelete');
 
         $this->repository->save($connection);
         $this->entityManager->clear();
@@ -149,8 +149,8 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
 
     public function testAllReturnsEveryConnectionIncludingDisabledOrderedByName(): void
     {
-        $enabled = $this->connection("10000000-0000-7000-8000-0000000000aa", self::PROBE_A, "Zeta");
-        $disabled = $this->connection("10000000-0000-7000-8000-0000000000ab", self::PROBE_B, "Alpha");
+        $enabled = $this->connection('10000000-0000-7000-8000-0000000000aa', self::PROBE_A, 'Zeta');
+        $disabled = $this->connection('10000000-0000-7000-8000-0000000000ab', self::PROBE_B, 'Alpha');
         $disabled->disable();
 
         $this->repository->save($enabled);
@@ -163,7 +163,7 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
 
         $names = array_map(static fn(Connection $c): string => $c->name(), $all->toArray());
 
-        $this->assertSame(["Alpha", "Zeta"], $names);
+        $this->assertSame(['Alpha', 'Zeta'], $names);
 
         $enabledFlags = [];
 
@@ -171,8 +171,8 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
             $enabledFlags[$connection->name()] = $connection->isEnabled();
         }
 
-        $this->assertFalse($enabledFlags["Alpha"]);
-        $this->assertTrue($enabledFlags["Zeta"]);
+        $this->assertFalse($enabledFlags['Alpha']);
+        $this->assertTrue($enabledFlags['Zeta']);
     }
 
     private function connection(string $id, string $probeId, string $name): Connection
@@ -181,11 +181,11 @@ final class DoctrineConnectionRepositoryTest extends KernelTestCase
             new ConnectionId($id),
             new ProbeId($probeId),
             $name,
-            "Orange",
+            'Orange',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Amber,
-            Labels::fromArray(["site" => "home", "link" => "wan1"]),
-            ServerPool::fromArray(["frankfurt.example.net:8080", "warsaw.example.net:8080"]),
+            Labels::fromArray(['site' => 'home', 'link' => 'wan1']),
+            ServerPool::fromArray(['frankfurt.example.net:8080', 'warsaw.example.net:8080']),
             Schedule::even(24, 120),
             true,
             Thresholds::of(0.85, 0.6, 120.0, null, 0.02),

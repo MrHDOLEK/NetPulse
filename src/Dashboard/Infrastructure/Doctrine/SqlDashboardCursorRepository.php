@@ -22,19 +22,17 @@ final readonly class SqlDashboardCursorRepository implements DashboardCursorRepo
     public function current(): DashboardCursor
     {
         /** @var array{latest: string|null, total: int|string} $row */
-        $row = $this->entityManager->createQueryBuilder()
-            ->select(
-                "MAX(measurement.completedAt) AS latest",
-                "COUNT(measurement.id) AS total",
-            )
-            ->from(Measurement::class, "measurement")
+        $row = $this->entityManager
+            ->createQueryBuilder()
+            ->select('MAX(measurement.completedAt) AS latest', 'COUNT(measurement.id) AS total')
+            ->from(Measurement::class, 'measurement')
             ->getQuery()
             ->getSingleResult();
 
-        $latest = $row["latest"] === null
+        $latest = $row['latest'] === null
             ? null
-            : new DateTimeImmutable($row["latest"], new DateTimeZone("UTC"))->getTimestamp();
+            : new DateTimeImmutable($row['latest'], new DateTimeZone('UTC'))->getTimestamp();
 
-        return new DashboardCursor($latest, (int)$row["total"]);
+        return new DashboardCursor($latest, (int) $row['total']);
     }
 }

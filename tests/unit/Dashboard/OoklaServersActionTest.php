@@ -16,31 +16,36 @@ final class OoklaServersActionTest extends TestCase
     public function testMapsTheCatalogToJson(): void
     {
         $action = new OoklaServersAction($this->catalog(
-            new OoklaServer(15317, "T-Mobile Polska S.A.", "Poznań", "poz1.t-mobile.pl"),
-            new OoklaServer(3599, "KAMNET", "Lubin", "speedtest1.kamnet.pl"),
+            new OoklaServer(15317, 'T-Mobile Polska S.A.', 'Poznań', 'poz1.t-mobile.pl'),
+            new OoklaServer(3599, 'KAMNET', 'Lubin', 'speedtest1.kamnet.pl'),
         ));
 
         $response = $action();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertStringContainsString("no-cache", (string)$response->headers->get("Cache-Control"));
+        self::assertStringContainsString('no-cache', (string) $response->headers->get('Cache-Control'));
         self::assertSame(
             [
-                "servers" => [
-                    ["id" => 15317, "name" => "T-Mobile Polska S.A.", "location" => "Poznań", "host" => "poz1.t-mobile.pl"],
-                    ["id" => 3599, "name" => "KAMNET", "location" => "Lubin", "host" => "speedtest1.kamnet.pl"],
+                'servers' => [
+                    [
+                        'id' => 15317,
+                        'name' => 'T-Mobile Polska S.A.',
+                        'location' => 'Poznań',
+                        'host' => 'poz1.t-mobile.pl',
+                    ],
+                    ['id' => 3599, 'name' => 'KAMNET', 'location' => 'Lubin', 'host' => 'speedtest1.kamnet.pl'],
                 ],
             ],
-            json_decode((string)$response->getContent(), true),
+            json_decode((string) $response->getContent(), true),
         );
     }
 
     public function testEmptyCatalogReturnsEmptyList(): void
     {
-        $response = new OoklaServersAction($this->catalog())();
+        $response = (new OoklaServersAction($this->catalog()))();
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame(["servers" => []], json_decode((string)$response->getContent(), true));
+        self::assertSame(['servers' => []], json_decode((string) $response->getContent(), true));
     }
 
     private function catalog(OoklaServer ...$servers): OoklaServerCatalog

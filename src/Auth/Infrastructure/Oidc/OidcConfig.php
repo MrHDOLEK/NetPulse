@@ -20,21 +20,21 @@ final readonly class OidcConfig
     public string $name;
 
     public function __construct(
-        #[Autowire("%env(string:OIDC_CLIENT_ID)%")]
+        #[Autowire('%env(string:OIDC_CLIENT_ID)%')]
         string $clientId,
-        #[Autowire("%env(string:OIDC_CLIENT_SECRET)%")]
+        #[Autowire('%env(string:OIDC_CLIENT_SECRET)%')]
         string $clientSecret,
-        #[Autowire("%env(string:OIDC_AUTHORIZATION_URL)%")]
+        #[Autowire('%env(string:OIDC_AUTHORIZATION_URL)%')]
         string $authorizationUrl,
-        #[Autowire("%env(string:OIDC_TOKEN_URL)%")]
+        #[Autowire('%env(string:OIDC_TOKEN_URL)%')]
         string $tokenUrl,
-        #[Autowire("%env(string:OIDC_USERINFO_URL)%")]
+        #[Autowire('%env(string:OIDC_USERINFO_URL)%')]
         string $userInfoUrl,
-        #[Autowire("%env(string:OIDC_REDIRECT_URL)%")]
+        #[Autowire('%env(string:OIDC_REDIRECT_URL)%')]
         string $redirectUrl,
-        #[Autowire("%env(string:OIDC_SCOPES)%")]
+        #[Autowire('%env(string:OIDC_SCOPES)%')]
         string $scopes,
-        #[Autowire("%env(string:OIDC_NAME)%")]
+        #[Autowire('%env(string:OIDC_NAME)%')]
         string $name,
     ) {
         $this->clientId = trim($clientId);
@@ -45,19 +45,21 @@ final readonly class OidcConfig
         $this->redirectUrl = trim($redirectUrl);
 
         $trimmedScopes = trim($scopes);
-        $this->scopes = $trimmedScopes === "" ? "openid email profile" : $trimmedScopes;
+        $this->scopes = $trimmedScopes === '' ? 'openid email profile' : $trimmedScopes;
 
         $trimmedName = trim($name);
-        $this->name = $trimmedName === "" ? "SSO" : $trimmedName;
+        $this->name = $trimmedName === '' ? 'SSO' : $trimmedName;
     }
 
     public function isEnabled(): bool
     {
-        return $this->clientId !== ""
-            && $this->clientSecret !== ""
-            && $this->authorizationUrl !== ""
-            && $this->tokenUrl !== ""
-            && $this->userInfoUrl !== "";
+        return (
+            $this->clientId !== ''
+            && $this->clientSecret !== ''
+            && $this->authorizationUrl !== ''
+            && $this->tokenUrl !== ''
+            && $this->userInfoUrl !== ''
+        );
     }
 
     public function displayName(): string
