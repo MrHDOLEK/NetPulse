@@ -47,3 +47,9 @@ features:
 ![NetPulse — self-hosted, metrics-first internet speed tracking](/banner.svg)
 
 </div>
+
+<div style="max-width: 1100px; margin: 2.5rem auto 0;">
+
+[![The NetPulse dashboard](/screenshots/dashboard.webp)](/guide/screenshots)
+
+</div>
