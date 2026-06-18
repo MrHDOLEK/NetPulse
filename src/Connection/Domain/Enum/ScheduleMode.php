@@ -6,6 +6,6 @@ namespace App\Connection\Domain\Enum;
 
 enum ScheduleMode: string
 {
-    case Cron = "cron";
-    case Even = "even";
+    case Cron = 'cron';
+    case Even = 'even';
 }

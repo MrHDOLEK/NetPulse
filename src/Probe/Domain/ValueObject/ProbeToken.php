@@ -17,7 +17,7 @@ final readonly class ProbeToken
 
     public static function generate(): self
     {
-        return new self(rtrim(strtr(base64_encode(random_bytes(32)), "+/", "-_"), "="));
+        return new self(rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '='));
     }
 
     public function toString(): string

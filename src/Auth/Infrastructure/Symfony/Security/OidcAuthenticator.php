@@ -24,10 +24,10 @@ use function is_string;
 
 final class OidcAuthenticator extends AbstractAuthenticator
 {
-    public const string SESSION_STATE = "oidc_state";
-    public const string SESSION_VERIFIER = "oidc_verifier";
-    public const string SESSION_NONCE = "oidc_nonce";
-    public const string CALLBACK_ROUTE = "oidc_callback";
+    public const string SESSION_STATE = 'oidc_state';
+    public const string SESSION_VERIFIER = 'oidc_verifier';
+    public const string SESSION_NONCE = 'oidc_nonce';
+    public const string CALLBACK_ROUTE = 'oidc_callback';
 
     public function __construct(
         private readonly OidcProvider $provider,
@@ -36,7 +36,7 @@ final class OidcAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): bool
     {
-        return $request->attributes->get("_route") === self::CALLBACK_ROUTE;
+        return $request->attributes->get('_route') === self::CALLBACK_ROUTE;
     }
 
     public function authenticate(Request $request): Passport
@@ -51,49 +51,52 @@ final class OidcAuthenticator extends AbstractAuthenticator
         $session->remove(self::SESSION_VERIFIER);
         $session->remove(self::SESSION_NONCE);
 
-        $queryState = $request->query->get("state");
+        $queryState = $request->query->get('state');
 
-        if (!is_string($expectedState) || $expectedState === "" || !is_string($queryState) || !hash_equals($expectedState, $queryState)) {
-            throw new CustomUserMessageAuthenticationException("Invalid SSO state");
+        if (
+            !is_string($expectedState)
+            || $expectedState === ''
+            || !is_string($queryState)
+            || !hash_equals($expectedState, $queryState)
+        ) {
+            throw new CustomUserMessageAuthenticationException('Invalid SSO state');
         }
 
-        $code = $request->query->get("code");
+        $code = $request->query->get('code');
 
-        if (!is_string($code) || $code === "") {
-            throw new CustomUserMessageAuthenticationException("SSO sign-in was not completed");
+        if (!is_string($code) || $code === '') {
+            throw new CustomUserMessageAuthenticationException('SSO sign-in was not completed');
         }
 
         try {
             $identity = $this->provider->exchange(
                 $code,
-                is_string($codeVerifier) ? $codeVerifier : "",
-                is_string($expectedNonce) ? $expectedNonce : "",
+                is_string($codeVerifier) ? $codeVerifier : '',
+                is_string($expectedNonce) ? $expectedNonce : '',
             );
         } catch (OidcException) {
-            throw new CustomUserMessageAuthenticationException("SSO sign-in failed");
+            throw new CustomUserMessageAuthenticationException('SSO sign-in failed');
         }
 
         if (!$identity->emailVerified) {
-            throw new CustomUserMessageAuthenticationException("Your SSO email is not verified");
+            throw new CustomUserMessageAuthenticationException('Your SSO email is not verified');
         }
 
-        return new SelfValidatingPassport(
-            new UserBadge($identity->email, function (string $email): SecurityUser {
-                try {
-                    return $this->users->loadUserByIdentifier($email);
-                } catch (UserNotFoundException $exception) {
-                    throw new CustomUserMessageAuthenticationException(
-                        "No NetPulse account for this email",
-                        previous: $exception,
-                    );
-                }
-            }),
-        );
+        return new SelfValidatingPassport(new UserBadge($identity->email, function (string $email): SecurityUser {
+            try {
+                return $this->users->loadUserByIdentifier($email);
+            } catch (UserNotFoundException $exception) {
+                throw new CustomUserMessageAuthenticationException(
+                    'No NetPulse account for this email',
+                    previous: $exception,
+                );
+            }
+        }));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): Response
     {
-        return new RedirectResponse("/");
+        return new RedirectResponse('/');
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
@@ -102,6 +105,6 @@ final class OidcAuthenticator extends AbstractAuthenticator
             $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         }
 
-        return new RedirectResponse("/login");
+        return new RedirectResponse('/login');
     }
 }

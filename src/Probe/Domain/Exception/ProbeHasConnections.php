@@ -13,6 +13,6 @@ final class ProbeHasConnections extends DomainException
 {
     public static function withId(ProbeId $id): self
     {
-        return new self(sprintf("Probe %s still has connections and cannot be deleted.", $id->toString()));
+        return new self(sprintf('Probe %s still has connections and cannot be deleted.', $id->toString()));
     }
 }

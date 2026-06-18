@@ -43,15 +43,33 @@ use function is_numeric;
 use function sprintf;
 
 #[AsCommand(
-    name: "app:dev:seed",
-    description: "Seed one probe, two connections and synthetic measurements for local dev.",
+    name: 'app:dev:seed',
+    description: 'Seed one probe, two connections and synthetic measurements for local dev.',
 )]
 final class SeedCommand extends Command
 {
     private const array SERVERS = [
-        ["id" => "12345", "name" => "Speedtest Frankfurt", "location" => "Frankfurt, DE", "host" => "fra.speedtest.example:8080", "isp" => "DE-Telekom"],
-        ["id" => "23456", "name" => "Speedtest Warsaw", "location" => "Warsaw, PL", "host" => "waw.speedtest.example:8080", "isp" => "Orange-PL"],
-        ["id" => "34567", "name" => "Speedtest Amsterdam", "location" => "Amsterdam, NL", "host" => "ams.speedtest.example:8080", "isp" => "KPN-NL"],
+        [
+            'id' => '12345',
+            'name' => 'Speedtest Frankfurt',
+            'location' => 'Frankfurt, DE',
+            'host' => 'fra.speedtest.example:8080',
+            'isp' => 'DE-Telekom',
+        ],
+        [
+            'id' => '23456',
+            'name' => 'Speedtest Warsaw',
+            'location' => 'Warsaw, PL',
+            'host' => 'waw.speedtest.example:8080',
+            'isp' => 'Orange-PL',
+        ],
+        [
+            'id' => '34567',
+            'name' => 'Speedtest Amsterdam',
+            'location' => 'Amsterdam, NL',
+            'host' => 'ams.speedtest.example:8080',
+            'isp' => 'KPN-NL',
+        ],
     ];
 
     public function __construct(
@@ -70,11 +88,11 @@ final class SeedCommand extends Command
     protected function configure(): void
     {
         $this->addOption(
-            "measurements",
-            "m",
+            'measurements',
+            'm',
             InputOption::VALUE_REQUIRED,
-            "Number of synthetic measurements to generate per connection",
-            "20",
+            'Number of synthetic measurements to generate per connection',
+            '20',
         );
     }
 
@@ -82,8 +100,8 @@ final class SeedCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $measurementsOption = $input->getOption("measurements");
-        $measurementsPerConnection = is_numeric($measurementsOption) ? (int)$measurementsOption : 20;
+        $measurementsOption = $input->getOption('measurements');
+        $measurementsPerConnection = is_numeric($measurementsOption) ? (int) $measurementsOption : 20;
 
         if ($measurementsPerConnection < 1) {
             $measurementsPerConnection = 1;
@@ -94,8 +112,8 @@ final class SeedCommand extends Command
 
         $probe = new Probe(
             new ProbeId($this->idGenerator->generate()->toString()),
-            "dev-probe",
-            Labels::fromArray(["site" => "home", "link" => "wan1"]),
+            'dev-probe',
+            Labels::fromArray(['site' => 'home', 'link' => 'wan1']),
             $this->probeTokenHasher->hash($token->toString()),
             true,
             $now,
@@ -105,12 +123,12 @@ final class SeedCommand extends Command
         $primary = new Connection(
             new ConnectionId($this->idGenerator->generate()->toString()),
             $probe->id(),
-            "Fiber WAN1",
-            "DE-Telekom",
+            'Fiber WAN1',
+            'DE-Telekom',
             new ExpectedSpeed(1_000_000_000, 500_000_000),
             ConnectionColor::Primary,
-            Labels::fromArray(["link" => "wan1"]),
-            ServerPool::fromList("12345", "23456", "34567"),
+            Labels::fromArray(['link' => 'wan1']),
+            ServerPool::fromList('12345', '23456', '34567'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -119,12 +137,12 @@ final class SeedCommand extends Command
         $secondary = new Connection(
             new ConnectionId($this->idGenerator->generate()->toString()),
             $probe->id(),
-            "LTE WAN2",
-            "Orange-PL",
+            'LTE WAN2',
+            'Orange-PL',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Violet,
-            Labels::fromArray(["link" => "wan2"]),
-            ServerPool::fromList("23456", "34567"),
+            Labels::fromArray(['link' => 'wan2']),
+            ServerPool::fromList('23456', '34567'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -142,11 +160,11 @@ final class SeedCommand extends Command
             for ($run = 0; $run < $measurementsPerConnection; ++$run) {
                 $server = self::SERVERS[($run + $connectionIndex) % count(self::SERVERS)];
 
-                $isFailed = $run !== 0 && $run % 4 === 3;
+                $isFailed = $run !== 0 && ($run % 4) === 3;
 
                 $isDegraded = $degradedConnection && !$isFailed && $run < 2;
 
-                $completedAt = $now->modify(sprintf("-%d minutes", $run * 15));
+                $completedAt = $now->modify(sprintf('-%d minutes', $run * 15));
 
                 $result = $this->buildOoklaResult($server, $isFailed, $isDegraded, $run);
 
@@ -172,11 +190,11 @@ final class SeedCommand extends Command
             }
         }
 
-        $io->success("Dev seed complete.");
-        $io->writeln(sprintf("Probe id: %s", $probe->id()->toString()));
-        $io->writeln(sprintf("Probe token: %s", $token->toString()));
-        $io->writeln(sprintf("Connections: %d", count($connections)));
-        $io->writeln(sprintf("Measurements: %d", $totalMeasurements));
+        $io->success('Dev seed complete.');
+        $io->writeln(sprintf('Probe id: %s', $probe->id()->toString()));
+        $io->writeln(sprintf('Probe token: %s', $token->toString()));
+        $io->writeln(sprintf('Connections: %d', count($connections)));
+        $io->writeln(sprintf('Measurements: %d', $totalMeasurements));
 
         return Command::SUCCESS;
     }
@@ -187,26 +205,22 @@ final class SeedCommand extends Command
     private function buildOoklaResult(array $server, bool $isFailed, bool $isDegraded, int $run): OoklaResult
     {
         $serverBlock = new OoklaServer(
-            id: (int)$server["id"],
-            name: $server["name"],
-            location: $server["location"],
-            host: $server["host"],
+            id: (int) $server['id'],
+            name: $server['name'],
+            location: $server['location'],
+            host: $server['host'],
         );
 
         if ($isFailed) {
-            return new OoklaResult(
-                type: "result",
-                server: $serverBlock,
-                isp: $server["isp"],
-            );
+            return new OoklaResult(type: 'result', server: $serverBlock, isp: $server['isp']);
         }
 
-        $downloadBandwidth = $isDegraded ? 15_000_000 : 110_000_000 + ($run % 5) * 3_000_000;
-        $uploadBandwidth = $isDegraded ? 3_000_000 : 55_000_000 + ($run % 5) * 1_500_000;
-        $ping = 8.0 + ($run % 7) * 1.5;
+        $downloadBandwidth = $isDegraded ? 15_000_000 : 110_000_000 + (($run % 5) * 3_000_000);
+        $uploadBandwidth = $isDegraded ? 3_000_000 : 55_000_000 + (($run % 5) * 1_500_000);
+        $ping = 8.0 + (($run % 7) * 1.5);
 
         return new OoklaResult(
-            type: "result",
+            type: 'result',
             ping: new OoklaPing(latency: $ping, low: $ping - 1.2, high: $ping + 2.4, jitter: 0.6),
             download: new OoklaBandwidth(
                 bandwidth: $downloadBandwidth,
@@ -222,11 +236,11 @@ final class SeedCommand extends Command
             ),
             server: $serverBlock,
             result: new OoklaResultMeta(
-                id: sprintf("res-%s-%d", $server["id"], $run),
-                url: sprintf("https://www.speedtest.net/result/c/res-%s-%d", $server["id"], $run),
+                id: sprintf('res-%s-%d', $server['id'], $run),
+                url: sprintf('https://www.speedtest.net/result/c/res-%s-%d', $server['id'], $run),
             ),
-            packetLoss: ($run % 6 === 0) ? 0.5 : 0.0,
-            isp: $server["isp"],
+            packetLoss: ($run % 6) === 0 ? 0.5 : 0.0,
+            isp: $server['isp'],
         );
     }
 }

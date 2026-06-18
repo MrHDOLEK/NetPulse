@@ -45,27 +45,22 @@ use Symfony\Component\Clock\MockClock;
 final class NotifyOnMeasurementHandlerTest extends TestCase
 {
     private const int THRESHOLD = 3;
-    private const string MEASUREMENT_ID = "11111111-1111-4111-8111-111111111111";
-    private const string PROBE_ID = "22222222-2222-4222-8222-222222222222";
-    private const string CONNECTION_ID = "33333333-3333-4333-8333-333333333333";
+    private const string MEASUREMENT_ID = '11111111-1111-4111-8111-111111111111';
+    private const string PROBE_ID = '22222222-2222-4222-8222-222222222222';
+    private const string CONNECTION_ID = '33333333-3333-4333-8333-333333333333';
 
     public function testReachingThresholdUnhealthySendsExactlyOneAlert(): void
     {
         $dispatcher = $this->recordingDispatcher();
 
-        $history = HealthHistory::of(
-            self::unhealthy(0),
-            self::unhealthy(1),
-            self::unhealthy(2),
-            self::healthy(3),
-        );
+        $history = HealthHistory::of(self::unhealthy(0), self::unhealthy(1), self::unhealthy(2), self::healthy(3));
 
         $this->handler($history, $dispatcher)(new NotifyOnMeasurementCommand(self::MEASUREMENT_ID));
 
         self::assertCount(1, $dispatcher->sent);
         self::assertSame(NotificationKind::Alert, $dispatcher->sent[0]->kind);
-        self::assertSame("wan1", $dispatcher->sent[0]->context["connection"]);
-        self::assertSame("home", $dispatcher->sent[0]->context["probe"]);
+        self::assertSame('wan1', $dispatcher->sent[0]->context['connection']);
+        self::assertSame('home', $dispatcher->sent[0]->context['probe']);
     }
 
     public function testOneMoreUnhealthyAfterAlertSendsNothing(): void
@@ -89,12 +84,7 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
     {
         $dispatcher = $this->recordingDispatcher();
 
-        $history = HealthHistory::of(
-            self::healthy(0),
-            self::unhealthy(1),
-            self::unhealthy(2),
-            self::unhealthy(3),
-        );
+        $history = HealthHistory::of(self::healthy(0), self::unhealthy(1), self::unhealthy(2), self::unhealthy(3));
 
         $this->handler($history, $dispatcher)(new NotifyOnMeasurementCommand(self::MEASUREMENT_ID));
 
@@ -106,11 +96,7 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
     {
         $dispatcher = $this->recordingDispatcher();
 
-        $history = HealthHistory::of(
-            self::unhealthy(0),
-            self::unhealthy(1),
-            self::healthy(2),
-        );
+        $history = HealthHistory::of(self::unhealthy(0), self::unhealthy(1), self::healthy(2));
 
         $this->handler($history, $dispatcher)(new NotifyOnMeasurementCommand(self::MEASUREMENT_ID));
 
@@ -129,11 +115,13 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
 
     private static function at(int $index): DateTimeImmutable
     {
-        return (new DateTimeImmutable("2026-06-06 12:00:00"))->modify("-" . ($index * 60) . " seconds");
+        return new DateTimeImmutable('2026-06-06 12:00:00')->modify('-' . ($index * 60) . ' seconds');
     }
 
-    private function handler(HealthHistory $history, RecordingNotificationDispatcher $dispatcher): NotifyOnMeasurementHandler
-    {
+    private function handler(
+        HealthHistory $history,
+        RecordingNotificationDispatcher $dispatcher,
+    ): NotifyOnMeasurementHandler {
         return new NotifyOnMeasurementHandler(
             $this->measurementRepository(),
             $this->connectionRepository(),
@@ -161,9 +149,9 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
                     consecutiveThreshold: $this->threshold,
                     channels: [],
                     emailRecipients: [],
-                    emailDsn: "",
-                    chatDsn: "",
-                    webhookUrl: "",
+                    emailDsn: '',
+                    chatDsn: '',
+                    webhookUrl: '',
                 );
             }
         };
@@ -174,24 +162,15 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
         return new class() implements NotificationRenderer {
             public function render(NotificationKind $kind, NotificationSeverity $severity, array $context): Notification
             {
-                return new Notification(
-                    $kind,
-                    $severity,
-                    "subject",
-                    "body",
-                    $context,
-                );
+                return new Notification($kind, $severity, 'subject', 'body', $context);
             }
 
             public function renderDigest(string $period, ConnectionDigestCollection $digests): Notification
             {
-                return new Notification(
-                    NotificationKind::Digest,
-                    NotificationSeverity::Info,
-                    "subject",
-                    "body",
-                    ["period" => $period, "connections" => $digests->count()],
-                );
+                return new Notification(NotificationKind::Digest, NotificationSeverity::Info, 'subject', 'body', [
+                    'period' => $period,
+                    'connections' => $digests->count(),
+                ]);
             }
         };
     }
@@ -219,20 +198,20 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
     {
         $measurement = MeasurementMother::fromOoklaArray(
             [
-                "type" => "result",
-                "timestamp" => "2026-06-05T10:00:01Z",
-                "ping" => ["jitter" => 0.5, "latency" => 12.5, "low" => 11.0, "high" => 14.0],
-                "download" => ["bandwidth" => 11_750_000, "bytes" => 50_000_000, "elapsed" => 5000],
-                "upload" => ["bandwidth" => 2_000_000, "bytes" => 10_000_000, "elapsed" => 5000],
-                "packetLoss" => 0.0,
-                "server" => ["id" => 1, "name" => "S", "location" => "L", "host" => "h", "ip" => "1.2.3.4"],
-                "result" => ["url" => "https://x"],
+                'type' => 'result',
+                'timestamp' => '2026-06-05T10:00:01Z',
+                'ping' => ['jitter' => 0.5, 'latency' => 12.5, 'low' => 11.0, 'high' => 14.0],
+                'download' => ['bandwidth' => 11_750_000, 'bytes' => 50_000_000, 'elapsed' => 5000],
+                'upload' => ['bandwidth' => 2_000_000, 'bytes' => 10_000_000, 'elapsed' => 5000],
+                'packetLoss' => 0.0,
+                'server' => ['id' => 1, 'name' => 'S', 'location' => 'L', 'host' => 'h', 'ip' => '1.2.3.4'],
+                'result' => ['url' => 'https://x'],
             ],
             self::MEASUREMENT_ID,
             self::PROBE_ID,
             self::CONNECTION_ID,
             true,
-            (new MockClock("2026-06-06T10:00:00+00:00"))->now(),
+            new MockClock('2026-06-06T10:00:00+00:00')->now(),
         );
 
         return new class($measurement) implements MeasurementRepository {
@@ -240,9 +219,7 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
                 private readonly Measurement $measurement,
             ) {}
 
-            public function save(Measurement $measurement): void
-            {
-            }
+            public function save(Measurement $measurement): void {}
 
             public function get(MeasurementId $id): Measurement
             {
@@ -261,12 +238,12 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
         $connection = new Connection(
             new ConnectionId(self::CONNECTION_ID),
             new ProbeId(self::PROBE_ID),
-            "wan1",
-            "Orange Polska",
+            'wan1',
+            'Orange Polska',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
             Labels::empty(),
-            ServerPool::fromList("12746"),
+            ServerPool::fromList('12746'),
             Schedule::even(24, 120),
             true,
             Thresholds::default(),
@@ -278,13 +255,9 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
                 private readonly Connection $connection,
             ) {}
 
-            public function save(Connection $connection): void
-            {
-            }
+            public function save(Connection $connection): void {}
 
-            public function delete(Connection $connection): void
-            {
-            }
+            public function delete(Connection $connection): void {}
 
             public function get(ConnectionId $connectionId): Connection
             {
@@ -317,11 +290,11 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
     {
         $probe = new Probe(
             new ProbeId(self::PROBE_ID),
-            "home",
-            Labels::fromArray(["site" => "warsaw"]),
-            "hash",
+            'home',
+            Labels::fromArray(['site' => 'warsaw']),
+            'hash',
             true,
-            new DateTimeImmutable("2026-06-06T10:00:00+00:00"),
+            new DateTimeImmutable('2026-06-06T10:00:00+00:00'),
         );
 
         return new class($probe) implements ProbeRepository {
@@ -329,13 +302,9 @@ final class NotifyOnMeasurementHandlerTest extends TestCase
                 private readonly Probe $probe,
             ) {}
 
-            public function save(Probe $probe): void
-            {
-            }
+            public function save(Probe $probe): void {}
 
-            public function delete(Probe $probe): void
-            {
-            }
+            public function delete(Probe $probe): void {}
 
             public function get(ProbeId $id): Probe
             {

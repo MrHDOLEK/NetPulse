@@ -25,7 +25,7 @@ final class DoctrineUserRepositoryTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $repository = $container->get("test." . UserRepository::class);
+        $repository = $container->get('test.' . UserRepository::class);
         self::assertInstanceOf(UserRepository::class, $repository);
 
         $this->repository = $repository;
@@ -38,17 +38,14 @@ final class DoctrineUserRepositoryTest extends KernelTestCase
         $this->repository->save($user);
         $this->entityManager->clear();
 
-        $loaded = $this->repository->byEmail(new Email("owner@example.com"));
+        $loaded = $this->repository->byEmail(new Email('owner@example.com'));
 
         self::assertInstanceOf(User::class, $loaded);
-        self::assertTrue($loaded->id()->equals(new UserId("550e8400-e29b-41d4-a716-446655440000")));
-        self::assertSame("owner@example.com", $loaded->email()->value());
-        self::assertSame("hashed-secret", $loaded->password()->value());
-        self::assertSame(["ROLE_ADMIN"], $loaded->roles()->toStringArray());
-        self::assertEquals(
-            new DateTimeImmutable("2026-06-05T10:00:00+00:00"),
-            $loaded->createdAt(),
-        );
+        self::assertTrue($loaded->id()->equals(new UserId('550e8400-e29b-41d4-a716-446655440000')));
+        self::assertSame('owner@example.com', $loaded->email()->value());
+        self::assertSame('hashed-secret', $loaded->password()->value());
+        self::assertSame(['ROLE_ADMIN'], $loaded->roles()->toStringArray());
+        self::assertEquals(new DateTimeImmutable('2026-06-05T10:00:00+00:00'), $loaded->createdAt());
     }
 
     public function testCountIncrementsAfterSave(): void
@@ -62,7 +59,7 @@ final class DoctrineUserRepositoryTest extends KernelTestCase
 
     public function testByEmailReturnsNullForUnknownEmail(): void
     {
-        self::assertNull($this->repository->byEmail(new Email("nobody@example.com")));
+        self::assertNull($this->repository->byEmail(new Email('nobody@example.com')));
     }
 
     public function testGetReturnsUserById(): void
@@ -70,26 +67,26 @@ final class DoctrineUserRepositoryTest extends KernelTestCase
         $this->repository->save($this->newUser());
         $this->entityManager->clear();
 
-        $loaded = $this->repository->get(new UserId("550e8400-e29b-41d4-a716-446655440000"));
+        $loaded = $this->repository->get(new UserId('550e8400-e29b-41d4-a716-446655440000'));
 
-        self::assertSame("owner@example.com", $loaded->email()->value());
+        self::assertSame('owner@example.com', $loaded->email()->value());
     }
 
     public function testGetThrowsForUnknownUser(): void
     {
         $this->expectException(UserNotFound::class);
 
-        $this->repository->get(new UserId("11111111-1111-1111-1111-111111111111"));
+        $this->repository->get(new UserId('11111111-1111-1111-1111-111111111111'));
     }
 
-    private function newUser(string $uuid = "550e8400-e29b-41d4-a716-446655440000"): User
+    private function newUser(string $uuid = '550e8400-e29b-41d4-a716-446655440000'): User
     {
         return User::register(
             new UserId($uuid),
-            new Email("owner@example.com"),
-            HashedPassword::fromHash("hashed-secret"),
-            UserRoleCollection::fromStrings(["ROLE_ADMIN"]),
-            new DateTimeImmutable("2026-06-05T10:00:00+00:00"),
+            new Email('owner@example.com'),
+            HashedPassword::fromHash('hashed-secret'),
+            UserRoleCollection::fromStrings(['ROLE_ADMIN']),
+            new DateTimeImmutable('2026-06-05T10:00:00+00:00'),
         );
     }
 }

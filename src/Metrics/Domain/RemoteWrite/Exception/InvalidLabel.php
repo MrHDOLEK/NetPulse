@@ -10,6 +10,6 @@ final class InvalidLabel extends DomainException
 {
     public static function emptyName(): self
     {
-        return new self("Remote write label name must not be empty.");
+        return new self('Remote write label name must not be empty.');
     }
 }

@@ -8,7 +8,7 @@ use App\Auth\Domain\Entity\User\UserId;
 use App\Auth\Domain\UserRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class RegenerateRecoveryCodesHandler
 {
     public function __construct(

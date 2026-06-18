@@ -29,12 +29,12 @@ final class FakeSpeedtestRunner implements SpeedtestRunner
 
         $next = array_shift($this->outcomes);
 
-        if ($next === "throw") {
-            throw new RuntimeException("runner exploded");
+        if ($next === 'throw') {
+            throw new RuntimeException('runner exploded');
         }
 
         if ($next === null) {
-            throw new RuntimeException("FakeSpeedtestRunner ran out of canned outcomes");
+            throw new RuntimeException('FakeSpeedtestRunner ran out of canned outcomes');
         }
 
         return $next;

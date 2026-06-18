@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class PushMeasurementOnRecordedTest extends TestCase
 {
-    private const string MEASUREMENT_ID = "11111111-1111-4111-8111-111111111111";
+    private const string MEASUREMENT_ID = '11111111-1111-4111-8111-111111111111';
 
     public function testDispatchesPushMessageWhenEnabled(): void
     {
@@ -77,9 +77,9 @@ final class PushMeasurementOnRecordedTest extends TestCase
     {
         return new MeasurementRecorded(
             new MeasurementId(self::MEASUREMENT_ID),
-            new ProbeId("22222222-2222-4222-8222-222222222222"),
-            new ConnectionId("33333333-3333-4333-8333-333333333333"),
-            new DateTimeImmutable("2026-06-05T10:00:01+00:00"),
+            new ProbeId('22222222-2222-4222-8222-222222222222'),
+            new ConnectionId('33333333-3333-4333-8333-333333333333'),
+            new DateTimeImmutable('2026-06-05T10:00:01+00:00'),
         );
     }
 }

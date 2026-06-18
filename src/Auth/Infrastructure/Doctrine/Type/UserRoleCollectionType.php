@@ -21,7 +21,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class UserRoleCollectionType extends Type
 {
-    public const string NAME = "user_role_collection";
+    public const string NAME = 'user_role_collection';
 
     /**
      * @param array<string, mixed> $column
@@ -38,7 +38,7 @@ final class UserRoleCollectionType extends Type
         }
 
         if (!$value instanceof UserRoleCollection) {
-            throw InvalidType::new($value, self::NAME, ["null", UserRoleCollection::class]);
+            throw InvalidType::new($value, self::NAME, ['null', UserRoleCollection::class]);
         }
 
         return json_encode($value->toStringArray(), JSON_THROW_ON_ERROR);
@@ -46,7 +46,7 @@ final class UserRoleCollectionType extends Type
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): UserRoleCollection
     {
-        if ($value === null || $value === "") {
+        if ($value === null || $value === '') {
             return new UserRoleCollection([]);
         }
 

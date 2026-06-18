@@ -40,24 +40,24 @@ final class LeagueOidcProvider implements OidcProvider
     public function authorizationUrl(string $state, string $codeVerifier, string $nonce): string
     {
         return $this->provider()->getAuthorizationUrl([
-            "state" => $state,
-            "scope" => $this->config->scopes,
-            "nonce" => $nonce,
-            "code_challenge" => $this->s256($codeVerifier),
-            "code_challenge_method" => "S256",
+            'state' => $state,
+            'scope' => $this->config->scopes,
+            'nonce' => $nonce,
+            'code_challenge' => $this->s256($codeVerifier),
+            'code_challenge_method' => 'S256',
         ]);
     }
 
     public function exchange(string $code, string $codeVerifier, string $expectedNonce): OidcIdentity
     {
         try {
-            $token = $this->provider()->getAccessToken("authorization_code", [
-                "code" => $code,
-                "code_verifier" => $codeVerifier,
+            $token = $this->provider()->getAccessToken('authorization_code', [
+                'code' => $code,
+                'code_verifier' => $codeVerifier,
             ]);
 
             if (!$token instanceof AccessToken) {
-                throw new OidcException("OIDC token exchange returned an unexpected token type.");
+                throw new OidcException('OIDC token exchange returned an unexpected token type.');
             }
 
             /** @var array<string, mixed> $tokenValues */
@@ -66,10 +66,10 @@ final class LeagueOidcProvider implements OidcProvider
 
             /** @var array<string, mixed> $owner */
             $owner = $this->provider()->getResourceOwner($token)->toArray();
-        } catch (IdentityProviderException | OidcException $exception) {
-            throw new OidcException("OIDC token exchange failed: " . $exception->getMessage(), 0, $exception);
+        } catch (IdentityProviderException|OidcException $exception) {
+            throw new OidcException('OIDC token exchange failed: ' . $exception->getMessage(), 0, $exception);
         } catch (Throwable $exception) {
-            throw new OidcException("OIDC token exchange failed.", 0, $exception);
+            throw new OidcException('OIDC token exchange failed.', 0, $exception);
         }
 
         return $this->mapIdentity($owner);
@@ -80,19 +80,19 @@ final class LeagueOidcProvider implements OidcProvider
      */
     private function mapIdentity(array $owner): OidcIdentity
     {
-        $email = $owner["email"] ?? null;
+        $email = $owner['email'] ?? null;
 
-        if (!is_string($email) || trim($email) === "") {
-            throw new OidcException("OIDC userinfo did not include an email address.");
+        if (!is_string($email) || trim($email) === '') {
+            throw new OidcException('OIDC userinfo did not include an email address.');
         }
 
-        $subject = $owner["sub"] ?? null;
-        $name = $owner["name"] ?? null;
+        $subject = $owner['sub'] ?? null;
+        $name = $owner['name'] ?? null;
 
         return new OidcIdentity(
-            is_string($subject) ? $subject : "",
+            is_string($subject) ? $subject : '',
             $email,
-            $this->isTrue($owner["email_verified"] ?? false),
+            $this->isTrue($owner['email_verified'] ?? false),
             is_string($name) ? $name : null,
         );
     }
@@ -102,21 +102,21 @@ final class LeagueOidcProvider implements OidcProvider
      */
     private function assertNonce(array $tokenValues, string $expectedNonce): void
     {
-        $idToken = $tokenValues["id_token"] ?? null;
+        $idToken = $tokenValues['id_token'] ?? null;
 
         if (!is_string($idToken)) {
             return;
         }
 
         $claims = $this->decodeJwtPayload($idToken);
-        $nonce = $claims["nonce"] ?? null;
+        $nonce = $claims['nonce'] ?? null;
 
         if ($nonce === null) {
             return;
         }
 
-        if (!is_string($nonce) || $expectedNonce === "" || !hash_equals($expectedNonce, $nonce)) {
-            throw new OidcException("OIDC id_token nonce mismatch.");
+        if (!is_string($nonce) || $expectedNonce === '' || !hash_equals($expectedNonce, $nonce)) {
+            throw new OidcException('OIDC id_token nonce mismatch.');
         }
     }
 
@@ -125,13 +125,13 @@ final class LeagueOidcProvider implements OidcProvider
      */
     private function decodeJwtPayload(string $jwt): array
     {
-        $parts = explode(".", $jwt);
+        $parts = explode('.', $jwt);
 
         if (count($parts) < 2) {
             return [];
         }
 
-        $decoded = base64_decode(strtr($parts[1], "-_", "+/"), true);
+        $decoded = base64_decode(strtr($parts[1], '-_', '+/'), true);
 
         if ($decoded === false) {
             return [];
@@ -150,7 +150,7 @@ final class LeagueOidcProvider implements OidcProvider
         $stringKeyed = [];
 
         foreach ($claims as $key => $value) {
-            $stringKeyed[(string)$key] = $value;
+            $stringKeyed[(string) $key] = $value;
         }
 
         return $stringKeyed;
@@ -158,24 +158,24 @@ final class LeagueOidcProvider implements OidcProvider
 
     private function s256(string $verifier): string
     {
-        return rtrim(strtr(base64_encode(hash("sha256", $verifier, true)), "+/", "-_"), "=");
+        return rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
     }
 
     private function isTrue(mixed $value): bool
     {
-        return $value === true || $value === "true";
+        return $value === true || $value === 'true';
     }
 
     private function provider(): GenericProvider
     {
         return $this->provider ??= new GenericProvider([
-            "clientId" => $this->config->clientId,
-            "clientSecret" => $this->config->clientSecret,
-            "redirectUri" => $this->config->redirectUrl,
-            "urlAuthorize" => $this->config->authorizationUrl,
-            "urlAccessToken" => $this->config->tokenUrl,
-            "urlResourceOwnerDetails" => $this->config->userInfoUrl,
-            "scopes" => explode(" ", $this->config->scopes),
+            'clientId' => $this->config->clientId,
+            'clientSecret' => $this->config->clientSecret,
+            'redirectUri' => $this->config->redirectUrl,
+            'urlAuthorize' => $this->config->authorizationUrl,
+            'urlAccessToken' => $this->config->tokenUrl,
+            'urlResourceOwnerDetails' => $this->config->userInfoUrl,
+            'scopes' => explode(' ', $this->config->scopes),
         ]);
     }
 }

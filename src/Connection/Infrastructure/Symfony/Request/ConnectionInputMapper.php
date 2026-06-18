@@ -36,9 +36,9 @@ final readonly class ConnectionInputMapper
         $labels = [];
 
         foreach ($this->parseList($raw) as $pair) {
-            $parts = explode("=", $pair, 2);
+            $parts = explode('=', $pair, 2);
 
-            if (count($parts) === 2 && trim($parts[0]) !== "") {
+            if (count($parts) === 2 && trim($parts[0]) !== '') {
                 $labels[trim($parts[0])] = trim($parts[1]);
             }
         }
@@ -51,13 +51,13 @@ final readonly class ConnectionInputMapper
      */
     public function parseList(string $raw): array
     {
-        if ($raw === "") {
+        if ($raw === '') {
             return [];
         }
 
         return array_values(array_filter(
-            array_map(static fn(string $item): string => trim($item), explode(",", $raw)),
-            static fn(string $item): bool => $item !== "",
+            array_map(static fn(string $item): string => trim($item), explode(',', $raw)),
+            static fn(string $item): bool => $item !== '',
         ));
     }
 
@@ -74,14 +74,14 @@ final readonly class ConnectionInputMapper
      */
     public function buildSchedule(string $mode, array $cronExpressions, int $testsPerDay, int $jitterSeconds): Schedule
     {
-        if ($mode === "cron") {
+        if ($mode === 'cron') {
             $expressions = array_values(array_filter(
                 array_map(static fn(string $expression): string => trim($expression), $cronExpressions),
-                static fn(string $expression): bool => $expression !== "",
+                static fn(string $expression): bool => $expression !== '',
             ));
 
             if ($expressions === []) {
-                throw new InvalidArgumentException("--schedule-mode=cron requires at least one --cron expression.");
+                throw new InvalidArgumentException('--schedule-mode=cron requires at least one --cron expression.');
             }
 
             foreach ($expressions as $expression) {
@@ -94,11 +94,11 @@ final readonly class ConnectionInputMapper
         }
 
         if ($testsPerDay < 1) {
-            throw new InvalidArgumentException("--tests-per-day must be an integer >= 1.");
+            throw new InvalidArgumentException('--tests-per-day must be an integer >= 1.');
         }
 
         if ($jitterSeconds < 0) {
-            throw new InvalidArgumentException("--jitter must be an integer >= 0.");
+            throw new InvalidArgumentException('--jitter must be an integer >= 0.');
         }
 
         return Schedule::even($testsPerDay, $jitterSeconds);

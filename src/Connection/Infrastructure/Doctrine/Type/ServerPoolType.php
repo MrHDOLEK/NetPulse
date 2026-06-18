@@ -20,7 +20,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class ServerPoolType extends Type
 {
-    public const string NAME = "server_pool";
+    public const string NAME = 'server_pool';
 
     /**
      * @param array<string, mixed> $column
@@ -37,7 +37,7 @@ final class ServerPoolType extends Type
         }
 
         if (!$value instanceof ServerPool) {
-            throw InvalidType::new($value, self::NAME, ["null", ServerPool::class]);
+            throw InvalidType::new($value, self::NAME, ['null', ServerPool::class]);
         }
 
         return json_encode($value->all(), JSON_THROW_ON_ERROR);
@@ -45,7 +45,7 @@ final class ServerPoolType extends Type
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ServerPool
     {
-        if ($value === null || $value === "") {
+        if ($value === null || $value === '') {
             return ServerPool::empty();
         }
 

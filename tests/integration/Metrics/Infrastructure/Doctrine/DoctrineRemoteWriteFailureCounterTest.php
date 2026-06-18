@@ -22,7 +22,7 @@ final class DoctrineRemoteWriteFailureCounterTest extends KernelTestCase
 
         /** @var Connection $connection */
         $connection = $container->get(Connection::class);
-        $connection->executeStatement("DELETE FROM remote_write_failures");
+        $connection->executeStatement('DELETE FROM remote_write_failures');
 
         $counter = new DoctrineRemoteWriteFailureCounter($entityManager);
 
@@ -34,9 +34,9 @@ final class DoctrineRemoteWriteFailureCounterTest extends KernelTestCase
 
         self::assertSame(3, $counter->total());
 
-        $row = $connection->fetchAssociative("SELECT id, total FROM remote_write_failures WHERE id = 1");
+        $row = $connection->fetchAssociative('SELECT id, total FROM remote_write_failures WHERE id = 1');
         self::assertNotFalse($row);
-        self::assertSame(RemoteWriteFailureCount::SINGLETON_ID, (int)$row["id"]);
-        self::assertSame(3, (int)$row["total"]);
+        self::assertSame(RemoteWriteFailureCount::SINGLETON_ID, (int) $row['id']);
+        self::assertSame(3, (int) $row['total']);
     }
 }

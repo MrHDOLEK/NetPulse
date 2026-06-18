@@ -8,9 +8,9 @@
 trends, get alerts, and export to Prometheus & Grafana — all on your own Docker host.**
 
 [![CI](https://github.com/MrHDOLEK/NetPulse/actions/workflows/php.yml/badge.svg?branch=main)](https://github.com/MrHDOLEK/NetPulse/actions/workflows/php.yml)
-[![PHPStan level 10](https://img.shields.io/badge/PHPStan-level%2010-31C652.svg?logo=php&logoColor=white)](https://phpstan.org/)
-[![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777bb3.svg?logo=php&logoColor=white)](https://php.net/)
-[![Symfony 7.3](https://img.shields.io/badge/Symfony-7.3-000000.svg?logo=symfony&logoColor=white)](https://symfony.com/)
+[![Mago](https://img.shields.io/badge/Mago-lint%20%C2%B7%20format%20%C2%B7%20analyze-f46036.svg)](https://mago.carthage.software/)
+[![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb3.svg?logo=php&logoColor=white)](https://php.net/)
+[![Symfony 8.1](https://img.shields.io/badge/Symfony-8.1-000000.svg?logo=symfony&logoColor=white)](https://symfony.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-success.svg)](LICENSE)
 
 [**Documentation**](https://mrhdolek.github.io/NetPulse/) ·
@@ -31,7 +31,7 @@ connections, records every result, and turns them into live charts, a searchable
 weekday × hour heatmap, alerts, and a **Prometheus `/metrics`** endpoint you can graph in **Grafana**.
 
 It runs entirely on **Docker**, is **single-tenant** (one admin, your data only), and is built on
-**PHP 8.4 / Symfony 7.3** with a clean Hexagonal + DDD architecture.
+**PHP 8.5 / Symfony 8.1** with a clean Hexagonal + DDD architecture.
 
 ## Features
 
@@ -42,7 +42,7 @@ It runs entirely on **Docker**, is **single-tenant** (one admin, your data only)
 - 🔔 **Alerts & digests** — edge-debounced alert/recovery notifications over email, chat or webhook, plus a daily/weekly digest.
 - 🔒 **Private & secure** — single admin created on first run, optional OIDC SSO and TOTP 2FA, strict CSP, token-guarded agent API.
 - 🐳 **Self-hosted** — Docker Compose for the server, Prometheus, Grafana, and the probe agent. No third-party telemetry.
-- 🧩 **Clean & strict** — Hexagonal + DDD enforced by deptrac, PHPStan level 10, a no-Node frontend (AssetMapper + Tailwind + Alpine + uPlot).
+- 🧩 **Clean & strict** — Hexagonal + DDD enforced by deptrac, Mago (lint/format/analyze), a no-Node frontend (AssetMapper + Tailwind + Alpine + uPlot).
 
 ## Screenshots
 
@@ -86,18 +86,29 @@ the [documentation](https://mrhdolek.github.io/NetPulse/guide/how-it-works).
 
 ## Quick start
 
-> **Prerequisites:** Docker + Docker Compose, and git.
+> **Prerequisites:** Docker + Docker Compose, git, and [`just`](https://github.com/casey/just) (`brew install just`, or use the [Nix shell](https://mrhdolek.github.io/NetPulse/guide/getting-started#develop-with-nix-optional) — it provides `just`; see *Getting started* for how to install Nix and enter the shell).
 
 ```bash
 git clone https://github.com/MrHDOLEK/NetPulse.git
 cd NetPulse
 
-make install          # build the image, start containers, composer install
-make start            # docker compose up -d
+just install          # build the image, start containers, composer install
 
 # Build the database from migrations
 docker compose exec -T app composer migrate
 ```
+
+> **Develop on the host with Nix** (instead of Docker for the PHP toolchain): install Nix once —
+> `sh <(curl -L https://nixos.org/nix/install)` ([instructions](https://nixos.org/download/)) — then run
+> **`nix-shell`** from the project root to get PHP 8.5 + Composer + Mago + Symfony CLI + `just` + the Ookla `speedtest` CLI:
+>
+> ```bash
+> nix-shell                          # enter the dev shell
+> nix-shell --pure                   # full isolation from the host
+> nix-shell --arg php-version 8.4    # pick a PHP version (default: 8.5)
+> ```
+>
+> More in [Getting started → Develop with Nix](https://mrhdolek.github.io/NetPulse/guide/getting-started#develop-with-nix-optional).
 
 Open **http://localhost:8080** — every page redirects to **`/setup`** until you create the first
 admin (email + password, min 12 chars). Then add a probe and a connection, and start the agent:
@@ -197,9 +208,10 @@ cd docs && npm install && npm run docs:dev
 
 ## Tech stack
 
-PHP 8.4 · Symfony 7.3 · Doctrine ORM (XML mapping, migrations-only) · SQLite / PostgreSQL ·
+PHP 8.5 · Symfony 8.1 · Doctrine ORM (XML mapping, migrations-only) · SQLite / PostgreSQL ·
 Ookla Speedtest CLI · Prometheus + Grafana · Twig + Tailwind 3 + Alpine.js (CSP build) + uPlot via
-AssetMapper (no Node) · Hexagonal + DDD (deptrac) · PHPStan level 10 · PHPUnit + Behat.
+AssetMapper (no Node) · Hexagonal + DDD (deptrac) · Mago (lint/format/analyze) · PHPUnit.
+A host **Nix shell** (`shell.nix`) provides PHP 8.5 + Composer + Mago + Symfony CLI + `just` + the Ookla `speedtest` CLI — enough to serve the app (`symfony server:start`) and run the agent (`app:agent:run`) on the host.
 
 ## Contributing
 

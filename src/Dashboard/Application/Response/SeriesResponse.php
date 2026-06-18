@@ -35,13 +35,7 @@ final readonly class SeriesResponse
             $buckets[] = self::bucket($metric, $bucket);
         }
 
-        return new self(
-            $connectionId->toString(),
-            $range->value,
-            $metric->value,
-            $buckets,
-            $series->trendPct(),
-        );
+        return new self($connectionId->toString(), $range->value, $metric->value, $buckets, $series->trendPct());
     }
 
     /**
@@ -56,11 +50,11 @@ final readonly class SeriesResponse
     public function toArray(): array
     {
         return [
-            "connectionId" => $this->connectionId,
-            "range" => $this->range,
-            "metric" => $this->metric,
-            "buckets" => $this->buckets,
-            "trendPct" => $this->trendPct,
+            'connectionId' => $this->connectionId,
+            'range' => $this->range,
+            'metric' => $this->metric,
+            'buckets' => $this->buckets,
+            'trendPct' => $this->trendPct,
         ];
     }
 
@@ -69,12 +63,12 @@ final readonly class SeriesResponse
      */
     private static function bucket(SeriesMetric $metric, SeriesBucket $bucket): array
     {
-        $point = ["t" => $bucket->bucketStart->getTimestamp()];
+        $point = ['t' => $bucket->bucketStart->getTimestamp()];
 
         return match ($metric) {
-            SeriesMetric::Speed => $point + ["dl" => $bucket->downloadBits, "up" => $bucket->uploadBits],
-            SeriesMetric::Ping => $point + ["ping" => $bucket->pingSeconds],
-            SeriesMetric::Loss => $point + ["loss" => $bucket->packetLossRatio],
+            SeriesMetric::Speed => $point + ['dl' => $bucket->downloadBits, 'up' => $bucket->uploadBits],
+            SeriesMetric::Ping => $point + ['ping' => $bucket->pingSeconds],
+            SeriesMetric::Loss => $point + ['loss' => $bucket->packetLossRatio],
         };
     }
 }

@@ -6,7 +6,7 @@ namespace App\Notification\Domain\Enum;
 
 enum NotificationSeverity: string
 {
-    case Info = "info";
-    case Warning = "warning";
-    case Critical = "critical";
+    case Info = 'info';
+    case Warning = 'warning';
+    case Critical = 'critical';
 }

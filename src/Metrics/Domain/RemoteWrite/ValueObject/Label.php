@@ -12,7 +12,7 @@ final readonly class Label
         public string $name,
         public string $value,
     ) {
-        if ($name === "") {
+        if ($name === '') {
             throw InvalidLabel::emptyName();
         }
     }

@@ -29,8 +29,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class DeleteProbeHandlerTest extends KernelTestCase
 {
-    private const string PROBE = "cccccccc-cccc-7ccc-8ccc-cccccccccccc";
-    private const string CONNECTION = "10000000-0000-7000-8000-0000000000a9";
+    private const string PROBE = 'cccccccc-cccc-7ccc-8ccc-cccccccccccc';
+    private const string CONNECTION = '10000000-0000-7000-8000-0000000000a9';
 
     private MessageBusInterface $commandBus;
     private ProbeRepository $probes;
@@ -43,14 +43,14 @@ final class DeleteProbeHandlerTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->commandBus = $container->get("command.bus");
+        $this->commandBus = $container->get('command.bus');
         $this->probes = $container->get(ProbeRepository::class);
         $this->connections = $container->get(ConnectionRepository::class);
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->dbal = $container->get(DbalConnection::class);
 
-        $this->dbal->executeStatement("DELETE FROM connections");
-        $this->dbal->executeStatement("DELETE FROM probes");
+        $this->dbal->executeStatement('DELETE FROM connections');
+        $this->dbal->executeStatement('DELETE FROM probes');
     }
 
     public function testDeletesAProbeWithNoConnections(): void
@@ -70,7 +70,7 @@ final class DeleteProbeHandlerTest extends KernelTestCase
 
         try {
             $this->commandBus->dispatch(new DeleteProbeCommand(new ProbeId(self::PROBE)));
-            self::fail("Expected ProbeHasConnections for a probe with connections.");
+            self::fail('Expected ProbeHasConnections for a probe with connections.');
         } catch (HandlerFailedException $exception) {
             self::assertInstanceOf(ProbeHasConnections::class, $exception->getPrevious());
         }
@@ -84,7 +84,7 @@ final class DeleteProbeHandlerTest extends KernelTestCase
     {
         try {
             $this->commandBus->dispatch(new DeleteProbeCommand(new ProbeId(self::PROBE)));
-            self::fail("Expected ProbeNotFound for a missing probe.");
+            self::fail('Expected ProbeNotFound for a missing probe.');
         } catch (HandlerFailedException $exception) {
             self::assertInstanceOf(ProbeNotFound::class, $exception->getPrevious());
         }
@@ -94,11 +94,11 @@ final class DeleteProbeHandlerTest extends KernelTestCase
     {
         return new Probe(
             new ProbeId(self::PROBE),
-            "edge-01",
+            'edge-01',
             Labels::empty(),
-            "hash",
+            'hash',
             true,
-            new DateTimeImmutable("2026-01-01T00:00:00+00:00"),
+            new DateTimeImmutable('2026-01-01T00:00:00+00:00'),
         );
     }
 
@@ -107,8 +107,8 @@ final class DeleteProbeHandlerTest extends KernelTestCase
         return new Connection(
             new ConnectionId(self::CONNECTION),
             new ProbeId(self::PROBE),
-            "Home WAN1",
-            "Orange",
+            'Home WAN1',
+            'Orange',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Primary,
             Labels::empty(),

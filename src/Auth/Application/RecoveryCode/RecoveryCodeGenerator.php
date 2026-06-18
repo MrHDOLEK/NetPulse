@@ -28,7 +28,7 @@ final readonly class RecoveryCodeGenerator
 
         for ($i = 0; $i < self::CODE_COUNT; $i++) {
             $raw = bin2hex(random_bytes(5));
-            $code = substr($raw, 0, 5) . "-" . substr($raw, 5, 5);
+            $code = substr($raw, 0, 5) . '-' . substr($raw, 5, 5);
             $plain[] = $code;
             $hashed[] = $hasher->hash($code);
         }

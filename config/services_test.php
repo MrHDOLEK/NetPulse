@@ -17,41 +17,23 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
 
-    $services->defaults()
-        ->autowire()
-        ->autoconfigure();
+    $services->defaults()->autowire()->autoconfigure();
 
-    $services->load('App\Tests\Integration\\', __DIR__ . "/../tests/integration/*");
+    $services->load('App\Tests\Integration\\', __DIR__ . '/../tests/integration/*');
 
-    
-    
-    
-    $services->alias("test." . UserRepository::class, UserRepository::class)
+    $services->alias('test.' . UserRepository::class, UserRepository::class)->public();
+
+    $services->alias('test.' . ClockInterface::class, ClockInterface::class)->public();
+
+    $services
+        ->set(OidcConfig::class)
+        ->factory([service(OidcConfigFactory::class), 'create'])
         ->public();
+    $services->alias(OidcProvider::class, App\Auth\Infrastructure\Oidc\LeagueOidcProvider::class)->public();
 
-    
-    
-    $services->alias("test." . ClockInterface::class, ClockInterface::class)
-        ->public();
+    $services->alias('test.' . SettingsReader::class, SettingsReader::class)->public();
+    $services->alias('test.' . SettingsWriter::class, SettingsWriter::class)->public();
+    $services->alias('test.' . AppSettings::class, AppSettings::class)->public();
 
-    
-    
-    
-    
-    
-    $services->set(OidcConfig::class)
-        ->factory([service(OidcConfigFactory::class), "create"])
-        ->public();
-    $services->alias(OidcProvider::class, App\Auth\Infrastructure\Oidc\LeagueOidcProvider::class)
-        ->public();
-
-    
-    
-    $services->alias("test." . SettingsReader::class, SettingsReader::class)->public();
-    $services->alias("test." . SettingsWriter::class, SettingsWriter::class)->public();
-    $services->alias("test." . AppSettings::class, AppSettings::class)->public();
-
-    
-    
     $services->set(OidcConfigFactory::class)->public();
 };

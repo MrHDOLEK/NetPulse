@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class ListConnectionsAction extends AbstractController
 {
     public function __construct(
@@ -21,7 +21,7 @@ final class ListConnectionsAction extends AbstractController
         private readonly ProbeRepository $probes,
     ) {}
 
-    #[Route("/settings/connections", name: "settings_connections", methods: ["GET"])]
+    #[Route('/settings/connections', name: 'settings_connections', methods: ['GET'])]
     public function __invoke(): Response
     {
         $probeNames = [];
@@ -42,9 +42,9 @@ final class ListConnectionsAction extends AbstractController
             $probes[] = $this->probeRow($probe);
         }
 
-        return $this->render("settings/connections/index.html.twig", [
-            "connections" => $connections,
-            "probes" => $probes,
+        return $this->render('settings/connections/index.html.twig', [
+            'connections' => $connections,
+            'probes' => $probes,
         ]);
     }
 
@@ -59,32 +59,32 @@ final class ListConnectionsAction extends AbstractController
         $probeId = $connection->probeId()->toString();
 
         return [
-            "id" => $connection->id()->toString(),
-            "probeId" => $probeId,
-            "probeName" => $probeNames[$probeId] ?? null,
-            "name" => $connection->name(),
-            "isp" => $connection->isp(),
-            "color" => $connection->color()->value,
-            "enabled" => $connection->isEnabled(),
-            "expectedDownloadBits" => $connection->expected()->expectedDownloadBits,
-            "expectedUploadBits" => $connection->expected()->expectedUploadBits,
-            "labels" => $connection->labels()->all(),
-            "serverPool" => $connection->serverPool()->all(),
-            "scheduleMode" => $schedule->mode()->value,
-            "cronExpressions" => $schedule->cronExpressions(),
-            "testsPerDay" => $schedule->testsPerDay(),
-            "jitterSeconds" => $schedule->jitterSeconds(),
-            "thresholds" => [
-                "minDownloadRatio" => $connection->thresholds()->minDownloadRatio(),
-                "minUploadRatio" => $connection->thresholds()->minUploadRatio(),
-                "maxPingMs" => $connection->thresholds()->maxPingMs(),
-                "maxJitterMs" => $connection->thresholds()->maxJitterMs(),
-                "maxPacketLossRatio" => $connection->thresholds()->maxPacketLossRatio(),
+            'id' => $connection->id()->toString(),
+            'probeId' => $probeId,
+            'probeName' => $probeNames[$probeId] ?? null,
+            'name' => $connection->name(),
+            'isp' => $connection->isp(),
+            'color' => $connection->color()->value,
+            'enabled' => $connection->isEnabled(),
+            'expectedDownloadBits' => $connection->expected()->expectedDownloadBits,
+            'expectedUploadBits' => $connection->expected()->expectedUploadBits,
+            'labels' => $connection->labels()->all(),
+            'serverPool' => $connection->serverPool()->all(),
+            'scheduleMode' => $schedule->mode()->value,
+            'cronExpressions' => $schedule->cronExpressions(),
+            'testsPerDay' => $schedule->testsPerDay(),
+            'jitterSeconds' => $schedule->jitterSeconds(),
+            'thresholds' => [
+                'minDownloadRatio' => $connection->thresholds()->minDownloadRatio(),
+                'minUploadRatio' => $connection->thresholds()->minUploadRatio(),
+                'maxPingMs' => $connection->thresholds()->maxPingMs(),
+                'maxJitterMs' => $connection->thresholds()->maxJitterMs(),
+                'maxPacketLossRatio' => $connection->thresholds()->maxPacketLossRatio(),
             ],
-            "adaptivePolicy" => [
-                "adaptiveIntervalSeconds" => $connection->adaptivePolicy()->adaptiveIntervalSeconds(),
-                "recoveryHealthyCount" => $connection->adaptivePolicy()->recoveryHealthyCount(),
-                "maxConsecutiveFailures" => $connection->adaptivePolicy()->maxConsecutiveFailures(),
+            'adaptivePolicy' => [
+                'adaptiveIntervalSeconds' => $connection->adaptivePolicy()->adaptiveIntervalSeconds(),
+                'recoveryHealthyCount' => $connection->adaptivePolicy()->recoveryHealthyCount(),
+                'maxConsecutiveFailures' => $connection->adaptivePolicy()->maxConsecutiveFailures(),
             ],
         ];
     }
@@ -95,9 +95,9 @@ final class ListConnectionsAction extends AbstractController
     private function probeRow(Probe $probe): array
     {
         return [
-            "id" => $probe->id()->toString(),
-            "name" => $probe->name(),
-            "enabled" => $probe->isEnabled(),
+            'id' => $probe->id()->toString(),
+            'name' => $probe->name(),
+            'enabled' => $probe->isEnabled(),
         ];
     }
 }

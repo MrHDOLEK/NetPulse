@@ -41,17 +41,17 @@ final readonly class SqlPublicResultRepository implements PublicResultRepository
         $row = $this->fetchRow($shareToken);
 
         return new PublicResult(
-            downloadBits: $row["downloadBits"],
-            uploadBits: $row["uploadBits"],
-            pingSeconds: $row["pingSeconds"],
-            jitterSeconds: $row["jitterSeconds"],
-            lossRatio: $row["lossRatio"],
-            serverName: $row["serverName"],
-            serverLocation: $row["serverLocation"],
-            isp: $row["isp"],
-            completedAtUnix: $row["completedAt"]->getTimestamp(),
-            status: $row["status"],
-            healthy: $row["healthy"],
+            downloadBits: $row['downloadBits'],
+            uploadBits: $row['uploadBits'],
+            pingSeconds: $row['pingSeconds'],
+            jitterSeconds: $row['jitterSeconds'],
+            lossRatio: $row['lossRatio'],
+            serverName: $row['serverName'],
+            serverLocation: $row['serverLocation'],
+            isp: $row['isp'],
+            completedAtUnix: $row['completedAt']->getTimestamp(),
+            status: $row['status'],
+            healthy: $row['healthy'],
         );
     }
 
@@ -64,28 +64,29 @@ final readonly class SqlPublicResultRepository implements PublicResultRepository
     {
         try {
             /** @var array<string,mixed> $row */
-            $row = $this->entityManager->createQueryBuilder()
+            $row = $this->entityManager
+                ->createQueryBuilder()
                 ->select(
-                    "measurement.downloadBits AS downloadBits",
-                    "measurement.uploadBits AS uploadBits",
-                    "(measurement.ping / 1000.0) AS pingSeconds",
-                    "(measurement.jitter / 1000.0) AS jitterSeconds",
-                    "measurement.packetLossRatio AS lossRatio",
-                    "measurement.serverName AS serverName",
-                    "measurement.serverLocation AS serverLocation",
-                    "measurement.isp AS isp",
-                    "measurement.completedAt AS completedAt",
-                    "measurement.status AS status",
-                    "measurement.healthy AS healthy",
+                    'measurement.downloadBits AS downloadBits',
+                    'measurement.uploadBits AS uploadBits',
+                    '(measurement.ping / 1000.0) AS pingSeconds',
+                    '(measurement.jitter / 1000.0) AS jitterSeconds',
+                    'measurement.packetLossRatio AS lossRatio',
+                    'measurement.serverName AS serverName',
+                    'measurement.serverLocation AS serverLocation',
+                    'measurement.isp AS isp',
+                    'measurement.completedAt AS completedAt',
+                    'measurement.status AS status',
+                    'measurement.healthy AS healthy',
                 )
-                ->from(Measurement::class, "measurement")
-                ->where("measurement.shareToken = :token")
-                ->setParameter("token", $shareToken)
+                ->from(Measurement::class, 'measurement')
+                ->where('measurement.shareToken = :token')
+                ->setParameter('token', $shareToken)
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getSingleResult();
         } catch (NoResultException) {
-            throw new ResultNotFound("No shared result for the given token.");
+            throw new ResultNotFound('No shared result for the given token.');
         }
 
         return $row;

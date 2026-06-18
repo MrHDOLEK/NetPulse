@@ -16,14 +16,14 @@ final class ThresholdsTest extends TestCase
      */
     public static function provideInvalid(): iterable
     {
-        yield "download ratio zero" => [0.0, 0.7, 100.0, 50.0, 0.05];
-        yield "download ratio negative" => [-0.1, 0.7, 100.0, 50.0, 0.05];
-        yield "download ratio above one" => [1.1, 0.7, 100.0, 50.0, 0.05];
-        yield "upload ratio zero" => [0.7, 0.0, 100.0, 50.0, 0.05];
-        yield "upload ratio above one" => [0.7, 1.5, 100.0, 50.0, 0.05];
-        yield "negative ping cap" => [0.7, 0.7, -1.0, 50.0, 0.05];
-        yield "negative jitter cap" => [0.7, 0.7, 100.0, -0.1, 0.05];
-        yield "negative loss cap" => [0.7, 0.7, 100.0, 50.0, -0.01];
+        yield 'download ratio zero' => [0.0, 0.7, 100.0, 50.0, 0.05];
+        yield 'download ratio negative' => [-0.1, 0.7, 100.0, 50.0, 0.05];
+        yield 'download ratio above one' => [1.1, 0.7, 100.0, 50.0, 0.05];
+        yield 'upload ratio zero' => [0.7, 0.0, 100.0, 50.0, 0.05];
+        yield 'upload ratio above one' => [0.7, 1.5, 100.0, 50.0, 0.05];
+        yield 'negative ping cap' => [0.7, 0.7, -1.0, 50.0, 0.05];
+        yield 'negative jitter cap' => [0.7, 0.7, 100.0, -0.1, 0.05];
+        yield 'negative loss cap' => [0.7, 0.7, 100.0, 50.0, -0.01];
     }
 
     public function testDefaultCarriesTheApprovedValues(): void
@@ -55,7 +55,7 @@ final class ThresholdsTest extends TestCase
         self::assertSame(0.0, $thresholds->maxPacketLossRatio());
     }
 
-    #[DataProvider("provideInvalid")]
+    #[DataProvider('provideInvalid')]
     public function testRejectsInvalidValues(
         float $minDownloadRatio,
         float $minUploadRatio,

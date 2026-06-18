@@ -23,14 +23,22 @@ final class HealthEvaluator
 
         $bandwidth = $measurement->bandwidth();
 
-        if ($expected->expectedDownloadBits > 0
-            && ($bandwidth === null || $bandwidth->downloadBits < $thresholds->minDownloadRatio() * $expected->expectedDownloadBits)
+        if (
+            $expected->expectedDownloadBits > 0
+            && (
+                $bandwidth === null
+                || $bandwidth->downloadBits < ($thresholds->minDownloadRatio() * $expected->expectedDownloadBits)
+            )
         ) {
             $breaches[] = ThresholdBreach::DownloadBelow;
         }
 
-        if ($expected->expectedUploadBits > 0
-            && ($bandwidth === null || $bandwidth->uploadBits < $thresholds->minUploadRatio() * $expected->expectedUploadBits)
+        if (
+            $expected->expectedUploadBits > 0
+            && (
+                $bandwidth === null
+                || $bandwidth->uploadBits < ($thresholds->minUploadRatio() * $expected->expectedUploadBits)
+            )
         ) {
             $breaches[] = ThresholdBreach::UploadBelow;
         }

@@ -6,6 +6,4 @@ namespace App\Auth\Application\Oidc;
 
 use RuntimeException;
 
-final class OidcException extends RuntimeException
-{
-}
+final class OidcException extends RuntimeException {}

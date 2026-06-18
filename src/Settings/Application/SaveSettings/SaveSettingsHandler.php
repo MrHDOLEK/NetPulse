@@ -8,7 +8,7 @@ use App\Settings\Application\SettingsWriter;
 use App\Settings\Domain\SettingKey;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class SaveSettingsHandler
 {
     public function __construct(

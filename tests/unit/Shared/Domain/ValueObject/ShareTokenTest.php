@@ -13,7 +13,7 @@ final class ShareTokenTest extends TestCase
     {
         $token = ShareToken::generate();
 
-        $this->assertMatchesRegularExpression("/^[A-Za-z0-9_-]{43}$/", $token->toString());
+        $this->assertMatchesRegularExpression('/^[A-Za-z0-9_-]{43}$/', $token->toString());
     }
 
     public function testGenerateProducesUniqueTokens(): void
@@ -22,6 +22,6 @@ final class ShareTokenTest extends TestCase
         $second = ShareToken::generate();
 
         $this->assertNotSame($first->toString(), $second->toString());
-        $this->assertMatchesRegularExpression("/^[A-Za-z0-9_-]{43}$/", $second->toString());
+        $this->assertMatchesRegularExpression('/^[A-Za-z0-9_-]{43}$/', $second->toString());
     }
 }

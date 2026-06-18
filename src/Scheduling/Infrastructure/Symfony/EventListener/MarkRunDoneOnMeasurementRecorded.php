@@ -8,7 +8,7 @@ use App\Measurement\Domain\Event\MeasurementRecorded;
 use App\Scheduling\Domain\RunStateRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "event.bus")]
+#[AsMessageHandler(bus: 'event.bus')]
 final readonly class MarkRunDoneOnMeasurementRecorded
 {
     public function __construct(

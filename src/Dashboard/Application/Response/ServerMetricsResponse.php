@@ -74,8 +74,8 @@ final readonly class ServerMetricsResponse
     public function toArray(): array
     {
         return [
-            "window" => $this->window,
-            "rows" => $this->rows,
+            'window' => $this->window,
+            'rows' => $this->rows,
         ];
     }
 
@@ -104,28 +104,28 @@ final readonly class ServerMetricsResponse
         $healthRatio = $row->testCount > 0 ? $row->healthyCount / $row->testCount : null;
 
         return [
-            "serverId" => $row->serverId,
-            "name" => $row->name,
-            "location" => $row->location,
-            "download" => $row->avgDownloadBits,
-            "downloadLabel" => UnitFormatter::bitsPerSecond(self::bits($row->avgDownloadBits)),
-            "upload" => $row->avgUploadBits,
-            "uploadLabel" => UnitFormatter::bitsPerSecond(self::bits($row->avgUploadBits)),
-            "ping" => $row->avgPingSeconds,
-            "pingLabel" => UnitFormatter::seconds($row->avgPingSeconds),
-            "loss" => $row->avgLossRatio,
-            "lossLabel" => UnitFormatter::ratio($row->avgLossRatio),
-            "tests" => $row->testCount,
+            'serverId' => $row->serverId,
+            'name' => $row->name,
+            'location' => $row->location,
+            'download' => $row->avgDownloadBits,
+            'downloadLabel' => UnitFormatter::bitsPerSecond(self::bits($row->avgDownloadBits)),
+            'upload' => $row->avgUploadBits,
+            'uploadLabel' => UnitFormatter::bitsPerSecond(self::bits($row->avgUploadBits)),
+            'ping' => $row->avgPingSeconds,
+            'pingLabel' => UnitFormatter::seconds($row->avgPingSeconds),
+            'loss' => $row->avgLossRatio,
+            'lossLabel' => UnitFormatter::ratio($row->avgLossRatio),
+            'tests' => $row->testCount,
 
-            "healthPct" => $healthRatio === null ? null : (float)($healthRatio * 100),
-            "healthLabel" => UnitFormatter::ratio($healthRatio),
-            "lastSeenUnix" => $row->lastSeenUnix,
-            "lastSeenLabel" => RelativeTime::fromUnix($row->lastSeenUnix, $nowUnix),
+            'healthPct' => $healthRatio === null ? null : (float) ($healthRatio * 100),
+            'healthLabel' => UnitFormatter::ratio($healthRatio),
+            'lastSeenUnix' => $row->lastSeenUnix,
+            'lastSeenLabel' => RelativeTime::fromUnix($row->lastSeenUnix, $nowUnix),
         ];
     }
 
     private static function bits(?float $value): ?int
     {
-        return $value === null ? null : (int)round($value);
+        return $value === null ? null : (int) round($value);
     }
 }

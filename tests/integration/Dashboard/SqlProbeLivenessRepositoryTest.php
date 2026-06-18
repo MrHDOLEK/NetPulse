@@ -14,10 +14,10 @@ use function in_array;
 
 final class SqlProbeLivenessRepositoryTest extends KernelTestCase
 {
-    private const string NOW = "2026-06-07 12:00:00";
-    private const string ONLINE_PROBE = "11111111-1111-1111-1111-111111111111";
-    private const string OFFLINE_PROBE = "22222222-2222-2222-2222-222222222222";
-    private const string NEVER_PROBE = "33333333-3333-3333-3333-333333333333";
+    private const string NOW = '2026-06-07 12:00:00';
+    private const string ONLINE_PROBE = '11111111-1111-1111-1111-111111111111';
+    private const string OFFLINE_PROBE = '22222222-2222-2222-2222-222222222222';
+    private const string NEVER_PROBE = '33333333-3333-3333-3333-333333333333';
 
     private DbalConnection $db;
     private ProbeLivenessRepository $readModel;
@@ -29,18 +29,18 @@ final class SqlProbeLivenessRepositoryTest extends KernelTestCase
 
         $container->set(ClockInterface::class, new MockClock(self::NOW));
 
-        $this->db = $container->get("doctrine.dbal.default_connection");
+        $this->db = $container->get('doctrine.dbal.default_connection');
         $this->readModel = $container->get(ProbeLivenessRepository::class);
 
         foreach ([self::ONLINE_PROBE, self::OFFLINE_PROBE, self::NEVER_PROBE] as $id) {
-            $this->db->executeStatement("DELETE FROM probes WHERE id = :id", ["id" => $id]);
+            $this->db->executeStatement('DELETE FROM probes WHERE id = :id', ['id' => $id]);
         }
 
-        $this->insertProbe(self::ONLINE_PROBE, "edge-a", "2026-06-01 09:00:00", "2026-06-07 11:58:00");
+        $this->insertProbe(self::ONLINE_PROBE, 'edge-a', '2026-06-01 09:00:00', '2026-06-07 11:58:00');
 
-        $this->insertProbe(self::OFFLINE_PROBE, "edge-b", "2026-06-02 09:00:00", "2026-06-07 11:50:00");
+        $this->insertProbe(self::OFFLINE_PROBE, 'edge-b', '2026-06-02 09:00:00', '2026-06-07 11:50:00');
 
-        $this->insertProbe(self::NEVER_PROBE, "edge-c", "2026-06-03 09:00:00", null);
+        $this->insertProbe(self::NEVER_PROBE, 'edge-c', '2026-06-03 09:00:00', null);
     }
 
     public function testDerivesOnlineOfflineAndNeverPolledFromLastPollAt(): void
@@ -77,14 +77,14 @@ final class SqlProbeLivenessRepositoryTest extends KernelTestCase
 
     private function insertProbe(string $id, string $name, string $createdAt, ?string $lastPollAt): void
     {
-        $this->db->insert("probes", [
-            "id" => $id,
-            "name" => $name,
-            "labels" => json_encode([], JSON_THROW_ON_ERROR),
-            "token_hash" => "x",
-            "enabled" => 1,
-            "created_at" => $createdAt,
-            "last_poll_at" => $lastPollAt,
+        $this->db->insert('probes', [
+            'id' => $id,
+            'name' => $name,
+            'labels' => json_encode([], JSON_THROW_ON_ERROR),
+            'token_hash' => 'x',
+            'enabled' => 1,
+            'created_at' => $createdAt,
+            'last_poll_at' => $lastPollAt,
         ]);
     }
 }

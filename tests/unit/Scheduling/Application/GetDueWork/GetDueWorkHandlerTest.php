@@ -32,12 +32,12 @@ use Symfony\Component\Clock\MockClock;
 
 final class GetDueWorkHandlerTest extends TestCase
 {
-    private const string PROBE_ID = "11111111-1111-4111-8111-111111111111";
-    private const string DUE_CONNECTION = "22222222-2222-4222-8222-222222222222";
-    private const string RECENT_CONNECTION = "33333333-3333-4333-8333-333333333333";
-    private const string DISABLED_CONNECTION = "44444444-4444-4444-8444-444444444444";
-    private const string NEVER_MEASURED_CONNECTION = "55555555-5555-4555-8555-555555555555";
-    private const string NOW = "2026-06-06 12:00:00";
+    private const string PROBE_ID = '11111111-1111-4111-8111-111111111111';
+    private const string DUE_CONNECTION = '22222222-2222-4222-8222-222222222222';
+    private const string RECENT_CONNECTION = '33333333-3333-4333-8333-333333333333';
+    private const string DISABLED_CONNECTION = '44444444-4444-4444-8444-444444444444';
+    private const string NEVER_MEASURED_CONNECTION = '55555555-5555-4555-8555-555555555555';
+    private const string NOW = '2026-06-06 12:00:00';
 
     public function testReturnsOnlyDueEnabledConnections(): void
     {
@@ -49,9 +49,24 @@ final class GetDueWorkHandlerTest extends TestCase
         $neverMeasured = $this->connection(self::NEVER_MEASURED_CONNECTION, $probeId, true);
 
         $lastMeasurements = new InMemoryLastMeasurementRepository(
-            new LastMeasurementRow(new ConnectionId(self::DUE_CONNECTION), $this->ago(7200), "old", HealthHistory::empty()),
-            new LastMeasurementRow(new ConnectionId(self::RECENT_CONNECTION), $this->ago(60), "old", HealthHistory::empty()),
-            new LastMeasurementRow(new ConnectionId(self::DISABLED_CONNECTION), $this->ago(7200), "old", HealthHistory::empty()),
+            new LastMeasurementRow(
+                new ConnectionId(self::DUE_CONNECTION),
+                $this->ago(7200),
+                'old',
+                HealthHistory::empty(),
+            ),
+            new LastMeasurementRow(
+                new ConnectionId(self::RECENT_CONNECTION),
+                $this->ago(60),
+                'old',
+                HealthHistory::empty(),
+            ),
+            new LastMeasurementRow(
+                new ConnectionId(self::DISABLED_CONNECTION),
+                $this->ago(7200),
+                'old',
+                HealthHistory::empty(),
+            ),
         );
 
         $handler = new GetDueWorkHandler(
@@ -81,8 +96,8 @@ final class GetDueWorkHandlerTest extends TestCase
             $byId[$task->connectionId->toString()] = $task->serverId;
         }
 
-        self::assertSame("x", $byId[self::DUE_CONNECTION]);
-        self::assertSame("x", $byId[self::NEVER_MEASURED_CONNECTION]);
+        self::assertSame('x', $byId[self::DUE_CONNECTION]);
+        self::assertSame('x', $byId[self::NEVER_MEASURED_CONNECTION]);
     }
 
     private function connection(string $id, ProbeId $probeId, bool $enabled): Connection
@@ -90,12 +105,12 @@ final class GetDueWorkHandlerTest extends TestCase
         return new Connection(
             new ConnectionId($id),
             $probeId,
-            "wan",
-            "isp",
+            'wan',
+            'isp',
             new ExpectedSpeed(1_000_000_000, 100_000_000),
             ConnectionColor::Primary,
             Labels::fromArray([]),
-            ServerPool::fromList("x"),
+            ServerPool::fromList('x'),
             Schedule::even(24, 0),
             $enabled,
             Thresholds::default(),
@@ -105,7 +120,7 @@ final class GetDueWorkHandlerTest extends TestCase
 
     private function ago(int $seconds): DateTimeImmutable
     {
-        return (new DateTimeImmutable(self::NOW))->modify("-{$seconds} seconds");
+        return new DateTimeImmutable(self::NOW)->modify("-{$seconds} seconds");
     }
 }
 
@@ -119,17 +134,13 @@ final class InMemoryConnectionRepository implements ConnectionRepository
         $this->connections = array_values($connections);
     }
 
-    public function save(Connection $connection): void
-    {
-    }
+    public function save(Connection $connection): void {}
 
-    public function delete(Connection $connection): void
-    {
-    }
+    public function delete(Connection $connection): void {}
 
     public function get(ConnectionId $connectionId): Connection
     {
-        throw new NotFoundException("not found");
+        throw new NotFoundException('not found');
     }
 
     public function find(ConnectionId $connectionId): ?Connection
@@ -144,9 +155,10 @@ final class InMemoryConnectionRepository implements ConnectionRepository
 
     public function allEnabled(): ConnectionCollection
     {
-        return ConnectionCollection::fromList(
-            array_values(array_filter($this->connections, static fn(Connection $c): bool => $c->isEnabled())),
-        );
+        return ConnectionCollection::fromList(array_values(array_filter(
+            $this->connections,
+            static fn(Connection $c): bool => $c->isEnabled(),
+        )));
     }
 
     public function all(): ConnectionCollection

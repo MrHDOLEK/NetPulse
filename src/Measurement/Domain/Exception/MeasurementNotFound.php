@@ -6,6 +6,4 @@ namespace App\Measurement\Domain\Exception;
 
 use App\Shared\Domain\NotFoundException;
 
-final class MeasurementNotFound extends NotFoundException
-{
-}
+final class MeasurementNotFound extends NotFoundException {}

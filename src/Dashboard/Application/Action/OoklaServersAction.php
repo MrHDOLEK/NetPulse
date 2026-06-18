@@ -14,28 +14,25 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function array_map;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class OoklaServersAction extends AbstractController
 {
     public function __construct(
         private readonly OoklaServerCatalog $catalog,
     ) {}
 
-    #[Route("/dashboard/ookla-servers", name: "dashboard_ookla_servers", methods: ["GET"])]
+    #[Route('/dashboard/ookla-servers', name: 'dashboard_ookla_servers', methods: ['GET'])]
     public function __invoke(): Response
     {
-        $servers = array_map(
-            static fn(OoklaServer $server): array => [
-                "id" => $server->id,
-                "name" => $server->name,
-                "location" => $server->location,
-                "host" => $server->host,
-            ],
-            $this->catalog->servers(),
-        );
+        $servers = array_map(static fn(OoklaServer $server): array => [
+            'id' => $server->id,
+            'name' => $server->name,
+            'location' => $server->location,
+            'host' => $server->host,
+        ], $this->catalog->servers());
 
-        $response = new JsonResponse(["servers" => $servers], Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response = new JsonResponse(['servers' => $servers], Response::HTTP_OK);
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }

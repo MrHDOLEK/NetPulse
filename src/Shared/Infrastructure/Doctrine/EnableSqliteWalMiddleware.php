@@ -47,7 +47,7 @@ final class EnableSqliteWalConnection extends AbstractConnectionMiddleware
     {
         parent::__construct($connection);
 
-        $connection->exec("PRAGMA journal_mode=WAL");
-        $connection->exec("PRAGMA busy_timeout=5000");
+        $connection->exec('PRAGMA journal_mode=WAL');
+        $connection->exec('PRAGMA busy_timeout=5000');
     }
 }

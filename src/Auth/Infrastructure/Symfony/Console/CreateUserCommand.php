@@ -24,8 +24,8 @@ use function is_string;
 use function trim;
 
 #[AsCommand(
-    name: "app:user:create",
-    description: "Create an administrator account (ROLE_ADMIN) with a hashed password.",
+    name: 'app:user:create',
+    description: 'Create an administrator account (ROLE_ADMIN) with a hashed password.',
 )]
 final class CreateUserCommand extends Command
 {
@@ -37,9 +37,17 @@ final class CreateUserCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->addOption("email", null, InputOption::VALUE_REQUIRED, "Email address of the new administrator")
-            ->addOption("password", null, InputOption::VALUE_REQUIRED, "Plaintext password (omit for a secure hidden prompt)");
+        $this->addOption(
+            'email',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Email address of the new administrator',
+        )->addOption(
+            'password',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Plaintext password (omit for a secure hidden prompt)',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -66,23 +74,23 @@ final class CreateUserCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->success("Created administrator " . $email . ".");
+        $io->success('Created administrator ' . $email . '.');
 
         return Command::SUCCESS;
     }
 
     private function resolveEmail(InputInterface $input, SymfonyStyle $io): ?string
     {
-        $raw = $input->getOption("email");
-        $email = is_string($raw) ? trim($raw) : "";
+        $raw = $input->getOption('email');
+        $email = is_string($raw) ? trim($raw) : '';
 
-        if ($email === "" && $input->isInteractive()) {
-            $answer = $io->ask("Email address");
-            $email = is_string($answer) ? trim($answer) : "";
+        if ($email === '' && $input->isInteractive()) {
+            $answer = $io->ask('Email address');
+            $email = is_string($answer) ? trim($answer) : '';
         }
 
-        if ($email === "") {
-            $io->error("The --email option is required.");
+        if ($email === '') {
+            $io->error('The --email option is required.');
 
             return null;
         }
@@ -92,29 +100,29 @@ final class CreateUserCommand extends Command
 
     private function resolvePassword(InputInterface $input, SymfonyStyle $io): ?string
     {
-        $raw = $input->getOption("password");
+        $raw = $input->getOption('password');
 
-        if (is_string($raw) && $raw !== "") {
+        if (is_string($raw) && $raw !== '') {
             return $raw;
         }
 
         if (!$input->isInteractive()) {
-            $io->error("The --password option is required in non-interactive mode.");
+            $io->error('The --password option is required in non-interactive mode.');
 
             return null;
         }
 
-        $password = $this->askHidden($input, $io, "Password (hidden)");
-        $confirm = $this->askHidden($input, $io, "Repeat password (hidden)");
+        $password = $this->askHidden($input, $io, 'Password (hidden)');
+        $confirm = $this->askHidden($input, $io, 'Repeat password (hidden)');
 
         if ($password !== $confirm) {
-            $io->error("The passwords do not match.");
+            $io->error('The passwords do not match.');
 
             return null;
         }
 
-        if ($password === "") {
-            $io->error("The password must not be empty.");
+        if ($password === '') {
+            $io->error('The password must not be empty.');
 
             return null;
         }
@@ -128,15 +136,15 @@ final class CreateUserCommand extends Command
         $question->setHidden(true);
         $question->setHiddenFallback(false);
 
-        $helper = $this->getHelper("question");
+        $helper = $this->getHelper('question');
 
         if (!$helper instanceof QuestionHelper) {
-            return "";
+            return '';
         }
 
         $answer = $helper->ask($input, $io, $question);
 
-        return is_string($answer) ? $answer : "";
+        return is_string($answer) ? $answer : '';
     }
 
     private function friendlyMessage(HandlerFailedException $exception): string
@@ -144,10 +152,10 @@ final class CreateUserCommand extends Command
         $cause = $this->unwrap($exception);
 
         return match (true) {
-            $cause instanceof WeakPassword => "The password must be at least 12 characters long.",
-            $cause instanceof AdminAlreadyExists => "An administrator account already exists for this email.",
-            $cause instanceof InvalidArgumentException => "Please enter a valid email address.",
-            default => "Could not create the administrator. Please check your details and try again.",
+            $cause instanceof WeakPassword => 'The password must be at least 12 characters long.',
+            $cause instanceof AdminAlreadyExists => 'An administrator account already exists for this email.',
+            $cause instanceof InvalidArgumentException => 'Please enter a valid email address.',
+            default => 'Could not create the administrator. Please check your details and try again.',
         };
     }
 

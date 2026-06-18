@@ -1,6 +1,6 @@
 # Introduction
 
-**NetPulse** is a self-hosted, metrics-first internet speed tracker built on PHP 8.4 and Symfony 7.3. It runs the official Ookla Speedtest CLI on a schedule, records every result, and turns those measurements into history, alerts, and first-class Prometheus metrics. Instead of opening a web page once in a while and trusting a single number, you get a continuous, queryable record of how your ISP actually performs over time — so you can spot degradation, prove an SLA breach, and back up a support ticket with data you own.
+**NetPulse** is a self-hosted, metrics-first internet speed tracker built on PHP 8.5 and Symfony 8.1. It runs the official Ookla Speedtest CLI on a schedule, records every result, and turns those measurements into history, alerts, and first-class Prometheus metrics. Instead of opening a web page once in a while and trusting a single number, you get a continuous, queryable record of how your ISP actually performs over time — so you can spot degradation, prove an SLA breach, and back up a support ticket with data you own.
 
 ## Why NetPulse
 
@@ -39,5 +39,5 @@ For the full mechanism — including the scheduling math, the round-robin server
 - [Contributing](/contributing) — develop, test, and contribute.
 
 ::: tip
-Ready to try it? Head to [Getting started](./getting-started) — `make install` builds the image, starts the stack, and runs `composer install`, then you create the first admin at `/setup`.
+Ready to try it? Head to [Getting started](./getting-started) — `just install` builds the image, starts the stack, and runs `composer install`, then you create the first admin at `/setup`.
 :::

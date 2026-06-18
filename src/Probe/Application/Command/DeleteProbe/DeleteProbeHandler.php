@@ -9,7 +9,7 @@ use App\Probe\Domain\Exception\ProbeHasConnections;
 use App\Probe\Domain\ProbeRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class DeleteProbeHandler
 {
     public function __construct(

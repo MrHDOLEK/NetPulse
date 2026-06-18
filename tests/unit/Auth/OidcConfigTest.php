@@ -10,24 +10,24 @@ use PHPUnit\Framework\TestCase;
 
 final class OidcConfigTest extends TestCase
 {
-    private const string CLIENT_ID = "client-id";
-    private const string CLIENT_SECRET = "client-secret";
-    private const string AUTH_URL = "https://idp.example/authorize";
-    private const string TOKEN_URL = "https://idp.example/token";
-    private const string USERINFO_URL = "https://idp.example/userinfo";
-    private const string REDIRECT_URL = "https://app.example/login/oidc/callback";
+    private const string CLIENT_ID = 'client-id';
+    private const string CLIENT_SECRET = 'client-secret';
+    private const string AUTH_URL = 'https://idp.example/authorize';
+    private const string TOKEN_URL = 'https://idp.example/token';
+    private const string USERINFO_URL = 'https://idp.example/userinfo';
+    private const string REDIRECT_URL = 'https://app.example/login/oidc/callback';
 
     /**
      * @return iterable<string, array{array<string, string>}>
      */
     public static function missingPieceProvider(): iterable
     {
-        yield "no client id" => [["clientId" => ""]];
-        yield "no client secret" => [["clientSecret" => ""]];
-        yield "no authorization url" => [["authorizationUrl" => ""]];
-        yield "no token url" => [["tokenUrl" => ""]];
-        yield "no userinfo url" => [["userInfoUrl" => ""]];
-        yield "whitespace-only client id" => [["clientId" => "   "]];
+        yield 'no client id' => [['clientId' => '']];
+        yield 'no client secret' => [['clientSecret' => '']];
+        yield 'no authorization url' => [['authorizationUrl' => '']];
+        yield 'no token url' => [['tokenUrl' => '']];
+        yield 'no userinfo url' => [['userInfoUrl' => '']];
+        yield 'whitespace-only client id' => [['clientId' => '   ']];
     }
 
     public function testIsEnabledWhenEverythingIsConfigured(): void
@@ -44,7 +44,7 @@ final class OidcConfigTest extends TestCase
      *     userInfoUrl?: string,
      * } $override
      */
-    #[DataProvider("missingPieceProvider")]
+    #[DataProvider('missingPieceProvider')]
     public function testIsDisabledWhenAnyRequiredPieceIsMissing(array $override): void
     {
         self::assertFalse($this->config($override)->isEnabled());
@@ -52,27 +52,27 @@ final class OidcConfigTest extends TestCase
 
     public function testIsDisabledWhenNothingIsConfigured(): void
     {
-        $config = new OidcConfig("", "", "", "", "", "", "", "");
+        $config = new OidcConfig('', '', '', '', '', '', '', '');
 
         self::assertFalse($config->isEnabled());
     }
 
     public function testDisplayNameUsesConfiguredName(): void
     {
-        $config = $this->config(["name" => "Company SSO"]);
+        $config = $this->config(['name' => 'Company SSO']);
 
-        self::assertSame("Company SSO", $config->displayName());
+        self::assertSame('Company SSO', $config->displayName());
     }
 
     public function testDisplayNameFallsBackToSso(): void
     {
-        self::assertSame("SSO", $this->config(["name" => ""])->displayName());
-        self::assertSame("SSO", $this->config(["name" => "   "])->displayName());
+        self::assertSame('SSO', $this->config(['name' => ''])->displayName());
+        self::assertSame('SSO', $this->config(['name' => '   '])->displayName());
     }
 
     public function testScopesDefaultToOpenidEmailProfile(): void
     {
-        self::assertSame("openid email profile", $this->config(["scopes" => ""])->scopes);
+        self::assertSame('openid email profile', $this->config(['scopes' => ''])->scopes);
     }
 
     /**
@@ -80,26 +80,27 @@ final class OidcConfigTest extends TestCase
      */
     private function config(array $override = []): OidcConfig
     {
-        $values = $override + [
-            "clientId" => self::CLIENT_ID,
-            "clientSecret" => self::CLIENT_SECRET,
-            "authorizationUrl" => self::AUTH_URL,
-            "tokenUrl" => self::TOKEN_URL,
-            "userInfoUrl" => self::USERINFO_URL,
-            "redirectUrl" => self::REDIRECT_URL,
-            "scopes" => "openid email profile",
-            "name" => "Company SSO",
+        $values = $override
+        + [
+            'clientId' => self::CLIENT_ID,
+            'clientSecret' => self::CLIENT_SECRET,
+            'authorizationUrl' => self::AUTH_URL,
+            'tokenUrl' => self::TOKEN_URL,
+            'userInfoUrl' => self::USERINFO_URL,
+            'redirectUrl' => self::REDIRECT_URL,
+            'scopes' => 'openid email profile',
+            'name' => 'Company SSO',
         ];
 
         return new OidcConfig(
-            $values["clientId"],
-            $values["clientSecret"],
-            $values["authorizationUrl"],
-            $values["tokenUrl"],
-            $values["userInfoUrl"],
-            $values["redirectUrl"],
-            $values["scopes"],
-            $values["name"],
+            $values['clientId'],
+            $values['clientSecret'],
+            $values['authorizationUrl'],
+            $values['tokenUrl'],
+            $values['userInfoUrl'],
+            $values['redirectUrl'],
+            $values['scopes'],
+            $values['name'],
         );
     }
 }

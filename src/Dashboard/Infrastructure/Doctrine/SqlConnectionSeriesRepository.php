@@ -31,7 +31,7 @@ final readonly class SqlConnectionSeriesRepository implements ConnectionSeriesRe
 
     public function series(ConnectionId $id, SeriesRange $range, SeriesMetric $metric): SeriesBucketCollection
     {
-        $now = $this->clock->now()->setTimezone(new DateTimeZone("UTC"));
+        $now = $this->clock->now()->setTimezone(new DateTimeZone('UTC'));
         $windowSeconds = $range->windowSeconds();
         $since = $now->modify("-{$windowSeconds} seconds");
         $prevSince = $since->modify("-{$windowSeconds} seconds");
@@ -53,15 +53,16 @@ final readonly class SqlConnectionSeriesRepository implements ConnectionSeriesRe
         DateTimeImmutable $prevSince,
         DateTimeImmutable $now,
     ): MeasurementSampleCollection {
-        $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.connectionId = :connectionId")
-            ->andWhere("measurement.completedAt >= :prevSince")
-            ->andWhere("measurement.completedAt < :now")
-            ->orderBy("measurement.completedAt", "ASC")
-            ->setParameter("connectionId", $id->toString())
-            ->setParameter("prevSince", $prevSince)
-            ->setParameter("now", $now);
+        $queryBuilder = $this->entityManager
+            ->createQueryBuilder()
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.connectionId = :connectionId')
+            ->andWhere('measurement.completedAt >= :prevSince')
+            ->andWhere('measurement.completedAt < :now')
+            ->orderBy('measurement.completedAt', 'ASC')
+            ->setParameter('connectionId', $id->toString())
+            ->setParameter('prevSince', $prevSince)
+            ->setParameter('now', $now);
 
         $this->selectMetricColumns($queryBuilder, $metric);
 
@@ -80,11 +81,11 @@ final readonly class SqlConnectionSeriesRepository implements ConnectionSeriesRe
 
         foreach ($rows as $row) {
             $samples[] = new MeasurementSample(
-                completedAtUnix: $row["completedAt"]->getTimestamp(),
-                downloadBits: $row["downloadBits"] ?? null,
-                uploadBits: $row["uploadBits"] ?? null,
-                pingSeconds: $row["pingSeconds"] ?? null,
-                packetLossRatio: $row["packetLossRatio"] ?? null,
+                completedAtUnix: $row['completedAt']->getTimestamp(),
+                downloadBits: $row['downloadBits'] ?? null,
+                uploadBits: $row['uploadBits'] ?? null,
+                pingSeconds: $row['pingSeconds'] ?? null,
+                packetLossRatio: $row['packetLossRatio'] ?? null,
             );
         }
 
@@ -93,15 +94,14 @@ final readonly class SqlConnectionSeriesRepository implements ConnectionSeriesRe
 
     private function selectMetricColumns(QueryBuilder $queryBuilder, SeriesMetric $metric): void
     {
-        $queryBuilder->select("measurement.completedAt AS completedAt");
+        $queryBuilder->select('measurement.completedAt AS completedAt');
 
         match ($metric) {
             SeriesMetric::Speed => $queryBuilder
-                ->addSelect("measurement.downloadBits AS downloadBits")
-                ->addSelect("measurement.uploadBits AS uploadBits"),
-
-            SeriesMetric::Ping => $queryBuilder->addSelect("(measurement.ping / 1000.0) AS pingSeconds"),
-            SeriesMetric::Loss => $queryBuilder->addSelect("measurement.packetLossRatio AS packetLossRatio"),
+                ->addSelect('measurement.downloadBits AS downloadBits')
+                ->addSelect('measurement.uploadBits AS uploadBits'),
+            SeriesMetric::Ping => $queryBuilder->addSelect('(measurement.ping / 1000.0) AS pingSeconds'),
+            SeriesMetric::Loss => $queryBuilder->addSelect('measurement.packetLossRatio AS packetLossRatio'),
         };
     }
 }

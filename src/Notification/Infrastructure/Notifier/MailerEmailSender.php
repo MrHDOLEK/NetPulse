@@ -14,7 +14,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[AsAlias(id: EmailSender::class)]
 final readonly class MailerEmailSender implements EmailSender
 {
-    private const string EMAIL_FROM = "netpulse@localhost";
+    private const string EMAIL_FROM = 'netpulse@localhost';
 
     public function __construct(
         private HttpClientInterface $httpClient,
@@ -25,7 +25,7 @@ final readonly class MailerEmailSender implements EmailSender
         $mailer = new Mailer(MailerTransport::fromDsn($dsn, null, $this->httpClient));
 
         foreach ($recipients as $recipient) {
-            $email = (new Email())
+            $email = new Email()
                 ->from(self::EMAIL_FROM)
                 ->to($recipient)
                 ->subject($subject)

@@ -24,24 +24,24 @@ final class SodiumProbeTokenHasherTest extends TestCase
 
     public function testHashIsNotPlaintextAndIsSalted(): void
     {
-        $hashOne = $this->hasher->hash("super-secret");
-        $hashTwo = $this->hasher->hash("super-secret");
+        $hashOne = $this->hasher->hash('super-secret');
+        $hashTwo = $this->hasher->hash('super-secret');
 
-        $this->assertNotSame("super-secret", $hashOne);
+        $this->assertNotSame('super-secret', $hashOne);
         $this->assertNotSame($hashOne, $hashTwo);
     }
 
     public function testVerifyMatchesCorrectPlaintext(): void
     {
-        $hash = $this->hasher->hash("super-secret");
+        $hash = $this->hasher->hash('super-secret');
 
-        $this->assertTrue($this->hasher->verify("super-secret", $hash));
+        $this->assertTrue($this->hasher->verify('super-secret', $hash));
     }
 
     public function testVerifyRejectsWrongPlaintext(): void
     {
-        $hash = $this->hasher->hash("super-secret");
+        $hash = $this->hasher->hash('super-secret');
 
-        $this->assertFalse($this->hasher->verify("wrong-secret", $hash));
+        $this->assertFalse($this->hasher->verify('wrong-secret', $hash));
     }
 }

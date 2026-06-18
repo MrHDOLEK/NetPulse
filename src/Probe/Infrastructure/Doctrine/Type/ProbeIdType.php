@@ -14,14 +14,14 @@ use function is_string;
 
 final class ProbeIdType extends Type
 {
-    private const string NAME = "probe_id";
+    private const string NAME = 'probe_id';
 
     /**
      * @param array<string, mixed> $column
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getStringTypeDeclarationSQL(["length" => 36]);
+        return $platform->getStringTypeDeclarationSQL(['length' => 36]);
     }
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
@@ -34,7 +34,7 @@ final class ProbeIdType extends Type
             return $value->toString();
         }
 
-        throw InvalidType::new($value, self::NAME, ["null", ProbeId::class]);
+        throw InvalidType::new($value, self::NAME, ['null', ProbeId::class]);
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?ProbeId

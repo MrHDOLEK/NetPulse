@@ -24,33 +24,30 @@ final class CreateProbeCommandTest extends KernelTestCase
         self::assertInstanceOf(ProbeRepository::class, $repository);
         $this->repository = $repository;
 
-        $command = (new Application(self::$kernel))->find("app:probe:create");
+        $command = new Application(self::$kernel)->find('app:probe:create');
         $this->tester = new CommandTester($command);
     }
 
     public function testCreatesProbePrintsTokenAndPersists(): void
     {
         $exitCode = $this->tester->execute([
-            "name" => "edge-warsaw",
-            "--label" => ["site=home", "link=wan1"],
+            'name' => 'edge-warsaw',
+            '--label' => ['site=home', 'link=wan1'],
         ]);
 
         $this->assertSame(0, $exitCode);
 
         $display = $this->tester->getDisplay();
-        $this->assertStringContainsString("Probe created", $display);
-        $this->assertMatchesRegularExpression(
-            "/Probe ID:\s+[0-9a-fA-F-]{36}/",
-            $display,
-        );
+        $this->assertStringContainsString('Probe created', $display);
+        $this->assertMatchesRegularExpression("/Probe ID:\s+[0-9a-fA-F-]{36}/", $display);
 
         $this->assertSame(1, preg_match("/Probe ID:\s+([0-9a-fA-F-]{36})/", $display, $idMatch));
         $this->assertSame(1, preg_match("/Token:\s+(\S+)/", $display, $tokenMatch));
 
         $probe = $this->repository->get(new ProbeId($idMatch[1]));
 
-        $this->assertSame("edge-warsaw", $probe->name());
-        $this->assertSame(["site" => "home", "link" => "wan1"], $probe->labels()->all());
+        $this->assertSame('edge-warsaw', $probe->name());
+        $this->assertSame(['site' => 'home', 'link' => 'wan1'], $probe->labels()->all());
         $this->assertTrue($probe->isEnabled());
 
         $hasher = self::getContainer()->get(ProbeTokenHasher::class);
@@ -61,11 +58,11 @@ final class CreateProbeCommandTest extends KernelTestCase
     public function testFailsOnMalformedLabel(): void
     {
         $exitCode = $this->tester->execute([
-            "name" => "edge-warsaw",
-            "--label" => ["broken-label-without-equals"],
+            'name' => 'edge-warsaw',
+            '--label' => ['broken-label-without-equals'],
         ]);
 
         $this->assertSame(1, $exitCode);
-        $this->assertStringContainsString("Invalid label", $this->tester->getDisplay());
+        $this->assertStringContainsString('Invalid label', $this->tester->getDisplay());
     }
 }

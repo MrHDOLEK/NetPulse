@@ -6,6 +6,6 @@ namespace App\Notification\Application\Command\GenerateDigest;
 
 enum GenerateDigestPeriod: string
 {
-    case Daily = "daily";
-    case Weekly = "weekly";
+    case Daily = 'daily';
+    case Weekly = 'weekly';
 }

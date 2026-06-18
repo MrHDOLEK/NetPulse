@@ -15,11 +15,11 @@ final readonly class Thresholds
         private ?float $maxJitterMs,
         private ?float $maxPacketLossRatio,
     ) {
-        $this->guardRatio("minDownloadRatio", $minDownloadRatio);
-        $this->guardRatio("minUploadRatio", $minUploadRatio);
-        $this->guardCap("maxPingMs", $maxPingMs);
-        $this->guardCap("maxJitterMs", $maxJitterMs);
-        $this->guardCap("maxPacketLossRatio", $maxPacketLossRatio);
+        $this->guardRatio('minDownloadRatio', $minDownloadRatio);
+        $this->guardRatio('minUploadRatio', $minUploadRatio);
+        $this->guardCap('maxPingMs', $maxPingMs);
+        $this->guardCap('maxJitterMs', $maxJitterMs);
+        $this->guardCap('maxPacketLossRatio', $maxPacketLossRatio);
     }
 
     public static function default(): self

@@ -1,0 +1,127 @@
+php-version = "8.5"
+
+[source]
+paths = [
+    "src",
+    "tests",
+    "config",
+    "public",
+    "migrations",
+]
+includes = [
+    "vendor",
+]
+excludes = [
+    "**/var/**",
+    # Auto-generated Symfony config-builder reference (app-only, gitignored).
+    "config/reference.php",
+    # Behat is parked until its ecosystem supports Symfony 8 (behat/behat core caps
+    # Symfony at ^7). These parked contexts/features reference Behat classes that are
+    # no longer installed, so they are excluded from format/lint/analyze.
+    "tests/integration/Context/**",
+    "tests/integration/Feature/**",
+]
+
+[parser]
+enable-short-tags = false
+
+[formatter]
+print-width = 120
+tab-width = 4
+use-tabs = false
+single-quote = true
+trailing-comma = true
+
+[linter]
+integrations = ["symfony", "phpunit"]
+
+[linter.rules]
+# PHPUnit assertion receiver (self::/$this-> vs static::) was never enforced by the
+# previous codestyle; keep it off to avoid churning every test.
+assertion-style = { enabled = false }
+# The following two flag genuine improvements but are NEW requirements the previous
+# php-cs-fixer setup never enforced; left off to keep this migration tooling-only.
+# Worth revisiting as a follow-up: add #[\SensitiveParameter] and review the
+# password-confirmation comparisons flagged by no-insecure-comparison.
+sensitive-parameter = { enabled = false }
+no-insecure-comparison = { enabled = false }
+cyclomatic-complexity = { enabled = false }
+excessive-nesting = { enabled = false }
+excessive-parameter-list = { enabled = false }
+halstead = { enabled = false }
+kan-defect = { enabled = false }
+too-many-enum-cases = { enabled = false }
+too-many-methods = { enabled = false }
+too-many-properties = { enabled = false }
+class-name = { enabled = false }
+constant-name = { enabled = false }
+enum-name = { enabled = false }
+file-name = { enabled = false }
+function-name = { enabled = false }
+interface-name = { enabled = false }
+trait-name = { enabled = false }
+single-class-per-file = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+literal-named-argument = { enabled = false }
+tagged-fixme = { enabled = false }
+tagged-todo = { enabled = false }
+prefer-static-closure = { enabled = false }
+prefer-arrow-function = { enabled = false }
+prefer-early-continue = { enabled = false }
+no-else-clause = { enabled = false }
+no-hash-comment = { enabled = false }
+no-empty-catch-clause = { enabled = false }
+no-isset = { enabled = false }
+no-nested-ternary = { enabled = false }
+no-assign-in-condition = { enabled = false }
+explicit-octal = { enabled = false }
+readable-literal = { enabled = false }
+no-redundant-final = { enabled = false }
+no-empty-loop = { enabled = false }
+no-empty = { enabled = false }
+loop-does-not-iterate = { enabled = false }
+no-debug-symbols = { enabled = false }
+no-multi-assignments = { enabled = false }
+identity-comparison = { enabled = false }
+prefer-first-class-callable = { enabled = false }
+final-controller = { enabled = false }
+prefer-interface = { enabled = false }
+no-shorthand-ternary = { enabled = false }
+no-error-control-operator = { enabled = false }
+no-literal-password = { enabled = false }
+no-ini-set = { enabled = false }
+instanceof-stringable = { enabled = false }
+no-redundant-file = { enabled = false }
+no-sprintf-concat = { enabled = false }
+no-global = { enabled = false }
+no-redundant-method-override = { enabled = false }
+# Conflicts with the intentional `/** @var */ $row = ...; return $row;` pattern used to give
+# the analyzer a precise return type (otherwise it sees `mixed`).
+inline-variable-return = { enabled = false }
+no-redundant-else = { enabled = true, level = "warning" }
+no-redundant-variable = { enabled = true, level = "warning" }
+strict-types = { enabled = true, level = "error" }
+no-fully-qualified-global-function = { enabled = true, level = "error" }
+no-fully-qualified-global-class-like = { enabled = true, level = "error" }
+no-fully-qualified-global-constant = { enabled = true, level = "error" }
+disallowed-functions = { enabled = true, level = "error", functions = [
+    { name = "var_dump", help = "Debugging only - remove before commit." },
+    { name = "var_export", help = "Debugging only - remove before commit." },
+    { name = "print_r", help = "Debugging only - remove before commit." },
+    { name = "dd", help = "Debugging only - remove before commit." },
+    { name = "dump", help = "Debugging only - remove before commit." },
+] }
+
+[analyzer]
+# The static analyzer matches the previous PHPStan scope (src + config). Test,
+# bootstrap (public/) and migration code are not statically analyzed (the linter and
+# formatter still cover them) - this also avoids false positives from Symfony's test
+# container typing that phpstan-symfony used to resolve.
+excludes = ["tests/**", "public/**", "migrations/**"]
+minimum-fail-level = "error"
+# Two Mago checks that go beyond the project's previous PHPStan (level max) standard and
+# flag correct code, so they are not enforced: `mixed-assignment` fires on values that are
+# narrowed downstream (json_decode + is_array, console input, messenger results), and
+# `avoid-catching-error` fires on the deliberate `catch (\Error)` boundaries in the Doctrine
+# DBAL types that turn malformed stored values into domain exceptions.
+ignore = ["mixed-assignment", "avoid-catching-error"]

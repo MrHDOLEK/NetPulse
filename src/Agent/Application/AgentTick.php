@@ -21,7 +21,7 @@ final readonly class AgentTick
     {
         $plan = $this->apiClient->fetchDue();
 
-        $this->logger->info("agent tick: due work fetched", ["tasks" => count($plan->tasks)]);
+        $this->logger->info('agent tick: due work fetched', ['tasks' => count($plan->tasks)]);
 
         $succeeded = 0;
         $failed = 0;
@@ -29,9 +29,9 @@ final readonly class AgentTick
 
         foreach ($plan->tasks as $task) {
             try {
-                $this->logger->info("running speedtest", [
-                    "connection" => $task->connectionId,
-                    "server" => $task->serverId ?? "auto",
+                $this->logger->info('running speedtest', [
+                    'connection' => $task->connectionId,
+                    'server' => $task->serverId ?? 'auto',
                 ]);
 
                 $outcome = $this->runner->run($task->serverId);
@@ -44,26 +44,26 @@ final readonly class AgentTick
 
                 if ($outcome->successful) {
                     $succeeded++;
-                    $this->logger->info("result pushed", [
-                        "connection" => $task->connectionId,
-                        "status" => "ok",
+                    $this->logger->info('result pushed', [
+                        'connection' => $task->connectionId,
+                        'status' => 'ok',
                     ]);
                 } else {
                     $failed++;
-                    $this->logger->info("result pushed", [
-                        "connection" => $task->connectionId,
-                        "status" => "failed",
+                    $this->logger->info('result pushed', [
+                        'connection' => $task->connectionId,
+                        'status' => 'failed',
                     ]);
-                    $this->logger->warning("task failed", [
-                        "connection" => $task->connectionId,
-                        "error" => $outcome->errorMessage ?? "unknown",
+                    $this->logger->warning('task failed', [
+                        'connection' => $task->connectionId,
+                        'error' => $outcome->errorMessage ?? 'unknown',
                     ]);
                 }
             } catch (Throwable $exception) {
                 $errored++;
-                $this->logger->warning("task failed", [
-                    "connection" => $task->connectionId,
-                    "error" => $exception->getMessage(),
+                $this->logger->warning('task failed', [
+                    'connection' => $task->connectionId,
+                    'error' => $exception->getMessage(),
                 ]);
             }
         }

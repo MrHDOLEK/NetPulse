@@ -28,49 +28,39 @@ use function in_array;
 
 final class CreateAdminHandlerTest extends TestCase
 {
-    private const NEW_ID = "0190a000-0000-7000-8000-000000000001";
-    private const CREATED_AT = "2026-06-06T10:00:00+00:00";
+    private const NEW_ID = '0190a000-0000-7000-8000-000000000001';
+    private const CREATED_AT = '2026-06-06T10:00:00+00:00';
 
     public function testCreatesSingleAdminWithVerifiableHashAndAdminRole(): void
     {
         $repository = new InMemoryUserRepository();
         $hasher = $this->hasher();
 
-        $handler = new CreateAdminHandler(
-            $repository,
-            $this->factory(),
-            $this->idGenerator(),
-            $this->clock(),
-        );
+        $handler = new CreateAdminHandler($repository, $this->factory(), $this->idGenerator(), $this->clock());
 
-        $handler(new CreateAdminCommand("admin@example.com", "super-secret-password"));
+        $handler(new CreateAdminCommand('admin@example.com', 'super-secret-password'));
 
         self::assertSame(1, $repository->count());
 
-        $stored = $repository->byEmail(new Email("admin@example.com"));
+        $stored = $repository->byEmail(new Email('admin@example.com'));
         self::assertInstanceOf(User::class, $stored);
-        self::assertSame("admin@example.com", $stored->email()->value());
+        self::assertSame('admin@example.com', $stored->email()->value());
         self::assertTrue($stored->id()->equals(new UserId(self::NEW_ID)));
-        self::assertTrue(in_array("ROLE_ADMIN", $stored->roles()->toStringArray(), true));
+        self::assertTrue(in_array('ROLE_ADMIN', $stored->roles()->toStringArray(), true));
 
-        self::assertNotSame("super-secret-password", $stored->password()->value());
-        self::assertTrue($hasher->verify($stored->password()->value(), "super-secret-password"));
+        self::assertNotSame('super-secret-password', $stored->password()->value());
+        self::assertTrue($hasher->verify($stored->password()->value(), 'super-secret-password'));
     }
 
     public function testRejectsPasswordShorterThanTwelveCharactersAndSavesNothing(): void
     {
         $repository = new InMemoryUserRepository();
 
-        $handler = new CreateAdminHandler(
-            $repository,
-            $this->factory(),
-            $this->idGenerator(),
-            $this->clock(),
-        );
+        $handler = new CreateAdminHandler($repository, $this->factory(), $this->idGenerator(), $this->clock());
 
         try {
-            $handler(new CreateAdminCommand("admin@example.com", "short"));
-            self::fail("Expected WeakPassword to be thrown.");
+            $handler(new CreateAdminCommand('admin@example.com', 'short'));
+            self::fail('Expected WeakPassword to be thrown.');
         } catch (WeakPassword $exception) {
             self::assertInstanceOf(InvalidArgumentException::class, $exception);
         }
@@ -82,40 +72,35 @@ final class CreateAdminHandlerTest extends TestCase
     {
         $repository = new InMemoryUserRepository();
         $repository->save(User::register(
-            new UserId("0190a000-0000-7000-8000-0000000000ff"),
-            new Email("admin@example.com"),
-            HashedPassword::fromHash("pre-existing-hash"),
-            UserRoleCollection::fromStrings(["ROLE_ADMIN"]),
+            new UserId('0190a000-0000-7000-8000-0000000000ff'),
+            new Email('admin@example.com'),
+            HashedPassword::fromHash('pre-existing-hash'),
+            UserRoleCollection::fromStrings(['ROLE_ADMIN']),
             $this->clock()->now(),
         ));
 
-        $handler = new CreateAdminHandler(
-            $repository,
-            $this->factory(),
-            $this->idGenerator(),
-            $this->clock(),
-        );
+        $handler = new CreateAdminHandler($repository, $this->factory(), $this->idGenerator(), $this->clock());
 
         try {
-            $handler(new CreateAdminCommand("admin@example.com", "another-strong-password"));
-            self::fail("Expected AdminAlreadyExists to be thrown.");
+            $handler(new CreateAdminCommand('admin@example.com', 'another-strong-password'));
+            self::fail('Expected AdminAlreadyExists to be thrown.');
         } catch (AdminAlreadyExists) {
         }
 
         self::assertSame(1, $repository->count());
-        $stored = $repository->byEmail(new Email("admin@example.com"));
+        $stored = $repository->byEmail(new Email('admin@example.com'));
         self::assertInstanceOf(User::class, $stored);
-        self::assertSame("pre-existing-hash", $stored->password()->value());
+        self::assertSame('pre-existing-hash', $stored->password()->value());
     }
 
     private function factory(): PasswordHasherFactory
     {
         return new PasswordHasherFactory([
             PasswordAuthenticatedUserInterface::class => [
-                "algorithm" => "auto",
-                "cost" => 4,
-                "time_cost" => 3,
-                "memory_cost" => 10,
+                'algorithm' => 'auto',
+                'cost' => 4,
+                'time_cost' => 3,
+                'memory_cost' => 10,
             ],
         ]);
     }

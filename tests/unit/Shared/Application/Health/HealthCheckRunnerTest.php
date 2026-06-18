@@ -54,26 +54,26 @@ final class HealthCheckRunnerTest extends TestCase
      */
     public static function provideAggregations(): iterable
     {
-        yield "all up" => [
+        yield 'all up' => [
             [
-                new FixedHealthCheck("a", HealthCheckResult::up()),
-                new FixedHealthCheck("b", HealthCheckResult::up()),
+                new FixedHealthCheck('a', HealthCheckResult::up()),
+                new FixedHealthCheck('b', HealthCheckResult::up()),
             ],
             true,
         ];
 
-        yield "first down" => [
+        yield 'first down' => [
             [
-                new FixedHealthCheck("a", HealthCheckResult::down("nope")),
-                new FixedHealthCheck("b", HealthCheckResult::up()),
+                new FixedHealthCheck('a', HealthCheckResult::down('nope')),
+                new FixedHealthCheck('b', HealthCheckResult::up()),
             ],
             false,
         ];
 
-        yield "last down" => [
+        yield 'last down' => [
             [
-                new FixedHealthCheck("a", HealthCheckResult::up()),
-                new FixedHealthCheck("b", HealthCheckResult::down("nope")),
+                new FixedHealthCheck('a', HealthCheckResult::up()),
+                new FixedHealthCheck('b', HealthCheckResult::down('nope')),
             ],
             false,
         ];
@@ -82,76 +82,88 @@ final class HealthCheckRunnerTest extends TestCase
     public function testReportIsHealthyWhenEveryCheckIsUp(): void
     {
         $runner = new HealthCheckRunner([
-            new FixedHealthCheck("database", HealthCheckResult::up()),
-            new FixedHealthCheck("cache", HealthCheckResult::up()),
+            new FixedHealthCheck('database', HealthCheckResult::up()),
+            new FixedHealthCheck('cache', HealthCheckResult::up()),
         ]);
 
         $report = $runner->run();
 
         self::assertTrue($report->isHealthy());
-        self::assertSame([
-            "status" => "healthy",
-            "checks" => [
-                "database" => ["status" => "up"],
-                "cache" => ["status" => "up"],
+        self::assertSame(
+            [
+                'status' => 'healthy',
+                'checks' => [
+                    'database' => ['status' => 'up'],
+                    'cache' => ['status' => 'up'],
+                ],
             ],
-        ], $report->toArray());
+            $report->toArray(),
+        );
     }
 
     public function testReportIsUnhealthyWhenAnyCheckIsDown(): void
     {
         $runner = new HealthCheckRunner([
-            new FixedHealthCheck("database", HealthCheckResult::up()),
-            new FixedHealthCheck("cache", HealthCheckResult::down("connection refused")),
+            new FixedHealthCheck('database', HealthCheckResult::up()),
+            new FixedHealthCheck('cache', HealthCheckResult::down('connection refused')),
         ]);
 
         $report = $runner->run();
 
         self::assertFalse($report->isHealthy());
-        self::assertSame([
-            "status" => "unhealthy",
-            "checks" => [
-                "database" => ["status" => "up"],
-                "cache" => ["status" => "down", "error" => "connection refused"],
+        self::assertSame(
+            [
+                'status' => 'unhealthy',
+                'checks' => [
+                    'database' => ['status' => 'up'],
+                    'cache' => ['status' => 'down', 'error' => 'connection refused'],
+                ],
             ],
-        ], $report->toArray());
+            $report->toArray(),
+        );
     }
 
     public function testThrowingCheckBecomesDownWithExceptionMessage(): void
     {
         $runner = new HealthCheckRunner([
-            new ThrowingHealthCheck("database", "boom"),
+            new ThrowingHealthCheck('database', 'boom'),
         ]);
 
         $report = $runner->run();
 
         self::assertFalse($report->isHealthy());
-        self::assertSame([
-            "status" => "unhealthy",
-            "checks" => [
-                "database" => ["status" => "down", "error" => "boom"],
+        self::assertSame(
+            [
+                'status' => 'unhealthy',
+                'checks' => [
+                    'database' => ['status' => 'down', 'error' => 'boom'],
+                ],
             ],
-        ], $report->toArray());
+            $report->toArray(),
+        );
     }
 
     public function testEmptyReportIsHealthy(): void
     {
-        $report = (new HealthCheckRunner([]))->run();
+        $report = new HealthCheckRunner([])->run();
 
         self::assertTrue($report->isHealthy());
-        self::assertSame([
-            "status" => "healthy",
-            "checks" => [],
-        ], $report->toArray());
+        self::assertSame(
+            [
+                'status' => 'healthy',
+                'checks' => [],
+            ],
+            $report->toArray(),
+        );
     }
 
     /**
      * @param list<HealthCheck> $checks
      */
-    #[DataProvider("provideAggregations")]
+    #[DataProvider('provideAggregations')]
     public function testAggregatesHealthAcrossChecks(array $checks, bool $expectedHealthy): void
     {
-        $report = (new HealthCheckRunner($checks))->run();
+        $report = new HealthCheckRunner($checks)->run();
 
         self::assertSame($expectedHealthy, $report->isHealthy());
     }

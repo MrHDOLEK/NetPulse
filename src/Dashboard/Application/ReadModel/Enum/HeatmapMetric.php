@@ -8,9 +8,9 @@ use InvalidArgumentException;
 
 enum HeatmapMetric: string
 {
-    case Download = "download";
-    case Health = "health";
-    case Ping = "ping";
+    case Download = 'download';
+    case Health = 'health';
+    case Ping = 'ping';
 
     public static function fromParam(string $param): self
     {
@@ -20,9 +20,9 @@ enum HeatmapMetric: string
     public function unit(): string
     {
         return match ($this) {
-            self::Download => "Mbps",
-            self::Health => "%",
-            self::Ping => "ms",
+            self::Download => 'Mbps',
+            self::Health => '%',
+            self::Ping => 'ms',
         };
     }
 
@@ -34,9 +34,9 @@ enum HeatmapMetric: string
     public function label(): string
     {
         return match ($this) {
-            self::Download => "Download",
-            self::Health => "Health",
-            self::Ping => "Ping",
+            self::Download => 'Download',
+            self::Health => 'Health',
+            self::Ping => 'Ping',
         };
     }
 }

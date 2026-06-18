@@ -24,36 +24,42 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SymfonyNotifierDispatcherTest extends TestCase
 {
-    private const string WEBHOOK_URL = "https://hooks.example.test/netpulse";
-    private const string NOW = "2026-06-06T12:00:00+00:00";
+    private const string WEBHOOK_URL = 'https://hooks.example.test/netpulse';
+    private const string NOW = '2026-06-06T12:00:00+00:00';
 
     public function testWebhookChannelPostsJsonPayload(): void
     {
         $requests = [];
-        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests): MockResponse {
-            $requests[] = ["method" => $method, "url" => $url, "options" => $options];
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (
+            &$requests,
+        ): MockResponse {
+            $requests[] = ['method' => $method, 'url' => $url, 'options' => $options];
 
-            return new MockResponse("", ["http_code" => Response::HTTP_OK]);
+            return new MockResponse('', ['http_code' => Response::HTTP_OK]);
         });
         $counter = new RecordingSendCounter();
 
-        $this->dispatcher(channels: "webhook", webhookUrl: self::WEBHOOK_URL, httpClient: $httpClient, sendCounter: $counter)
-            ->send($this->alert());
+        $this->dispatcher(
+            channels: 'webhook',
+            webhookUrl: self::WEBHOOK_URL,
+            httpClient: $httpClient,
+            sendCounter: $counter,
+        )->send($this->alert());
 
-        self::assertSame([["alert", "webhook", "sent"]], $counter->increments);
+        self::assertSame([['alert', 'webhook', 'sent']], $counter->increments);
 
         self::assertCount(1, $requests);
-        self::assertSame("POST", $requests[0]["method"]);
-        self::assertSame(self::WEBHOOK_URL, $requests[0]["url"]);
+        self::assertSame('POST', $requests[0]['method']);
+        self::assertSame(self::WEBHOOK_URL, $requests[0]['url']);
 
         /** @var array<string, mixed> $payload */
-        $payload = json_decode($this->requestBody($requests[0]["options"]), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame("alert", $payload["kind"]);
-        self::assertSame("critical", $payload["severity"]);
-        self::assertSame("Subject line", $payload["subject"]);
-        self::assertSame("Body text", $payload["body"]);
-        self::assertSame(self::NOW, $payload["timestamp"]);
-        self::assertSame("wan1", $payload["context"]["connection"]);
+        $payload = json_decode($this->requestBody($requests[0]['options']), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('alert', $payload['kind']);
+        self::assertSame('critical', $payload['severity']);
+        self::assertSame('Subject line', $payload['subject']);
+        self::assertSame('Body text', $payload['body']);
+        self::assertSame(self::NOW, $payload['timestamp']);
+        self::assertSame('wan1', $payload['context']['connection']);
     }
 
     public function testEmailChannelSendsToEveryRecipientWithTheSavedDsn(): void
@@ -62,34 +68,35 @@ final class SymfonyNotifierDispatcherTest extends TestCase
         $counter = new RecordingSendCounter();
 
         $this->dispatcher(
-            channels: "email",
-            emailTo: "ops@example.test, oncall@example.test",
-            emailDsn: "smtp://mail.example.test:587",
+            channels: 'email',
+            emailTo: 'ops@example.test, oncall@example.test',
+            emailDsn: 'smtp://mail.example.test:587',
             emailSender: $emailSender,
             sendCounter: $counter,
         )->send($this->alert());
 
-        self::assertSame([["alert", "email", "sent"]], $counter->increments);
+        self::assertSame([['alert', 'email', 'sent']], $counter->increments);
 
         self::assertCount(1, $emailSender->sent);
         $sent = $emailSender->sent[0];
-        self::assertSame("smtp://mail.example.test:587", $sent["dsn"]);
-        self::assertSame(["ops@example.test", "oncall@example.test"], $sent["recipients"]);
-        self::assertSame("Subject line", $sent["subject"]);
-        self::assertSame("Body text", $sent["body"]);
+        self::assertSame('smtp://mail.example.test:587', $sent['dsn']);
+        self::assertSame(['ops@example.test', 'oncall@example.test'], $sent['recipients']);
+        self::assertSame('Subject line', $sent['subject']);
+        self::assertSame('Body text', $sent['body']);
     }
 
     public function testChatChannelSendsOneChatMessage(): void
     {
         $chatSender = new RecordingChatSender();
 
-        $this->dispatcher(channels: "chat", chatDsn: "slack://token@default", chatSender: $chatSender)
-            ->send($this->alert());
+        $this->dispatcher(channels: 'chat', chatDsn: 'slack://token@default', chatSender: $chatSender)->send(
+            $this->alert(),
+        );
 
         self::assertCount(1, $chatSender->sent);
-        self::assertSame("slack://token@default", $chatSender->sent[0]["dsn"]);
-        self::assertStringContainsString("Subject line", $chatSender->sent[0]["text"]);
-        self::assertStringContainsString("Body text", $chatSender->sent[0]["text"]);
+        self::assertSame('slack://token@default', $chatSender->sent[0]['dsn']);
+        self::assertStringContainsString('Subject line', $chatSender->sent[0]['text']);
+        self::assertStringContainsString('Body text', $chatSender->sent[0]['text']);
     }
 
     public function testNoChannelsConfiguredSendsNothing(): void
@@ -98,14 +105,21 @@ final class SymfonyNotifierDispatcherTest extends TestCase
         $chatSender = new RecordingChatSender();
         $counter = new RecordingSendCounter();
         $requests = [];
-        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests): MockResponse {
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (
+            &$requests,
+        ): MockResponse {
             $requests[] = $url;
 
-            return new MockResponse("", ["http_code" => Response::HTTP_OK]);
+            return new MockResponse('', ['http_code' => Response::HTTP_OK]);
         });
 
-        $this->dispatcher(channels: "", emailSender: $emailSender, chatSender: $chatSender, httpClient: $httpClient, sendCounter: $counter)
-            ->send($this->alert());
+        $this->dispatcher(
+            channels: '',
+            emailSender: $emailSender,
+            chatSender: $chatSender,
+            httpClient: $httpClient,
+            sendCounter: $counter,
+        )->send($this->alert());
 
         self::assertSame([], $emailSender->sent);
         self::assertSame([], $chatSender->sent);
@@ -118,23 +132,30 @@ final class SymfonyNotifierDispatcherTest extends TestCase
     {
         $logger = new RecordingLogger();
         $requests = [];
-        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$requests): MockResponse {
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (
+            &$requests,
+        ): MockResponse {
             $requests[] = $url;
 
-            return new MockResponse("", ["http_code" => Response::HTTP_OK]);
+            return new MockResponse('', ['http_code' => Response::HTTP_OK]);
         });
 
         $counter = new RecordingSendCounter();
 
-        $this->dispatcher(channels: "webhook", webhookUrl: "", httpClient: $httpClient, logger: $logger, sendCounter: $counter)
-            ->send($this->alert());
+        $this->dispatcher(
+            channels: 'webhook',
+            webhookUrl: '',
+            httpClient: $httpClient,
+            logger: $logger,
+            sendCounter: $counter,
+        )->send($this->alert());
 
         self::assertSame([], $requests);
-        self::assertTrue($logger->has("warning", "notification channel skipped"));
-        self::assertSame("webhook", $logger->lastContext("warning")["channel"] ?? null);
-        self::assertSame("not_configured", $logger->lastContext("warning")["reason"] ?? null);
+        self::assertTrue($logger->has('warning', 'notification channel skipped'));
+        self::assertSame('webhook', $logger->lastContext('warning')['channel'] ?? null);
+        self::assertSame('not_configured', $logger->lastContext('warning')['reason'] ?? null);
 
-        self::assertSame([["alert", "webhook", "skipped"]], $counter->increments);
+        self::assertSame([['alert', 'webhook', 'skipped']], $counter->increments);
     }
 
     public function testOneFailingChannelDoesNotDropTheOthers(): void
@@ -144,13 +165,15 @@ final class SymfonyNotifierDispatcherTest extends TestCase
         $counter = new RecordingSendCounter();
 
         $httpClient = new MockHttpClient(
-            static fn(): MockResponse => new MockResponse("boom", ["http_code" => Response::HTTP_INTERNAL_SERVER_ERROR]),
+            static fn(): MockResponse => new MockResponse('boom', [
+                'http_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+            ]),
         );
 
         $this->dispatcher(
-            channels: "webhook,email",
-            emailTo: "ops@example.test",
-            emailDsn: "smtp://mail.example.test:587",
+            channels: 'webhook,email',
+            emailTo: 'ops@example.test',
+            emailDsn: 'smtp://mail.example.test:587',
             webhookUrl: self::WEBHOOK_URL,
             emailSender: $emailSender,
             httpClient: $httpClient,
@@ -159,13 +182,16 @@ final class SymfonyNotifierDispatcherTest extends TestCase
         )->send($this->alert());
 
         self::assertCount(1, $emailSender->sent);
-        self::assertTrue($logger->has("error", "notification channel failed"));
-        self::assertSame("webhook", $logger->lastContext("error")["channel"] ?? null);
+        self::assertTrue($logger->has('error', 'notification channel failed'));
+        self::assertSame('webhook', $logger->lastContext('error')['channel'] ?? null);
 
-        self::assertStringNotContainsString(self::WEBHOOK_URL, (string)($logger->lastContext("error")["error"] ?? ""));
+        self::assertStringNotContainsString(self::WEBHOOK_URL, (string) ($logger->lastContext('error')['error'] ?? ''));
 
         self::assertSame(
-            [["alert", "webhook", "failed"], ["alert", "email", "sent"]],
+            [
+                ['alert', 'webhook', 'failed'],
+                ['alert', 'email',   'sent'],
+            ],
             $counter->increments,
         );
     }
@@ -175,20 +201,20 @@ final class SymfonyNotifierDispatcherTest extends TestCase
         $emailSender = new RecordingEmailSender();
         $counter = new RecordingSendCounter();
         $httpClient = new MockHttpClient(
-            static fn(): MockResponse => new MockResponse("", ["http_code" => Response::HTTP_OK]),
+            static fn(): MockResponse => new MockResponse('', ['http_code' => Response::HTTP_OK]),
         );
 
         $results = $this->dispatcher(
-            channels: "email,webhook",
-            emailTo: "ops@example.test",
-            emailDsn: "smtp://mail.example.test:587",
+            channels: 'email,webhook',
+            emailTo: 'ops@example.test',
+            emailDsn: 'smtp://mail.example.test:587',
             webhookUrl: self::WEBHOOK_URL,
             emailSender: $emailSender,
             httpClient: $httpClient,
             sendCounter: $counter,
         )->test();
 
-        self::assertSame(["email" => "sent", "webhook" => "sent"], $results);
+        self::assertSame(['email' => 'sent', 'webhook' => 'sent'], $results);
 
         self::assertCount(1, $emailSender->sent);
 
@@ -197,21 +223,19 @@ final class SymfonyNotifierDispatcherTest extends TestCase
 
     private function alert(): Notification
     {
-        return new Notification(
-            NotificationKind::Alert,
-            NotificationSeverity::Critical,
-            "Subject line",
-            "Body text",
-            ["probe" => "home", "connection" => "wan1", "reason" => "3 consecutive unhealthy measurements"],
-        );
+        return new Notification(NotificationKind::Alert, NotificationSeverity::Critical, 'Subject line', 'Body text', [
+            'probe' => 'home',
+            'connection' => 'wan1',
+            'reason' => '3 consecutive unhealthy measurements',
+        ]);
     }
 
     private function dispatcher(
-        string $channels = "",
-        string $emailTo = "",
-        string $emailDsn = "smtp://localhost:25",
-        string $chatDsn = "",
-        string $webhookUrl = "",
+        string $channels = '',
+        string $emailTo = '',
+        string $emailDsn = 'smtp://localhost:25',
+        string $chatDsn = '',
+        string $webhookUrl = '',
         ?RecordingEmailSender $emailSender = null,
         ?RecordingChatSender $chatSender = null,
         ?HttpClientInterface $httpClient = null,
@@ -244,13 +268,13 @@ final class SymfonyNotifierDispatcherTest extends TestCase
      */
     private function csv(string $value): array
     {
-        if (trim($value) === "") {
+        if (trim($value) === '') {
             return [];
         }
 
         return array_values(array_filter(
-            array_map(static fn(string $item): string => trim($item), explode(",", $value)),
-            static fn(string $item): bool => $item !== "",
+            array_map(static fn(string $item): string => trim($item), explode(',', $value)),
+            static fn(string $item): bool => $item !== '',
         ));
     }
 
@@ -259,23 +283,23 @@ final class SymfonyNotifierDispatcherTest extends TestCase
      */
     private function requestBody(array $options): string
     {
-        $body = $options["body"] ?? "";
+        $body = $options['body'] ?? '';
 
         if (is_string($body)) {
             return $body;
         }
 
         if (is_iterable($body)) {
-            $buffer = "";
+            $buffer = '';
 
             foreach ($body as $chunk) {
-                $buffer .= is_string($chunk) ? $chunk : "";
+                $buffer .= is_string($chunk) ? $chunk : '';
             }
 
             return $buffer;
         }
 
-        return "";
+        return '';
     }
 }
 
@@ -309,7 +333,7 @@ final class RecordingEmailSender implements EmailSender
 
     public function send(string $dsn, array $recipients, string $subject, string $body): void
     {
-        $this->sent[] = ["dsn" => $dsn, "recipients" => $recipients, "subject" => $subject, "body" => $body];
+        $this->sent[] = ['dsn' => $dsn, 'recipients' => $recipients, 'subject' => $subject, 'body' => $body];
     }
 }
 
@@ -320,7 +344,7 @@ final class RecordingChatSender implements ChatSender
 
     public function send(string $dsn, string $text): void
     {
-        $this->sent[] = ["dsn" => $dsn, "text" => $text];
+        $this->sent[] = ['dsn' => $dsn, 'text' => $text];
     }
 }
 
@@ -335,16 +359,16 @@ final class RecordingLogger extends AbstractLogger
     public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         $this->records[] = [
-            "level" => (string)$level,
-            "message" => (string)$message,
-            "context" => $context,
+            'level' => (string) $level,
+            'message' => (string) $message,
+            'context' => $context,
         ];
     }
 
     public function has(string $level, string $message): bool
     {
         foreach ($this->records as $record) {
-            if ($record["level"] === $level && $record["message"] === $message) {
+            if ($record['level'] === $level && $record['message'] === $message) {
                 return true;
             }
         }
@@ -360,8 +384,8 @@ final class RecordingLogger extends AbstractLogger
         $context = [];
 
         foreach ($this->records as $record) {
-            if ($record["level"] === $level) {
-                $context = $record["context"];
+            if ($record['level'] === $level) {
+                $context = $record['context'];
             }
         }
 

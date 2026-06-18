@@ -73,8 +73,8 @@ final readonly class DefaultOoklaResultMapper implements OoklaResultMapper
             $packetLoss,
             $bandwidth->downloadBytes,
             $bandwidth->uploadBytes,
-            (int)($result->download->elapsed ?? 0),
-            (int)($result->upload->elapsed ?? 0),
+            (int) ($result->download->elapsed ?? 0),
+            (int) ($result->upload->elapsed ?? 0),
             $result->result?->url,
             $rawPayload,
         );
@@ -84,19 +84,19 @@ final readonly class DefaultOoklaResultMapper implements OoklaResultMapper
     {
         $server = $result->server;
 
-        $host = $server->host ?? "";
-        $port = $server?->port !== null ? (string)$server->port : "";
+        $host = $server->host ?? '';
+        $port = $server?->port !== null ? (string) $server?->port : '';
 
-        if ($port !== "" && $host !== "") {
-            $host .= ":" . $port;
+        if ($port !== '' && $host !== '') {
+            $host .= ':' . $port;
         }
 
         return new ServerInfo(
-            serverId: $server?->id !== null ? (string)$server->id : "",
-            serverName: $server->name ?? "",
-            serverLocation: $server->location ?? "",
+            serverId: $server?->id !== null ? (string) $server?->id : '',
+            serverName: $server->name ?? '',
+            serverLocation: $server->location ?? '',
             serverHost: $host,
-            isp: $result->isp ?? "",
+            isp: $result->isp ?? '',
         );
     }
 
@@ -106,10 +106,10 @@ final readonly class DefaultOoklaResultMapper implements OoklaResultMapper
         $upload = $result->upload;
 
         return new Bandwidth(
-            downloadBits: (int)($download->bandwidth ?? 0) * 8,
-            uploadBits: (int)($upload->bandwidth ?? 0) * 8,
-            downloadBytes: (int)($download->bytes ?? 0),
-            uploadBytes: (int)($upload->bytes ?? 0),
+            downloadBits: (int) ($download->bandwidth ?? 0) * 8,
+            uploadBits: (int) ($upload->bandwidth ?? 0) * 8,
+            downloadBytes: (int) ($download->bytes ?? 0),
+            uploadBytes: (int) ($upload->bytes ?? 0),
         );
     }
 

@@ -12,7 +12,7 @@ final class IdTest extends TestCase
 {
     public function testCanCreateValidId(): void
     {
-        $validUuid = "550e8400-e29b-41d4-a716-446655440000";
+        $validUuid = '550e8400-e29b-41d4-a716-446655440000';
         $id = new Id($validUuid);
 
         $this->assertEquals($validUuid, $id->toString());
@@ -22,15 +22,15 @@ final class IdTest extends TestCase
     {
         $this->expectException(InvalidId::class);
 
-        new Id("invalid-id");
+        new Id('invalid-id');
     }
 
     public function testCanCompareIds(): void
     {
-        $uuid = "550e8400-e29b-41d4-a716-446655440000";
+        $uuid = '550e8400-e29b-41d4-a716-446655440000';
         $id1 = new Id($uuid);
         $id2 = new Id($uuid);
-        $id3 = new Id("550e8400-e29b-41d4-a716-446655440001");
+        $id3 = new Id('550e8400-e29b-41d4-a716-446655440001');
 
         $this->assertTrue($id1->equals($id2));
         $this->assertFalse($id1->equals($id3));

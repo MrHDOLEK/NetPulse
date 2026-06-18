@@ -15,15 +15,15 @@ final class HealthCheckResultTest extends TestCase
 
         self::assertTrue($result->isHealthy());
         self::assertNull($result->error());
-        self::assertSame(["status" => "up"], $result->toArray());
+        self::assertSame(['status' => 'up'], $result->toArray());
     }
 
     public function testDownCarriesError(): void
     {
-        $result = HealthCheckResult::down("connection refused");
+        $result = HealthCheckResult::down('connection refused');
 
         self::assertFalse($result->isHealthy());
-        self::assertSame("connection refused", $result->error());
-        self::assertSame(["status" => "down", "error" => "connection refused"], $result->toArray());
+        self::assertSame('connection refused', $result->error());
+        self::assertSame(['status' => 'down', 'error' => 'connection refused'], $result->toArray());
     }
 }

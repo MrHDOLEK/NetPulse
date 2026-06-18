@@ -37,7 +37,7 @@ final readonly class SqlConnectionOverviewRepository implements ConnectionOvervi
 
     public function overview(SeriesRange $range): ConnectionOverviewCollection
     {
-        $now = $this->clock->now()->setTimezone(new DateTimeZone("UTC"));
+        $now = $this->clock->now()->setTimezone(new DateTimeZone('UTC'));
         $since = $now->modify("-{$range->windowSeconds()} seconds");
 
         $latest = $this->latestByConnectionId();
@@ -62,8 +62,8 @@ final readonly class SqlConnectionOverviewRepository implements ConnectionOvervi
                 jitterSeconds: $latestRow?->jitterSeconds,
                 packetLossRatio: $latestRow?->packetLossRatio,
                 completedAtUnix: $latestRow?->completedAtUnix,
-                serverName: $latestRow->serverName ?? "",
-                serverLocation: $latestRow->serverLocation ?? "",
+                serverName: $latestRow->serverName ?? '',
+                serverLocation: $latestRow->serverLocation ?? '',
                 latestHealthy: $latestRow?->healthy,
                 status: $this->deriveStatus($connection, $latestRow, $aggregate, $degraded),
                 testsRun: $aggregate->testsRun,
@@ -129,17 +129,18 @@ final readonly class SqlConnectionOverviewRepository implements ConnectionOvervi
          *     healthy: bool|null
          * }> $rows
          */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.connectionId AS connectionId",
-                "measurement.status AS status",
-                "measurement.healthy AS healthy",
+                'measurement.connectionId AS connectionId',
+                'measurement.status AS status',
+                'measurement.healthy AS healthy',
             )
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.completedAt >= :since")
-            ->orderBy("measurement.connectionId", "ASC")
-            ->addOrderBy("measurement.completedAt", "DESC")
-            ->setParameter("since", $since, Types::DATETIME_IMMUTABLE)
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.completedAt >= :since')
+            ->orderBy('measurement.connectionId', 'ASC')
+            ->addOrderBy('measurement.completedAt', 'DESC')
+            ->setParameter('since', $since, Types::DATETIME_IMMUTABLE)
             ->getQuery()
             ->getResult();
 
@@ -147,10 +148,10 @@ final readonly class SqlConnectionOverviewRepository implements ConnectionOvervi
         $aggregates = [];
 
         foreach ($rows as $row) {
-            $key = $row["connectionId"]->toString();
-            $failed = $row["status"] === MeasurementStatus::Failed;
-            $unhealthy = $row["healthy"] === false;
-            $healthy = $row["healthy"] === true;
+            $key = $row['connectionId']->toString();
+            $failed = $row['status'] === MeasurementStatus::Failed;
+            $unhealthy = $row['healthy'] === false;
+            $healthy = $row['healthy'] === true;
 
             if (!array_key_exists($key, $aggregates)) {
                 $aggregates[$key] = WindowAggregate::first($failed);

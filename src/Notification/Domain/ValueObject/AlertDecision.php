@@ -25,7 +25,7 @@ final readonly class AlertDecision
 
     public static function none(): self
     {
-        return new self(null, "no edge crossed");
+        return new self(null, 'no edge crossed');
     }
 
     public function shouldNotify(): bool

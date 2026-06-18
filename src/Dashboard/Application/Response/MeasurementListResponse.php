@@ -42,10 +42,10 @@ final readonly class MeasurementListResponse
     public function toArray(): array
     {
         return [
-            "items" => $this->items,
-            "total" => $this->total,
-            "limit" => $this->limit,
-            "offset" => $this->offset,
+            'items' => $this->items,
+            'total' => $this->total,
+            'limit' => $this->limit,
+            'offset' => $this->offset,
         ];
     }
 
@@ -55,29 +55,29 @@ final readonly class MeasurementListResponse
     private static function item(MeasurementListItem $item): array
     {
         return [
-            "id" => $item->id->toString(),
-            "t" => $item->completedAtUnix,
+            'id' => $item->id->toString(),
+            't' => $item->completedAtUnix,
 
-            "completedAt" => gmdate("Y-m-d H:i", $item->completedAtUnix),
-            "status" => $item->status->value,
-            "statusLabel" => ucfirst($item->status->value),
-            "connection" => $item->connectionName,
-            "color" => $item->connectionColor->value,
-            "isp" => $item->isp,
-            "server" => $item->serverName,
-            "location" => $item->serverLocation,
-            "dl" => $item->downloadBits,
-            "up" => $item->uploadBits,
-            "ping" => $item->pingSeconds,
-            "jitter" => $item->jitterSeconds,
-            "loss" => $item->packetLossRatio,
-            "healthy" => $item->healthy,
-            "scheduled" => $item->scheduled,
-            "downloadLabel" => UnitFormatter::bitsPerSecond($item->downloadBits),
-            "uploadLabel" => UnitFormatter::bitsPerSecond($item->uploadBits),
-            "pingLabel" => UnitFormatter::seconds($item->pingSeconds),
-            "jitterLabel" => UnitFormatter::seconds($item->jitterSeconds),
-            "lossLabel" => UnitFormatter::ratio($item->packetLossRatio),
+            'completedAt' => gmdate('Y-m-d H:i', $item->completedAtUnix),
+            'status' => $item->status->value,
+            'statusLabel' => ucfirst($item->status->value),
+            'connection' => $item->connectionName,
+            'color' => $item->connectionColor->value,
+            'isp' => $item->isp,
+            'server' => $item->serverName,
+            'location' => $item->serverLocation,
+            'dl' => $item->downloadBits,
+            'up' => $item->uploadBits,
+            'ping' => $item->pingSeconds,
+            'jitter' => $item->jitterSeconds,
+            'loss' => $item->packetLossRatio,
+            'healthy' => $item->healthy,
+            'scheduled' => $item->scheduled,
+            'downloadLabel' => UnitFormatter::bitsPerSecond($item->downloadBits),
+            'uploadLabel' => UnitFormatter::bitsPerSecond($item->uploadBits),
+            'pingLabel' => UnitFormatter::seconds($item->pingSeconds),
+            'jitterLabel' => UnitFormatter::seconds($item->jitterSeconds),
+            'lossLabel' => UnitFormatter::ratio($item->packetLossRatio),
         ];
     }
 }

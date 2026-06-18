@@ -24,28 +24,28 @@ final readonly class OidcDiscoveryProbe
     {
         $url = $this->discoveryUrl(trim($issuerOrDiscoveryUrl));
 
-        if ($url === "") {
-            return OidcDiscoveryResult::failure("Enter the issuer or discovery URL first.");
+        if ($url === '') {
+            return OidcDiscoveryResult::failure('Enter the issuer or discovery URL first.');
         }
 
         try {
-            $response = $this->httpClient->request("GET", $url, [
-                "timeout" => 8,
-                "max_redirects" => 3,
-                "headers" => ["Accept" => "application/json"],
+            $response = $this->httpClient->request('GET', $url, [
+                'timeout' => 8,
+                'max_redirects' => 3,
+                'headers' => ['Accept' => 'application/json'],
             ]);
 
             $status = $response->getStatusCode();
 
             if ($status >= 400) {
-                return OidcDiscoveryResult::failure("Discovery returned HTTP " . $status . ".");
+                return OidcDiscoveryResult::failure('Discovery returned HTTP ' . $status . '.');
             }
 
             $document = $response->toArray(false);
         } catch (HttpClientException $exception) {
-            return OidcDiscoveryResult::failure("Could not reach the discovery URL: " . $exception->getMessage());
+            return OidcDiscoveryResult::failure('Could not reach the discovery URL: ' . $exception->getMessage());
         } catch (Throwable) {
-            return OidcDiscoveryResult::failure("The discovery URL did not return a valid OpenID configuration.");
+            return OidcDiscoveryResult::failure('The discovery URL did not return a valid OpenID configuration.');
         }
 
         return $this->evaluate($document, $url);
@@ -58,46 +58,46 @@ final readonly class OidcDiscoveryProbe
     {
         $missing = [];
 
-        foreach (["authorization_endpoint", "token_endpoint", "userinfo_endpoint"] as $endpoint) {
+        foreach (['authorization_endpoint', 'token_endpoint', 'userinfo_endpoint'] as $endpoint) {
             $value = $document[$endpoint] ?? null;
 
-            if (!is_string($value) || trim($value) === "") {
+            if (!is_string($value) || trim($value) === '') {
                 $missing[] = $endpoint;
             }
         }
 
         if ($missing !== []) {
             return OidcDiscoveryResult::failure(
-                "The discovery document is missing required endpoints: " . implode(", ", $missing) . ".",
+                'The discovery document is missing required endpoints: ' . implode(', ', $missing) . '.',
             );
         }
 
-        $issuer = $document["issuer"] ?? null;
-        $issuerLabel = is_string($issuer) && trim($issuer) !== "" ? trim($issuer) : $url;
+        $issuer = $document['issuer'] ?? null;
+        $issuerLabel = is_string($issuer) && trim($issuer) !== '' ? trim($issuer) : $url;
 
         return OidcDiscoveryResult::success(
-            "Discovery succeeded — " . $issuerLabel . " advertises all required endpoints.",
+            'Discovery succeeded — ' . $issuerLabel . ' advertises all required endpoints.',
         );
     }
 
     private function discoveryUrl(string $input): string
     {
-        if ($input === "") {
-            return "";
+        if ($input === '') {
+            return '';
         }
 
-        if (!str_contains($input, "://")) {
-            return "";
+        if (!str_contains($input, '://')) {
+            return '';
         }
 
-        if (str_contains($input, "/.well-known/")) {
+        if (str_contains($input, '/.well-known/')) {
             return $input;
         }
 
-        if (str_ends_with($input, "openid-configuration")) {
+        if (str_ends_with($input, 'openid-configuration')) {
             return $input;
         }
 
-        return rtrim($input, "/") . "/.well-known/openid-configuration";
+        return rtrim($input, '/') . '/.well-known/openid-configuration';
     }
 }

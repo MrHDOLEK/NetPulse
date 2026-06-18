@@ -16,17 +16,17 @@ final class LoginAction extends AbstractController
         private readonly OidcConfig $oidcConfig,
     ) {}
 
-    #[Route("/login", name: "login", methods: ["GET", "POST"])]
+    #[Route('/login', name: 'login', methods: ['GET', 'POST'])]
     public function __invoke(AuthenticationUtils $authenticationUtils): Response
     {
         $providers = $this->oidcConfig->isEnabled()
-            ? [["name" => $this->oidcConfig->displayName(), "url" => "/login/oidc/start"]]
+            ? [['name' => $this->oidcConfig->displayName(), 'url' => '/login/oidc/start']]
             : [];
 
-        return $this->render("security/login.html.twig", [
-            "error" => $authenticationUtils->getLastAuthenticationError(),
-            "last_username" => $authenticationUtils->getLastUsername(),
-            "providers" => $providers,
+        return $this->render('security/login.html.twig', [
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+            'last_username' => $authenticationUtils->getLastUsername(),
+            'providers' => $providers,
         ]);
     }
 }

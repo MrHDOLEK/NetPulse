@@ -82,10 +82,10 @@ final readonly class HeatmapScale
         $goodness = $this->goodness($value);
 
         if ($goodness === null) {
-            return "background: var(--surface-2)";
+            return 'background: var(--surface-2)';
         }
 
-        $pct = (int)round($goodness * 100);
+        $pct = (int) round($goodness * 100);
 
         return "background: color-mix(in oklab, var(--good) {$pct}%, var(--bad))";
     }
@@ -99,11 +99,11 @@ final readonly class HeatmapScale
         $steps = self::LEGEND_BREAKS - 1;
 
         for ($i = 0; $i < self::LEGEND_BREAKS; ++$i) {
-            $value = $this->min + ($this->max - $this->min) * ($i / $steps);
+            $value = $this->min + (($this->max - $this->min) * ($i / $steps));
 
             $breaks[] = [
-                "label" => $this->label($value),
-                "bgStyle" => $this->bgStyle($value),
+                'label' => $this->label($value),
+                'bgStyle' => $this->bgStyle($value),
             ];
         }
 
@@ -116,7 +116,7 @@ final readonly class HeatmapScale
     private static function percentile(array $sorted, int $p): float
     {
         $count = count($sorted);
-        $rank = (int)ceil($p / 100 * $count);
+        $rank = (int) ceil(($p / 100) * $count);
         $rank = max(1, min($count, $rank));
 
         return $sorted[$rank - 1];
@@ -125,7 +125,7 @@ final readonly class HeatmapScale
     private function label(float $value): string
     {
         return match ($this->metric) {
-            HeatmapMetric::Download => UnitFormatter::bitsPerSecond((int)$value),
+            HeatmapMetric::Download => UnitFormatter::bitsPerSecond((int) $value),
             HeatmapMetric::Ping => UnitFormatter::seconds($value),
             HeatmapMetric::Health => UnitFormatter::ratio($value),
         };

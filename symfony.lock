@@ -44,27 +44,6 @@
             "migrations/.gitignore"
         ]
     },
-    "friends-of-behat/symfony-extension": {
-        "version": "2.4",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "2.0",
-            "ref": "1e012e04f573524ca83795cd19df9ea690adb604"
-        }
-    },
-    "friendsofphp/php-cs-fixer": {
-        "version": "3.65",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "3.0",
-            "ref": "be2103eb4a20942e28a6dd87736669b757132435"
-        },
-        "files": [
-            ".php-cs-fixer.dist.php"
-        ]
-    },
     "nelmio/api-doc-bundle": {
         "version": "5.5",
         "recipe": {
@@ -77,15 +56,6 @@
             "config/packages/nelmio_api_doc.yaml",
             "config/routes/nelmio_api_doc.yaml"
         ]
-    },
-    "phpstan/phpstan": {
-        "version": "1.11",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "1.0",
-            "ref": "f10b8054de1a94a3b9e8806a6453fd5c98491c44"
-        }
     },
     "phpunit/phpunit": {
         "version": "10.3",
@@ -100,15 +70,6 @@
             "phpunit.xml.dist",
             "tests/bootstrap.php"
         ]
-    },
-    "qossmic/deptrac": {
-        "version": "2.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "2.0",
-            "ref": "05ab8813714080c7bc915cb10c780e6cfdbdb991"
-        }
     },
     "qossmic/deptrac-shim": {
         "version": "1.0",

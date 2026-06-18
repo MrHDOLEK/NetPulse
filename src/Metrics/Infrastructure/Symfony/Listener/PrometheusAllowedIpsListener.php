@@ -12,13 +12,13 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 final readonly class PrometheusAllowedIpsListener
 {
-    private const string METRICS_PATH = "/metrics";
+    private const string METRICS_PATH = '/metrics';
 
     public function __construct(
         private PrometheusConfig $config,
     ) {}
 
-    #[AsEventListener(event: "kernel.request", priority: 100)]
+    #[AsEventListener(event: 'kernel.request', priority: 100)]
     public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
@@ -32,7 +32,7 @@ final readonly class PrometheusAllowedIpsListener
         }
 
         if (!$this->config->metricsEnabled()) {
-            $event->setResponse(new Response("", Response::HTTP_NOT_FOUND));
+            $event->setResponse(new Response('', Response::HTTP_NOT_FOUND));
 
             return;
         }
@@ -46,7 +46,7 @@ final readonly class PrometheusAllowedIpsListener
         $clientIp = $request->getClientIp();
 
         if ($clientIp === null || !IpUtils::checkIp($clientIp, $allowedCidrs)) {
-            $event->setResponse(new Response("", Response::HTTP_FORBIDDEN));
+            $event->setResponse(new Response('', Response::HTTP_FORBIDDEN));
         }
     }
 }

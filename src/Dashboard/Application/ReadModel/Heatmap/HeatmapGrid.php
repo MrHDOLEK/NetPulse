@@ -13,7 +13,7 @@ final class HeatmapGrid extends Collection
 {
     public static function key(int $dow, int $hour): string
     {
-        return $dow . ":" . $hour;
+        return $dow . ':' . $hour;
     }
 
     /**

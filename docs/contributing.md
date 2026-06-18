@@ -4,17 +4,17 @@ Thanks for helping improve NetPulse — this page covers setting up a dev enviro
 
 ## Local development
 
-NetPulse runs in Docker. Bring the stack up once and develop against it:
+NetPulse runs in Docker. The task runner is [`just`](https://github.com/casey/just) (`brew install just`, or use the [Nix shell](#nix-shell) which provides it). Bring the stack up once and develop against it:
 
 ```bash
-make install   # build the image, start the stack, run composer install
-make start     # docker compose up -d (start an already-built stack)
-make stop      # docker compose down --remove-orphans
-make bash      # open a shell inside the app container
-make help      # list all make targets
+just install   # build the image, start the stack, run composer install
+just start     # docker compose up -d (start an already-built stack)
+just stop      # docker compose down --remove-orphans
+just bash      # open a shell inside the app container
+just           # list all recipes
 ```
 
-Every `php`, `composer`, and `bin/console` command runs **inside the `app` container** — never on the host. Use a shell (`make bash`) or the one-off form:
+Every `php`, `composer`, and `bin/console` command runs **inside the `app` container** — never on the host. Use a shell (`just bash`) or the one-off form:
 
 ```bash
 docker compose exec -T app composer install
@@ -32,21 +32,41 @@ docker compose exec -T app php bin/console tailwind:build
 The frontend is built with Symfony **AssetMapper** — JS is served from the import map and there is no `npm`/Vite/Webpack step. The only `tailwind:build` is the CSS rebuild above.
 :::
 
-## The quality gate
+### Nix shell
 
-Before you push, this checklist must be green. CI runs the same job — **Test&lint PHP codebase** — on every push and pull request to `main`, so getting it green locally means getting it green in CI.
+Prefer the host? A classic `shell.nix` (no flake, no direnv) provides PHP 8.5, Composer, **Mago**, the **Symfony CLI**, and **`just`** — enough for the quality gate and CLI work without Docker. The full app stack (nginx, the agent + Ookla speedtest CLI, Prometheus, Grafana) still runs in Docker Compose.
 
 ```bash
-docker compose exec -T app composer cs:fix       # code style (CI uses cs:check, a dry-run)
-docker compose exec -T app composer phpstan      # PHPStan level 10, zero errors
-docker compose exec -T app vendor/bin/deptrac --no-progress   # architecture, 0 violations
-docker compose exec -T app composer db:test      # apply migrations to the TEST database
-docker compose exec -T app composer test         # PHPUnit
-docker compose exec -T app vendor/bin/behat      # BDD
+nix-shell                          # enter the dev shell (PHP 8.5 + Composer + Mago + Symfony CLI + just)
+nix-shell --pure                   # full isolation from the host
+nix-shell --arg php-version 8.4    # pick a PHP version (default: 8.5)
+nix-shell --arg with-xdebug true   # add Xdebug
+type php                           # show the Nix PHP binary path (for IDE config)
 ```
 
-::: tip Run them sequentially, inside the container
-Run the gate steps one at a time in the `app` container (e.g. via `make bash`). Don't background or overlap container commands.
+Mago and Deptrac install as isolated Composer tools (`tools/mago/`, `tools/deptrac/`) via the `composer install` `tools:install` hook. Optional custom prompt: copy `.nix/shell/starship.toml.dist` to `.nix/shell/starship.toml`.
+
+## The quality gate
+
+Before you push, this checklist must be green. CI runs the same job — **Test&lint PHP codebase** — on every push and pull request to `main`, so getting it green locally means getting it green in CI. Run it inside the [Nix shell](#nix-shell) or the `app` container; the `just` recipes wrap the same commands:
+
+```bash
+just lint          # Mago format --check + Mago lint
+just analyze       # Mago static analysis (src + config; must be clean)
+just deptrac       # architecture, 0 violations
+composer db:test   # apply migrations to the TEST database
+composer test      # PHPUnit
+just fix           # auto-format + auto-fix (Mago)
+```
+
+[Mago](https://mago.carthage.software/) is the sole linter, formatter, and static analyzer — it replaced PHP-CS-Fixer and PHPStan. Mago and Deptrac are isolated Composer tools under `tools/`. `mago analyze` covers `src` + `config` (matching the previous PHPStan scope) and must be clean — there is **no baseline**; two checks that go beyond that standard (`mixed-assignment`, `avoid-catching-error`) are intentionally not enforced (see `mago.toml`). In CI, `mago lint`/`analyze` findings are uploaded to **GitHub Code scanning** (Security tab + inline annotations on the PR diff).
+
+::: info Behat is parked
+The Behat suite is paused until its ecosystem supports Symfony 8 (`behat/behat` caps Symfony at `^7`). The `.feature` files and `behat.yml` stay in the repo; coverage currently rests on the PHPUnit integration tests.
+:::
+
+::: tip Run the gate sequentially
+Run the gate steps one at a time (in `nix-shell` or via `just bash`). Don't background or overlap container commands.
 :::
 
 ## Adding a module

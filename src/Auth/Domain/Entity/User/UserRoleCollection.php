@@ -27,10 +27,7 @@ final class UserRoleCollection extends Collection
      */
     public static function fromStrings(array $values): self
     {
-        return new self(array_map(
-            static fn(string $value): UserRole => UserRole::from($value),
-            $values,
-        ));
+        return new self(array_map(static fn(string $value): UserRole => UserRole::from($value), $values));
     }
 
     /**

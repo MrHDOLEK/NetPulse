@@ -24,7 +24,7 @@ final class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $path = $event->getRequest()->getPathInfo();
-        $isApi = str_starts_with($path, "/api/") || $path === "/metrics";
+        $isApi = str_starts_with($path, '/api/') || $path === '/metrics';
 
         if (!$isApi) {
             return;
@@ -36,7 +36,7 @@ final class ExceptionListener
 
         if ($exception instanceof ValidationError) {
             $code = Response::HTTP_BAD_REQUEST;
-            $content["errors"] = $exception->getErrors();
+            $content['errors'] = $exception->getErrors();
         } elseif ($exception instanceof NotFoundException) {
             $code = Response::HTTP_NOT_FOUND;
         } elseif ($exception instanceof InvalidProbeToken) {
@@ -52,9 +52,9 @@ final class ExceptionListener
         } else {
             $code = Response::HTTP_INTERNAL_SERVER_ERROR;
 
-            if ($this->environment !== "prod") {
-                $content["errors"] = [
-                    "server" => $exception::class . " - " . $event->getThrowable()->getMessage(),
+            if ($this->environment !== 'prod') {
+                $content['errors'] = [
+                    'server' => $exception::class . ' - ' . $event->getThrowable()->getMessage(),
                 ];
             }
         }

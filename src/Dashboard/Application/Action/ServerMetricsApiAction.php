@@ -21,13 +21,13 @@ final class ServerMetricsApiAction extends AbstractController
         private readonly ClockInterface $clock,
     ) {}
 
-    #[Route("/dashboard/servers", name: "dashboard_servers", methods: ["GET"])]
+    #[Route('/dashboard/servers', name: 'dashboard_servers', methods: ['GET'])]
     public function servers(Request $request): Response
     {
-        $window = HeatmapWindow::tryFrom((string)$request->query->get("window", ""));
+        $window = HeatmapWindow::tryFrom($request->query->get('window', ''));
 
         if ($window === null) {
-            return $this->badRequest("Unknown or missing window");
+            return $this->badRequest('Unknown or missing window');
         }
 
         $rows = $this->servers->all($window);
@@ -42,13 +42,13 @@ final class ServerMetricsApiAction extends AbstractController
     private function noCacheJson(array $payload): JsonResponse
     {
         $response = new JsonResponse($payload, Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function badRequest(string $message): JsonResponse
     {
-        return new JsonResponse(["error" => $message], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => $message], Response::HTTP_BAD_REQUEST);
     }
 }

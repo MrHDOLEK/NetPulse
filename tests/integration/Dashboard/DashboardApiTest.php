@@ -22,14 +22,14 @@ use function sprintf;
 
 final class DashboardApiTest extends KernelTestCase
 {
-    private const string CSRF_TOKEN_ID = "authenticate";
-    private const string RUN_TEST_TOKEN_ID = "run-test";
-    private const string CSRF_RAW_TOKEN = "phpunit-login-token";
-    private const string ADMIN_EMAIL = "admin@example.com";
-    private const string ADMIN_PASSWORD = "correct-horse-battery";
-    private const string PROBE = "11111111-1111-1111-1111-111111111111";
-    private const string CONN = "aaaaaaaa-0000-0000-0000-000000000001";
-    private const string CONN_NAME = "Fibre WAN Primary";
+    private const string CSRF_TOKEN_ID = 'authenticate';
+    private const string RUN_TEST_TOKEN_ID = 'run-test';
+    private const string CSRF_RAW_TOKEN = 'phpunit-login-token';
+    private const string ADMIN_EMAIL = 'admin@example.com';
+    private const string ADMIN_PASSWORD = 'correct-horse-battery';
+    private const string PROBE = '11111111-1111-1111-1111-111111111111';
+    private const string CONN = 'aaaaaaaa-0000-0000-0000-000000000001';
+    private const string CONN_NAME = 'Fibre WAN Primary';
 
     private DbalConnection $db;
     private MessageBusInterface $commandBus;
@@ -41,7 +41,7 @@ final class DashboardApiTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->db = $container->get("doctrine.dbal.default_connection");
+        $this->db = $container->get('doctrine.dbal.default_connection');
         $this->commandBus = $container->get(MessageBusInterface::class);
 
         $this->session = new Session(new MockArraySessionStorage());
@@ -53,28 +53,28 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/series?connection=%s&range=7d&metric=speed", self::CONN));
+        $response = $this->get(sprintf('/dashboard/series?connection=%s&range=7d&metric=speed', self::CONN));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertStringContainsString("application/json", (string)$response->headers->get("Content-Type"));
-        self::assertStringContainsString("no-cache", (string)$response->headers->get("Cache-Control"));
+        self::assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+        self::assertStringContainsString('no-cache', (string) $response->headers->get('Cache-Control'));
 
         $payload = $this->decode($response);
 
-        self::assertSame(self::CONN, $payload["connectionId"]);
-        self::assertSame("7d", $payload["range"]);
-        self::assertSame("speed", $payload["metric"]);
-        self::assertArrayHasKey("trendPct", $payload);
-        self::assertIsArray($payload["buckets"]);
+        self::assertSame(self::CONN, $payload['connectionId']);
+        self::assertSame('7d', $payload['range']);
+        self::assertSame('speed', $payload['metric']);
+        self::assertArrayHasKey('trendPct', $payload);
+        self::assertIsArray($payload['buckets']);
 
-        $populated = $this->firstPopulated($payload["buckets"], "dl");
-        self::assertNotNull($populated, "expected at least one bucket with a download value");
-        self::assertArrayHasKey("t", $populated);
-        self::assertArrayHasKey("dl", $populated);
-        self::assertArrayHasKey("up", $populated);
-        self::assertIsInt($populated["t"]);
+        $populated = $this->firstPopulated($payload['buckets'], 'dl');
+        self::assertNotNull($populated, 'expected at least one bucket with a download value');
+        self::assertArrayHasKey('t', $populated);
+        self::assertArrayHasKey('dl', $populated);
+        self::assertArrayHasKey('up', $populated);
+        self::assertIsInt($populated['t']);
 
-        self::assertGreaterThan(100_000_000, $populated["dl"]);
+        self::assertGreaterThan(100_000_000, $populated['dl']);
     }
 
     public function testSeriesReturnsPingJson(): void
@@ -82,19 +82,19 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/series?connection=%s&range=7d&metric=ping", self::CONN));
+        $response = $this->get(sprintf('/dashboard/series?connection=%s&range=7d&metric=ping', self::CONN));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         $payload = $this->decode($response);
-        self::assertSame("ping", $payload["metric"]);
+        self::assertSame('ping', $payload['metric']);
 
-        $populated = $this->firstPopulated($payload["buckets"], "ping");
+        $populated = $this->firstPopulated($payload['buckets'], 'ping');
         self::assertNotNull($populated);
-        self::assertArrayHasKey("t", $populated);
-        self::assertArrayHasKey("ping", $populated);
-        self::assertArrayNotHasKey("dl", $populated);
+        self::assertArrayHasKey('t', $populated);
+        self::assertArrayHasKey('ping', $populated);
+        self::assertArrayNotHasKey('dl', $populated);
 
-        self::assertLessThan(1.0, $populated["ping"]);
+        self::assertLessThan(1.0, $populated['ping']);
     }
 
     public function testSeriesReturnsLossJson(): void
@@ -102,17 +102,17 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/series?connection=%s&range=7d&metric=loss", self::CONN));
+        $response = $this->get(sprintf('/dashboard/series?connection=%s&range=7d&metric=loss', self::CONN));
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
         $payload = $this->decode($response);
-        self::assertSame("loss", $payload["metric"]);
+        self::assertSame('loss', $payload['metric']);
 
-        $populated = $this->firstPopulated($payload["buckets"], "loss");
+        $populated = $this->firstPopulated($payload['buckets'], 'loss');
         self::assertNotNull($populated);
-        self::assertArrayHasKey("t", $populated);
-        self::assertArrayHasKey("loss", $populated);
-        self::assertArrayNotHasKey("dl", $populated);
+        self::assertArrayHasKey('t', $populated);
+        self::assertArrayHasKey('loss', $populated);
+        self::assertArrayNotHasKey('dl', $populated);
     }
 
     public function testSeriesRejectsBadRange(): void
@@ -120,7 +120,7 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/series?connection=%s&range=5y&metric=speed", self::CONN));
+        $response = $this->get(sprintf('/dashboard/series?connection=%s&range=5y&metric=speed', self::CONN));
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -130,7 +130,7 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get(sprintf("/dashboard/series?connection=%s&range=7d&metric=foo", self::CONN));
+        $response = $this->get(sprintf('/dashboard/series?connection=%s&range=7d&metric=foo', self::CONN));
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -140,7 +140,7 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get("/dashboard/series?connection=not-a-uuid&range=7d&metric=speed");
+        $response = $this->get('/dashboard/series?connection=not-a-uuid&range=7d&metric=speed');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -150,7 +150,7 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get("/dashboard/series?range=7d&metric=speed");
+        $response = $this->get('/dashboard/series?range=7d&metric=speed');
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -159,10 +159,10 @@ final class DashboardApiTest extends KernelTestCase
     {
         $this->seedWorld();
 
-        $response = $this->get(sprintf("/dashboard/series?connection=%s&range=7d&metric=speed", self::CONN));
+        $response = $this->get(sprintf('/dashboard/series?connection=%s&range=7d&metric=speed', self::CONN));
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/login", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/login', (string) $response->headers->get('Location'));
     }
 
     public function testSnapshotReturnsJson(): void
@@ -170,50 +170,50 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get("/dashboard/snapshot");
+        $response = $this->get('/dashboard/snapshot');
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertStringContainsString("application/json", (string)$response->headers->get("Content-Type"));
-        self::assertStringContainsString("no-cache", (string)$response->headers->get("Cache-Control"));
+        self::assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+        self::assertStringContainsString('no-cache', (string) $response->headers->get('Cache-Control'));
 
         $payload = $this->decode($response);
 
-        self::assertArrayHasKey("connections", $payload);
-        self::assertArrayHasKey("prometheus", $payload);
-        self::assertSame(["status" => "scraping", "endpoint" => "/metrics"], $payload["prometheus"]);
+        self::assertArrayHasKey('connections', $payload);
+        self::assertArrayHasKey('prometheus', $payload);
+        self::assertSame(['status' => 'scraping', 'endpoint' => '/metrics'], $payload['prometheus']);
 
-        self::assertIsArray($payload["connections"]);
-        self::assertCount(1, $payload["connections"]);
+        self::assertIsArray($payload['connections']);
+        self::assertCount(1, $payload['connections']);
 
-        $connection = $payload["connections"][0];
-        self::assertSame(self::CONN, $connection["connectionId"]);
-        self::assertSame(self::CONN_NAME, $connection["name"]);
+        $connection = $payload['connections'][0];
+        self::assertSame(self::CONN, $connection['connectionId']);
+        self::assertSame(self::CONN_NAME, $connection['name']);
 
         foreach ([
-            "status",
-            "downloadBits",
-            "uploadBits",
-            "pingSeconds",
-            "packetLossRatio",
-            "uptimePct",
-            "latestHealthy",
-            "completedAtUnix",
+            'status',
+            'downloadBits',
+            'uploadBits',
+            'pingSeconds',
+            'packetLossRatio',
+            'uptimePct',
+            'latestHealthy',
+            'completedAtUnix',
         ] as $field) {
             self::assertArrayHasKey($field, $connection);
         }
 
-        self::assertSame(955_000_000, $connection["downloadBits"]);
-        self::assertLessThan(1.0, $connection["pingSeconds"]);
+        self::assertSame(955_000_000, $connection['downloadBits']);
+        self::assertLessThan(1.0, $connection['pingSeconds']);
     }
 
     public function testSnapshotRequiresAuthentication(): void
     {
         $this->seedWorld();
 
-        $response = $this->get("/dashboard/snapshot");
+        $response = $this->get('/dashboard/snapshot');
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/login", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/login', (string) $response->headers->get('Location'));
     }
 
     public function testCursorReturnsChangeTokenJson(): void
@@ -221,29 +221,29 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->get("/dashboard/cursor");
+        $response = $this->get('/dashboard/cursor');
 
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
-        self::assertStringContainsString("application/json", (string)$response->headers->get("Content-Type"));
-        self::assertStringContainsString("no-cache", (string)$response->headers->get("Cache-Control"));
+        self::assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+        self::assertStringContainsString('no-cache', (string) $response->headers->get('Cache-Control'));
 
         $payload = $this->decode($response);
 
-        self::assertArrayHasKey("latestCompletedAtUnix", $payload);
-        self::assertArrayHasKey("totalMeasurementCount", $payload);
+        self::assertArrayHasKey('latestCompletedAtUnix', $payload);
+        self::assertArrayHasKey('totalMeasurementCount', $payload);
 
-        self::assertIsInt($payload["latestCompletedAtUnix"]);
-        self::assertSame(3, $payload["totalMeasurementCount"]);
+        self::assertIsInt($payload['latestCompletedAtUnix']);
+        self::assertSame(3, $payload['totalMeasurementCount']);
     }
 
     public function testCursorRequiresAuthentication(): void
     {
         $this->seedWorld();
 
-        $response = $this->get("/dashboard/cursor");
+        $response = $this->get('/dashboard/cursor');
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/login", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/login', (string) $response->headers->get('Location'));
     }
 
     public function testRunQueuesConnectionScopeWithPinAndMarksDueNow(): void
@@ -251,20 +251,21 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(
-            ["scope" => "connection", "connectionId" => self::CONN, "serverId" => "12345"],
-            $this->validRunTestToken(),
-        );
+        $response = $this->postRun([
+            'scope' => 'connection',
+            'connectionId' => self::CONN,
+            'serverId' => '12345',
+        ], $this->validRunTestToken());
 
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_ACCEPTED]);
-        self::assertStringContainsString("application/json", (string)$response->headers->get("Content-Type"));
-        self::assertStringContainsString("no-cache", (string)$response->headers->get("Cache-Control"));
+        self::assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+        self::assertStringContainsString('no-cache', (string) $response->headers->get('Cache-Control'));
 
         $payload = $this->decode($response);
-        self::assertSame("queued", $payload["status"]);
+        self::assertSame('queued', $payload['status']);
 
-        self::assertSame(1, $this->markerCount(self::CONN), "expected a due-now marker for the connection");
-        self::assertSame("12345", $this->markerForcedServerId(self::CONN));
+        self::assertSame(1, $this->markerCount(self::CONN), 'expected a due-now marker for the connection');
+        self::assertSame('12345', $this->markerForcedServerId(self::CONN));
     }
 
     public function testRunQueuesAllScope(): void
@@ -272,11 +273,11 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(["scope" => "all"], $this->validRunTestToken());
+        $response = $this->postRun(['scope' => 'all'], $this->validRunTestToken());
 
         self::assertContains($response->getStatusCode(), [Response::HTTP_OK, Response::HTTP_ACCEPTED]);
         $payload = $this->decode($response);
-        self::assertSame("queued", $payload["status"]);
+        self::assertSame('queued', $payload['status']);
 
         self::assertSame(1, $this->markerCount(self::CONN));
         self::assertNull($this->markerForcedServerId(self::CONN));
@@ -287,10 +288,10 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(["scope" => "all", "serverId" => "12345"], $this->validRunTestToken());
+        $response = $this->postRun(['scope' => 'all', 'serverId' => '12345'], $this->validRunTestToken());
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        self::assertSame(0, $this->markerCount(self::CONN), "no marker may be created for an invalid all+pin request");
+        self::assertSame(0, $this->markerCount(self::CONN), 'no marker may be created for an invalid all+pin request');
     }
 
     public function testRunRejectsUnknownScope(): void
@@ -298,7 +299,7 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(["scope" => "nonsense", "connectionId" => self::CONN], $this->validRunTestToken());
+        $response = $this->postRun(['scope' => 'nonsense', 'connectionId' => self::CONN], $this->validRunTestToken());
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -308,10 +309,10 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(["scope" => "connection", "connectionId" => self::CONN], null);
+        $response = $this->postRun(['scope' => 'connection', 'connectionId' => self::CONN], null);
 
         self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
-        self::assertSame(0, $this->markerCount(self::CONN), "no marker may be created without a valid CSRF token");
+        self::assertSame(0, $this->markerCount(self::CONN), 'no marker may be created without a valid CSRF token');
     }
 
     public function testRunRejectsInvalidCsrfToken(): void
@@ -319,10 +320,10 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(["scope" => "connection", "connectionId" => self::CONN], "not-the-real-token");
+        $response = $this->postRun(['scope' => 'connection', 'connectionId' => self::CONN], 'not-the-real-token');
 
         self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
-        self::assertSame(0, $this->markerCount(self::CONN), "no marker may be created with an invalid CSRF token");
+        self::assertSame(0, $this->markerCount(self::CONN), 'no marker may be created with an invalid CSRF token');
     }
 
     public function testRunRejectsNonUuidConnectionWithBadRequest(): void
@@ -330,7 +331,10 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $response = $this->postRun(["scope" => "connection", "connectionId" => "not-a-uuid"], $this->validRunTestToken());
+        $response = $this->postRun([
+            'scope' => 'connection',
+            'connectionId' => 'not-a-uuid',
+        ], $this->validRunTestToken());
 
         self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -340,21 +344,21 @@ final class DashboardApiTest extends KernelTestCase
         $this->seedWorld();
         $this->login();
 
-        $unknown = "bbbbbbbb-0000-0000-0000-000000000099";
-        $response = $this->postRun(["scope" => "connection", "connectionId" => $unknown], $this->validRunTestToken());
+        $unknown = 'bbbbbbbb-0000-0000-0000-000000000099';
+        $response = $this->postRun(['scope' => 'connection', 'connectionId' => $unknown], $this->validRunTestToken());
 
         self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
-        self::assertSame(0, $this->markerCount($unknown), "no marker may be created for an unknown connection");
+        self::assertSame(0, $this->markerCount($unknown), 'no marker may be created for an unknown connection');
     }
 
     public function testRunRequiresAuthentication(): void
     {
         $this->seedWorld();
 
-        $response = $this->postRun(["scope" => "connection", "connectionId" => self::CONN], $this->validRunTestToken());
+        $response = $this->postRun(['scope' => 'connection', 'connectionId' => self::CONN], $this->validRunTestToken());
 
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertStringContainsString("/login", (string)$response->headers->get("Location"));
+        self::assertStringContainsString('/login', (string) $response->headers->get('Location'));
     }
 
     /**
@@ -378,7 +382,7 @@ final class DashboardApiTest extends KernelTestCase
      */
     private function decode(Response $response): array
     {
-        $decoded = json_decode((string)$response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $decoded = json_decode((string) $response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($decoded);
 
         return $decoded;
@@ -394,36 +398,30 @@ final class DashboardApiTest extends KernelTestCase
 
     private function login(): void
     {
-        $this->session->set(
-            SessionTokenStorage::SESSION_NAMESPACE . "/" . self::CSRF_TOKEN_ID,
-            self::CSRF_RAW_TOKEN,
-        );
+        $this->session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . self::CSRF_TOKEN_ID, self::CSRF_RAW_TOKEN);
 
-        $request = Request::create("/login", "POST", [
-            "_username" => self::ADMIN_EMAIL,
-            "_password" => self::ADMIN_PASSWORD,
-            "_csrf_token" => self::CSRF_RAW_TOKEN,
+        $request = Request::create('/login', 'POST', [
+            '_username' => self::ADMIN_EMAIL,
+            '_password' => self::ADMIN_PASSWORD,
+            '_csrf_token' => self::CSRF_RAW_TOKEN,
         ]);
         $this->attachSession($request);
 
-        self::getContainer()->get("kernel")->handle($request);
+        self::getContainer()->get('kernel')->handle($request);
     }
 
     private function get(string $path): Response
     {
-        $request = Request::create($path, "GET");
+        $request = Request::create($path, 'GET');
         $this->attachSession($request);
 
-        return self::getContainer()->get("kernel")->handle($request);
+        return self::getContainer()->get('kernel')->handle($request);
     }
 
     private function validRunTestToken(): string
     {
-        $token = "phpunit-run-test-token";
-        $this->session->set(
-            SessionTokenStorage::SESSION_NAMESPACE . "/" . self::RUN_TEST_TOKEN_ID,
-            $token,
-        );
+        $token = 'phpunit-run-test-token';
+        $this->session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . self::RUN_TEST_TOKEN_ID, $token);
 
         return $token;
     }
@@ -434,41 +432,39 @@ final class DashboardApiTest extends KernelTestCase
     private function postRun(array $body, ?string $csrfToken): Response
     {
         $request = Request::create(
-            "/dashboard/run",
-            "POST",
+            '/dashboard/run',
+            'POST',
             [],
             [],
             [],
-            ["CONTENT_TYPE" => "application/json"],
+            ['CONTENT_TYPE' => 'application/json'],
             json_encode($body, JSON_THROW_ON_ERROR),
         );
 
         if ($csrfToken !== null) {
-            $request->headers->set("X-CSRF-Token", $csrfToken);
+            $request->headers->set('X-CSRF-Token', $csrfToken);
         }
         $this->attachSession($request);
 
-        return self::getContainer()->get("kernel")->handle($request);
+        return self::getContainer()->get('kernel')->handle($request);
     }
 
     private function markerCount(string $connectionId): int
     {
-        $count = $this->db->fetchOne(
-            "SELECT COUNT(*) FROM due_now_markers WHERE connection_id = :id",
-            ["id" => $connectionId],
-        );
+        $count = $this->db->fetchOne('SELECT COUNT(*) FROM due_now_markers WHERE connection_id = :id', [
+            'id' => $connectionId,
+        ]);
 
-        return (int)$count;
+        return (int) $count;
     }
 
     private function markerForcedServerId(string $connectionId): ?string
     {
-        $value = $this->db->fetchOne(
-            "SELECT forced_server_id FROM due_now_markers WHERE connection_id = :id",
-            ["id" => $connectionId],
-        );
+        $value = $this->db->fetchOne('SELECT forced_server_id FROM due_now_markers WHERE connection_id = :id', [
+            'id' => $connectionId,
+        ]);
 
-        return $value === false ? null : ($value === null ? null : (string)$value);
+        return $value === false ? null : ($value === null ? null : (string) $value);
     }
 
     private function attachSession(Request $request): void
@@ -479,41 +475,56 @@ final class DashboardApiTest extends KernelTestCase
 
     private function seedMeasurements(): void
     {
-        $now = (new DateTimeImmutable("now", new DateTimeZone("UTC")))->getTimestamp();
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'))->getTimestamp();
 
-        $this->insertMeasurement("completed", $now - 3 * 3600, 920_000_000, 92_000_000, 12.0, 1.5, 0.0, true);
-        $this->insertMeasurement("completed", $now - 2 * 3600, 940_000_000, 95_000_000, 11.0, 1.2, 0.0, true);
-        $this->insertMeasurement("completed", $now - 1 * 3600, 955_000_000, 98_000_000, 9.5, 1.0, 0.0, true);
+        $this->insertMeasurement('completed', $now - (3 * 3600), 920_000_000, 92_000_000, 12.0, 1.5, 0.0, true);
+        $this->insertMeasurement('completed', $now - (2 * 3600), 940_000_000, 95_000_000, 11.0, 1.2, 0.0, true);
+        $this->insertMeasurement('completed', $now - (1 * 3600), 955_000_000, 98_000_000, 9.5, 1.0, 0.0, true);
     }
 
     private function insertProbe(): void
     {
-        $this->db->insert("probes", [
-            "id" => self::PROBE,
-            "name" => "home",
-            "labels" => json_encode([], JSON_THROW_ON_ERROR),
-            "token_hash" => "x",
-            "enabled" => 1,
-            "created_at" => "2026-06-05 10:00:00",
+        $this->db->insert('probes', [
+            'id' => self::PROBE,
+            'name' => 'home',
+            'labels' => json_encode([], JSON_THROW_ON_ERROR),
+            'token_hash' => 'x',
+            'enabled' => 1,
+            'created_at' => '2026-06-05 10:00:00',
         ]);
     }
 
     private function insertConnection(): void
     {
-        $this->db->insert("connections", [
-            "id" => self::CONN,
-            "probe_id" => self::PROBE,
-            "name" => self::CONN_NAME,
-            "isp" => "Acme ISP",
-            "expected_download_bits" => 1_000_000_000,
-            "expected_upload_bits" => 500_000_000,
-            "color" => "primary",
-            "labels" => json_encode([], JSON_THROW_ON_ERROR),
-            "server_pool" => json_encode([], JSON_THROW_ON_ERROR),
-            "schedule" => json_encode(["mode" => "even", "cronExpressions" => [], "testsPerDay" => 24, "jitterSeconds" => 120], JSON_THROW_ON_ERROR),
-            "thresholds" => json_encode(["minDownloadRatio" => 0.7, "minUploadRatio" => 0.7, "maxPingMs" => 100, "maxJitterMs" => 50, "maxPacketLossRatio" => 0.05], JSON_THROW_ON_ERROR),
-            "adaptive_policy" => json_encode(["adaptiveIntervalSeconds" => 300, "recoveryHealthyCount" => 3, "maxConsecutiveFailures" => 5], JSON_THROW_ON_ERROR),
-            "enabled" => 1,
+        $this->db->insert('connections', [
+            'id' => self::CONN,
+            'probe_id' => self::PROBE,
+            'name' => self::CONN_NAME,
+            'isp' => 'Acme ISP',
+            'expected_download_bits' => 1_000_000_000,
+            'expected_upload_bits' => 500_000_000,
+            'color' => 'primary',
+            'labels' => json_encode([], JSON_THROW_ON_ERROR),
+            'server_pool' => json_encode([], JSON_THROW_ON_ERROR),
+            'schedule' => json_encode([
+                'mode' => 'even',
+                'cronExpressions' => [],
+                'testsPerDay' => 24,
+                'jitterSeconds' => 120,
+            ], JSON_THROW_ON_ERROR),
+            'thresholds' => json_encode([
+                'minDownloadRatio' => 0.7,
+                'minUploadRatio' => 0.7,
+                'maxPingMs' => 100,
+                'maxJitterMs' => 50,
+                'maxPacketLossRatio' => 0.05,
+            ], JSON_THROW_ON_ERROR),
+            'adaptive_policy' => json_encode([
+                'adaptiveIntervalSeconds' => 300,
+                'recoveryHealthyCount' => 3,
+                'maxConsecutiveFailures' => 5,
+            ], JSON_THROW_ON_ERROR),
+            'enabled' => 1,
         ]);
     }
 
@@ -527,38 +538,42 @@ final class DashboardApiTest extends KernelTestCase
         ?float $packetLossRatio,
         ?bool $healthy,
     ): void {
-        $completedAt = (new DateTimeImmutable("@" . $completedAtUnix))
-            ->setTimezone(new DateTimeZone("UTC"))
-            ->format("Y-m-d H:i:s");
+        $completedAt = new DateTimeImmutable('@' . $completedAtUnix)
+            ->setTimezone(new DateTimeZone('UTC'))
+            ->format('Y-m-d H:i:s');
 
         $sequence = ++$this->measurementSeq;
 
-        $this->db->insert("measurements", [
-            "id" => sprintf("eeeeeeee-0000-0000-0000-%012d", $sequence),
-            "probe_id" => self::PROBE,
-            "connection_id" => self::CONN,
-            "status" => $status,
-            "scheduled" => 1,
-            "started_at" => $completedAt,
-            "completed_at" => $completedAt,
-            "server_id" => "12345",
-            "server_name" => "Acme Speedtest",
-            "server_location" => "Warsaw",
-            "server_host" => "speedtest.acme.example:8080",
-            "isp" => "Acme ISP",
-            "download_bits" => $downloadBits,
-            "upload_bits" => $uploadBits,
-            "ping" => $pingMs,
-            "jitter" => $jitterMs,
-            "packet_loss_ratio" => $packetLossRatio,
-            "data_used_download" => 0,
-            "data_used_upload" => 0,
-            "download_elapsed" => 4000,
-            "upload_elapsed" => 4000,
-            "raw_payload" => json_encode([], JSON_THROW_ON_ERROR),
-            "healthy" => $healthy,
-        ], [
-            "healthy" => Types::BOOLEAN,
-        ]);
+        $this->db->insert(
+            'measurements',
+            [
+                'id' => sprintf('eeeeeeee-0000-0000-0000-%012d', $sequence),
+                'probe_id' => self::PROBE,
+                'connection_id' => self::CONN,
+                'status' => $status,
+                'scheduled' => 1,
+                'started_at' => $completedAt,
+                'completed_at' => $completedAt,
+                'server_id' => '12345',
+                'server_name' => 'Acme Speedtest',
+                'server_location' => 'Warsaw',
+                'server_host' => 'speedtest.acme.example:8080',
+                'isp' => 'Acme ISP',
+                'download_bits' => $downloadBits,
+                'upload_bits' => $uploadBits,
+                'ping' => $pingMs,
+                'jitter' => $jitterMs,
+                'packet_loss_ratio' => $packetLossRatio,
+                'data_used_download' => 0,
+                'data_used_upload' => 0,
+                'download_elapsed' => 4000,
+                'upload_elapsed' => 4000,
+                'raw_payload' => json_encode([], JSON_THROW_ON_ERROR),
+                'healthy' => $healthy,
+            ],
+            [
+                'healthy' => Types::BOOLEAN,
+            ],
+        );
     }
 }

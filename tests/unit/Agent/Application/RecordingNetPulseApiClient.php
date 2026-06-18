@@ -24,9 +24,9 @@ final class RecordingNetPulseApiClient implements NetPulseApiClient
     public function pushResult(string $connectionId, array $ooklaJson, bool $scheduled): void
     {
         $this->pushed[] = [
-            "connectionId" => $connectionId,
-            "ookla" => $ooklaJson,
-            "scheduled" => $scheduled,
+            'connectionId' => $connectionId,
+            'ookla' => $ooklaJson,
+            'scheduled' => $scheduled,
         ];
     }
 }

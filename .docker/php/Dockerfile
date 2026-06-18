@@ -1,6 +1,6 @@
-ARG PHP_VERSION=8.4
+ARG PHP_VERSION=8.5
 
-FROM php:${PHP_VERSION}-fpm-bullseye AS base
+FROM php:${PHP_VERSION}-fpm-bookworm AS base
 
 ARG COMPOSER_VERSION=2.8.4
 
@@ -11,9 +11,9 @@ RUN apt-get update && apt-get install -y nginx python3 supervisor \
      vim libjpeg62-turbo-dev libfreetype6-dev libonig-dev \
      libpq-dev libxpm-dev libvpx-dev libbz2-dev zlib1g-dev libzip-dev gnumeric \
     && curl -sS https://getcomposer.org/installer | php -- --version="${COMPOSER_VERSION}" --install-dir=/usr/local/bin --filename=composer \
-    && docker-php-ext-install intl bcmath mbstring bz2 gd zip pgsql pdo_pgsql opcache pcntl sockets \
-    && pecl install apcu \
-    && docker-php-ext-enable intl pcntl apcu \
+    && docker-php-ext-install intl bcmath mbstring bz2 gd zip pgsql pdo_pgsql pcntl sockets \
+    && docker-php-ext-enable intl pcntl \
+    && (pecl install apcu && docker-php-ext-enable apcu || echo "APCu skipped: no PECL release compatible with this PHP yet (optional opportunistic cache; Symfony falls back to filesystem)") \
     && apt-get remove -y git \
     && apt-get autoremove -y \
     && apt-get clean \

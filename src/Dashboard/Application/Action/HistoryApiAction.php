@@ -40,8 +40,8 @@ final class HistoryApiAction extends AbstractController
 {
     private const int DEFAULT_LIMIT = 25;
     private const int DEFAULT_WINDOW_DAYS = 7;
-    private const array ALLOWED_LIMITS = [10, 25, 50];        
-    private const string SHARE_TOKEN_ID = "run-test";
+    private const array ALLOWED_LIMITS = [10, 25, 50];
+    private const string SHARE_TOKEN_ID = 'run-test';
 
     public function __construct(
         private readonly MeasurementListRepository $measurements,
@@ -51,25 +51,25 @@ final class HistoryApiAction extends AbstractController
         private readonly ShareMeasurement $shareMeasurement,
     ) {}
 
-    #[Route("/dashboard/history", name: "dashboard_history", methods: ["GET"])]
+    #[Route('/dashboard/history', name: 'dashboard_history', methods: ['GET'])]
     public function history(Request $request): Response
     {
-        $limit = (int)$request->query->get("limit", (string)self::DEFAULT_LIMIT);
+        $limit = (int) $request->query->get('limit', (string) self::DEFAULT_LIMIT);
 
         if (!in_array($limit, self::ALLOWED_LIMITS, true)) {
-            return $this->badRequest("Unsupported limit (allowed: 10, 25, 50)");
+            return $this->badRequest('Unsupported limit (allowed: 10, 25, 50)');
         }
 
-        $offset = (int)$request->query->get("offset", "0");
+        $offset = (int) $request->query->get('offset', '0');
 
         if ($offset < 0) {
-            return $this->badRequest("Offset must be zero or positive");
+            return $this->badRequest('Offset must be zero or positive');
         }
 
-        $sort = MeasurementSort::tryFrom((string)$request->query->get("sort", MeasurementSort::default()->value));
+        $sort = MeasurementSort::tryFrom($request->query->get('sort', MeasurementSort::default()->value));
 
         if ($sort === null) {
-            return $this->badRequest("Unknown sort");
+            return $this->badRequest('Unknown sort');
         }
 
         try {
@@ -81,54 +81,62 @@ final class HistoryApiAction extends AbstractController
         $items = $this->measurements->list($filter, $limit, $offset, $sort);
         $total = $this->measurements->countMatching($filter);
 
-        return $this->noCacheJson(
-            MeasurementListResponse::from($items, $total, $limit, $offset)->toArray(),
-        );
+        return $this->noCacheJson(MeasurementListResponse::from($items, $total, $limit, $offset)->toArray());
     }
 
-    #[Route("/dashboard/history/{id}", name: "dashboard_history_detail", methods: ["GET"], requirements: ["id" => "[0-9a-fA-F-]{36}"])]
+    #[Route(
+        '/dashboard/history/{id}',
+        name: 'dashboard_history_detail',
+        methods: ['GET'],
+        requirements: ['id' => '[0-9a-fA-F-]{36}'],
+    )]
     public function detail(string $id): Response
     {
         try {
             $measurementId = new MeasurementId($id);
         } catch (InvalidId) {
-            return $this->badRequest("Invalid measurement id");
+            return $this->badRequest('Invalid measurement id');
         }
 
         try {
             $detail = $this->details->get($measurementId);
         } catch (MeasurementNotFound) {
-            return new JsonResponse(["error" => "Measurement not found"], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Measurement not found'], Response::HTTP_NOT_FOUND);
         }
 
         return $this->noCacheJson(MeasurementDetailResponse::from($detail)->toArray());
     }
 
-    #[Route("/dashboard/history/{id}/share", name: "dashboard_history_share", methods: ["POST"], requirements: ["id" => "[0-9a-fA-F-]{36}"])]
+    #[Route(
+        '/dashboard/history/{id}/share',
+        name: 'dashboard_history_share',
+        methods: ['POST'],
+        requirements: ['id' => '[0-9a-fA-F-]{36}'],
+    )]
     public function share(string $id, Request $request): Response
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         if (!is_string($token) || !$this->isCsrfTokenValid(self::SHARE_TOKEN_ID, $token)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         try {
             $measurementId = new MeasurementId($id);
         } catch (InvalidId) {
-            return $this->badRequest("Invalid measurement id");
+            return $this->badRequest('Invalid measurement id');
         }
 
         try {
             $shareToken = ($this->shareMeasurement)($measurementId);
         } catch (MeasurementDomainNotFound) {
-            return new JsonResponse(["error" => "Measurement not found"], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Measurement not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->noCacheJson(["shareUrl" => "/r/" . $shareToken]);
+        return $this->noCacheJson(['shareUrl' => '/r/' . $shareToken]);
     }
 
-    #[Route("/dashboard/history/export.csv", name: "dashboard_history_csv", methods: ["GET"])]
+    #[Route('/dashboard/history/export.csv', name: 'dashboard_history_csv', methods: ['GET'])]
     public function exportCsv(Request $request): Response
     {
         try {
@@ -140,26 +148,26 @@ final class HistoryApiAction extends AbstractController
         $exporter = $this->csvExporter;
 
         $response = new StreamedResponse(static function () use ($exporter, $filter): void {
-            $out = fopen("php://output", "w");
+            $out = fopen('php://output', 'w');
 
             if ($out === false) {
                 return;
             }
 
-            fputcsv($out, $exporter->header(), escape: "");
+            fputcsv($out, $exporter->header(), escape: '');
 
             foreach ($exporter->rows($filter) as $row) {
-                fputcsv($out, $row, escape: "");
+                fputcsv($out, $row, escape: '');
             }
 
             fclose($out);
         });
 
-        $filename = sprintf("netpulse-history-%d.csv", $this->clock->now()->getTimestamp());
+        $filename = sprintf('netpulse-history-%d.csv', $this->clock->now()->getTimestamp());
 
-        $response->headers->set("Content-Type", "text/csv; charset=utf-8");
-        $response->headers->set("Content-Disposition", sprintf('attachment; filename="%s"', $filename));
-        $response->headers->set("Cache-Control", "no-cache");
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $filename));
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
@@ -169,33 +177,33 @@ final class HistoryApiAction extends AbstractController
      */
     private function buildFilter(Request $request): MeasurementFilter
     {
-        $statusParam = $request->query->get("status");
+        $statusParam = $request->query->get('status');
         $status = null;
 
-        if ($statusParam !== null && $statusParam !== "") {
-            $status = MeasurementStatus::tryFrom((string)$statusParam);
+        if ($statusParam !== null && $statusParam !== '') {
+            $status = MeasurementStatus::tryFrom($statusParam);
 
             if ($status === null) {
-                throw new BadFilterRequest("Unknown status");
+                throw new BadFilterRequest('Unknown status');
             }
         }
 
-        $healthy = $this->parseBool($request->query->get("healthy"));
-        $scheduled = $this->parseBool($request->query->get("scheduled"));
+        $healthy = $this->parseBool($request->query->get('healthy'));
+        $scheduled = $this->parseBool($request->query->get('scheduled'));
 
-        $connectionParam = $request->query->get("connection");
+        $connectionParam = $request->query->get('connection');
         $connection = null;
 
-        if ($connectionParam !== null && $connectionParam !== "") {
+        if ($connectionParam !== null && $connectionParam !== '') {
             try {
-                $connection = new ConnectionId((string)$connectionParam);
+                $connection = new ConnectionId($connectionParam);
             } catch (InvalidId) {
-                throw new BadFilterRequest("Invalid connection id");
+                throw new BadFilterRequest('Invalid connection id');
             }
         }
 
-        $serverParam = $request->query->get("server");
-        $server = ($serverParam !== null && $serverParam !== "") ? (string)$serverParam : null;
+        $serverParam = $request->query->get('server');
+        $server = $serverParam !== null && $serverParam !== '' ? $serverParam : null;
 
         return $this->buildWindow($request, $connection, $server, $status, $healthy, $scheduled);
     }
@@ -211,13 +219,13 @@ final class HistoryApiAction extends AbstractController
         ?bool $healthy,
         ?bool $scheduled,
     ): MeasurementFilter {
-        $sinceParam = $request->query->get("since");
-        $untilParam = $request->query->get("until");
+        $sinceParam = $request->query->get('since');
+        $untilParam = $request->query->get('until');
 
-        $utc = new DateTimeZone("UTC");
+        $utc = new DateTimeZone('UTC');
         $now = $this->clock->now()->setTimezone($utc);
 
-        if (($sinceParam === null || $sinceParam === "") && ($untilParam === null || $untilParam === "")) {
+        if (($sinceParam === null || $sinceParam === '') && ($untilParam === null || $untilParam === '')) {
             return MeasurementFilter::lastDays(
                 self::DEFAULT_WINDOW_DAYS,
                 $now,
@@ -230,17 +238,16 @@ final class HistoryApiAction extends AbstractController
         }
 
         try {
-            $since = ($sinceParam !== null && $sinceParam !== "")
-                ? new DateTimeImmutable((string)$sinceParam, $utc)
-                : $now->modify("-" . self::DEFAULT_WINDOW_DAYS . " days");
+            $since =
+                $sinceParam !== null && $sinceParam !== ''
+                    ? new DateTimeImmutable($sinceParam, $utc)
+                    : $now->modify('-' . self::DEFAULT_WINDOW_DAYS . ' days');
 
-            $until = ($untilParam !== null && $untilParam !== "")
-                ? $this->parseUntil((string)$untilParam, $utc)
-                : $now;
+            $until = $untilParam !== null && $untilParam !== '' ? $this->parseUntil($untilParam, $utc) : $now;
 
             return new MeasurementFilter($connection, $since, $until, $server, $status, $healthy, $scheduled);
-        } catch (InvalidArgumentException | Exception) {
-            throw new BadFilterRequest("Invalid time window");
+        } catch (InvalidArgumentException|Exception) {
+            throw new BadFilterRequest('Invalid time window');
         }
     }
 
@@ -249,7 +256,7 @@ final class HistoryApiAction extends AbstractController
         $until = new DateTimeImmutable($value, $utc);
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1) {
-            return $until->modify("+1 day");
+            return $until->modify('+1 day');
         }
 
         return $until;
@@ -257,13 +264,13 @@ final class HistoryApiAction extends AbstractController
 
     private function parseBool(mixed $value): ?bool
     {
-        if (!is_string($value) || $value === "") {
+        if (!is_string($value) || $value === '') {
             return null;
         }
 
         return match ($value) {
-            "1", "true" => true,
-            "0", "false" => false,
+            '1', 'true' => true,
+            '0', 'false' => false,
             default => null,
         };
     }
@@ -274,13 +281,13 @@ final class HistoryApiAction extends AbstractController
     private function noCacheJson(array $payload): JsonResponse
     {
         $response = new JsonResponse($payload, Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function badRequest(string $message): JsonResponse
     {
-        return new JsonResponse(["error" => $message], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => $message], Response::HTTP_BAD_REQUEST);
     }
 }

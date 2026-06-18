@@ -20,8 +20,8 @@ use function implode;
 use function is_string;
 
 #[AsCommand(
-    name: "app:notifications:digest",
-    description: "Build and dispatch the daily or weekly health digest for every connection.",
+    name: 'app:notifications:digest',
+    description: 'Build and dispatch the daily or weekly health digest for every connection.',
 )]
 final class SendDigestCommand extends Command
 {
@@ -34,10 +34,10 @@ final class SendDigestCommand extends Command
     protected function configure(): void
     {
         $this->addOption(
-            "period",
+            'period',
             null,
             InputOption::VALUE_REQUIRED,
-            "Digest window: daily (last 24h) or weekly (last 7 days)",
+            'Digest window: daily (last 24h) or weekly (last 7 days)',
             GenerateDigestPeriod::Daily->value,
         );
     }
@@ -46,23 +46,23 @@ final class SendDigestCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $periodRaw = $input->getOption("period");
+        $periodRaw = $input->getOption('period');
 
         try {
-            $period = GenerateDigestPeriod::from(is_string($periodRaw) ? $periodRaw : "");
+            $period = GenerateDigestPeriod::from(is_string($periodRaw) ? $periodRaw : '');
         } catch (ValueError) {
-            $allowed = implode(
-                ", ",
-                array_map(static fn(GenerateDigestPeriod $case): string => $case->value, GenerateDigestPeriod::cases()),
-            );
-            $io->error("Invalid --period; expected one of: " . $allowed . ".");
+            $allowed = implode(', ', array_map(
+                static fn(GenerateDigestPeriod $case): string => $case->value,
+                GenerateDigestPeriod::cases(),
+            ));
+            $io->error('Invalid --period; expected one of: ' . $allowed . '.');
 
             return Command::FAILURE;
         }
 
         ($this->handler)(new GenerateDigestCommand($period->value));
 
-        $io->success($period->value . " digest dispatched (or skipped if there was no data).");
+        $io->success($period->value . ' digest dispatched (or skipped if there was no data).');
 
         return Command::SUCCESS;
     }

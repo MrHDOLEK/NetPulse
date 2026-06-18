@@ -8,10 +8,10 @@ use InvalidArgumentException;
 
 enum SeriesRange: string
 {
-    case Day = "24h";
-    case Week = "7d";
-    case Month = "30d";
-    case Quarter = "90d";
+    case Day = '24h';
+    case Week = '7d';
+    case Month = '30d';
+    case Quarter = '90d';
 
     public static function fromParam(string $param): self
     {

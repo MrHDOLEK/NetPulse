@@ -6,7 +6,7 @@ namespace App\Dashboard\Application\ReadModel\Enum;
 
 enum ConnectionStatus: string
 {
-    case Healthy = "healthy";
-    case Degraded = "degraded";
-    case Down = "down";
+    case Healthy = 'healthy';
+    case Degraded = 'degraded';
+    case Down = 'down';
 }

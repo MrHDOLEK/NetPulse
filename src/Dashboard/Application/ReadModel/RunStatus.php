@@ -6,7 +6,7 @@ namespace App\Dashboard\Application\ReadModel;
 
 final readonly class RunStatus
 {
-    public const string IDLE = "idle";
+    public const string IDLE = 'idle';
 
     public function __construct(
         public string $state,

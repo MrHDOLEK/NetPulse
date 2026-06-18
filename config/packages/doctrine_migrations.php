@@ -5,11 +5,11 @@ declare(strict_types=1);
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
-    $containerConfigurator->extension("doctrine_migrations", [
-        "migrations_paths" => [
-            "DoctrineMigrations" => "%kernel.project_dir%/migrations",
+    $containerConfigurator->extension('doctrine_migrations', [
+        'migrations_paths' => [
+            'DoctrineMigrations' => '%kernel.project_dir%/migrations',
         ],
-        "enable_profiler" => "%kernel.debug%",
-        "organize_migrations" => "BY_YEAR_AND_MONTH",
+        'enable_profiler' => '%kernel.debug%',
+        'organize_migrations' => 'BY_YEAR_AND_MONTH',
     ]);
 };

@@ -39,7 +39,7 @@ features:
     details: Edge-debounced alert and recovery notifications over email, chat or webhook, plus a daily or weekly digest of every connection.
   - icon: 🧩
     title: Clean architecture
-    details: PHP 8.4 / Symfony 7.3, Hexagonal + DDD enforced by deptrac, PHPStan level 10. A no-Node frontend via AssetMapper, Tailwind, Alpine and uPlot.
+    details: PHP 8.5 / Symfony 8.1, Hexagonal + DDD enforced by Deptrac, linted and analysed by Mago. A no-Node frontend via AssetMapper, Tailwind, Alpine and uPlot.
 ---
 
 <div style="max-width: 960px; margin: 3rem auto 0; text-align: center;">

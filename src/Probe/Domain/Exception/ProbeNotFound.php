@@ -13,6 +13,6 @@ final class ProbeNotFound extends NotFoundException
 {
     public static function withId(ProbeId $id): self
     {
-        return new self(sprintf("Probe %s not found.", $id->toString()));
+        return new self(sprintf('Probe %s not found.', $id->toString()));
     }
 }

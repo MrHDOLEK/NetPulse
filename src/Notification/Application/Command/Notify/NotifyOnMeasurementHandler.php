@@ -60,9 +60,9 @@ final readonly class NotifyOnMeasurementHandler
 
         $this->dispatcher->send($notification);
 
-        $this->logger->info("notification dispatched", [
-            "kind" => $notification->kind->value,
-            "connection" => $connection->name(),
+        $this->logger->info('notification dispatched', [
+            'kind' => $notification->kind->value,
+            'connection' => $connection->name(),
         ]);
     }
 
@@ -92,14 +92,14 @@ final readonly class NotifyOnMeasurementHandler
         $packetLoss = $measurement->packetLoss();
 
         return [
-            "probe" => $probeName,
-            "connection" => $connectionName,
-            "reason" => $decision->reason,
+            'probe' => $probeName,
+            'connection' => $connectionName,
+            'reason' => $decision->reason,
 
-            "downloadBits" => $bandwidth === null ? 0 : $bandwidth->downloadBits,
-            "uploadBits" => $bandwidth === null ? 0 : $bandwidth->uploadBits,
-            "pingMs" => $latency === null ? 0.0 : $latency->ping,
-            "packetLoss" => $packetLoss === null ? 0.0 : $packetLoss->ratio * 100.0,
+            'downloadBits' => $bandwidth === null ? 0 : $bandwidth->downloadBits,
+            'uploadBits' => $bandwidth === null ? 0 : $bandwidth->uploadBits,
+            'pingMs' => $latency === null ? 0.0 : $latency->ping,
+            'packetLoss' => $packetLoss === null ? 0.0 : $packetLoss->ratio * 100.0,
         ];
     }
 }

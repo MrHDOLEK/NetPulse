@@ -63,33 +63,33 @@ final readonly class SqlMeasurementDetailRepository implements MeasurementDetail
         }
 
         return new MeasurementDetail(
-            id: $row["id"],
-            completedAtUnix: $row["completedAt"]->getTimestamp(),
-            startedAtUnix: $row["startedAt"]->getTimestamp(),
-            connectionName: $row["connectionName"],
-            connectionColor: $row["connectionColor"],
-            isp: $row["isp"],
-            serverId: $row["serverId"],
-            serverName: $row["serverName"],
-            serverLocation: $row["serverLocation"],
-            serverHost: $row["serverHost"],
-            scheduled: $row["scheduled"],
-            status: $row["status"],
-            failReason: $this->failReason($row["rawPayload"]),
-            downloadBits: $row["downloadBits"],
-            uploadBits: $row["uploadBits"],
-            pingSeconds: $row["pingSeconds"],
-            pingLowSeconds: $row["pingLowSeconds"],
-            pingHighSeconds: $row["pingHighSeconds"],
-            jitterSeconds: $row["jitterSeconds"],
-            downloadLatencyIqmSeconds: $row["downloadLatencyIqmSeconds"],
-            uploadLatencyIqmSeconds: $row["uploadLatencyIqmSeconds"],
-            packetLossRatio: $row["packetLossRatio"],
-            healthy: $row["healthy"],
-            dataUsedDownload: $row["dataUsedDownload"],
-            dataUsedUpload: $row["dataUsedUpload"],
-            resultUrl: $row["resultUrl"],
-            rawPayload: $row["rawPayload"],
+            id: $row['id'],
+            completedAtUnix: $row['completedAt']->getTimestamp(),
+            startedAtUnix: $row['startedAt']->getTimestamp(),
+            connectionName: $row['connectionName'],
+            connectionColor: $row['connectionColor'],
+            isp: $row['isp'],
+            serverId: $row['serverId'],
+            serverName: $row['serverName'],
+            serverLocation: $row['serverLocation'],
+            serverHost: $row['serverHost'],
+            scheduled: $row['scheduled'],
+            status: $row['status'],
+            failReason: $this->failReason($row['rawPayload']),
+            downloadBits: $row['downloadBits'],
+            uploadBits: $row['uploadBits'],
+            pingSeconds: $row['pingSeconds'],
+            pingLowSeconds: $row['pingLowSeconds'],
+            pingHighSeconds: $row['pingHighSeconds'],
+            jitterSeconds: $row['jitterSeconds'],
+            downloadLatencyIqmSeconds: $row['downloadLatencyIqmSeconds'],
+            uploadLatencyIqmSeconds: $row['uploadLatencyIqmSeconds'],
+            packetLossRatio: $row['packetLossRatio'],
+            healthy: $row['healthy'],
+            dataUsedDownload: $row['dataUsedDownload'],
+            dataUsedUpload: $row['dataUsedUpload'],
+            resultUrl: $row['resultUrl'],
+            rawPayload: $row['rawPayload'],
         );
     }
 
@@ -99,39 +99,40 @@ final readonly class SqlMeasurementDetailRepository implements MeasurementDetail
     private function fetchRow(MeasurementId $id): ?array
     {
         /** @var array<string,mixed>|null $row */
-        $row = $this->entityManager->createQueryBuilder()
+        $row = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.id AS id",
-                "measurement.completedAt AS completedAt",
-                "measurement.startedAt AS startedAt",
-                "connection.name AS connectionName",
-                "connection.color AS connectionColor",
-                "connection.isp AS isp",
-                "measurement.serverId AS serverId",
-                "measurement.serverName AS serverName",
-                "measurement.serverLocation AS serverLocation",
-                "measurement.serverHost AS serverHost",
-                "measurement.scheduled AS scheduled",
-                "measurement.status AS status",
-                "measurement.downloadBits AS downloadBits",
-                "measurement.uploadBits AS uploadBits",
-                "(measurement.ping / 1000.0) AS pingSeconds",
-                "(measurement.pingLow / 1000.0) AS pingLowSeconds",
-                "(measurement.pingHigh / 1000.0) AS pingHighSeconds",
-                "(measurement.jitter / 1000.0) AS jitterSeconds",
-                "(measurement.downloadLatencyIqm / 1000.0) AS downloadLatencyIqmSeconds",
-                "(measurement.uploadLatencyIqm / 1000.0) AS uploadLatencyIqmSeconds",
-                "measurement.packetLossRatio AS packetLossRatio",
-                "measurement.healthy AS healthy",
-                "measurement.dataUsedDownload AS dataUsedDownload",
-                "measurement.dataUsedUpload AS dataUsedUpload",
-                "measurement.resultUrl AS resultUrl",
-                "measurement.rawPayload AS rawPayload",
+                'measurement.id AS id',
+                'measurement.completedAt AS completedAt',
+                'measurement.startedAt AS startedAt',
+                'connection.name AS connectionName',
+                'connection.color AS connectionColor',
+                'connection.isp AS isp',
+                'measurement.serverId AS serverId',
+                'measurement.serverName AS serverName',
+                'measurement.serverLocation AS serverLocation',
+                'measurement.serverHost AS serverHost',
+                'measurement.scheduled AS scheduled',
+                'measurement.status AS status',
+                'measurement.downloadBits AS downloadBits',
+                'measurement.uploadBits AS uploadBits',
+                '(measurement.ping / 1000.0) AS pingSeconds',
+                '(measurement.pingLow / 1000.0) AS pingLowSeconds',
+                '(measurement.pingHigh / 1000.0) AS pingHighSeconds',
+                '(measurement.jitter / 1000.0) AS jitterSeconds',
+                '(measurement.downloadLatencyIqm / 1000.0) AS downloadLatencyIqmSeconds',
+                '(measurement.uploadLatencyIqm / 1000.0) AS uploadLatencyIqmSeconds',
+                'measurement.packetLossRatio AS packetLossRatio',
+                'measurement.healthy AS healthy',
+                'measurement.dataUsedDownload AS dataUsedDownload',
+                'measurement.dataUsedUpload AS dataUsedUpload',
+                'measurement.resultUrl AS resultUrl',
+                'measurement.rawPayload AS rawPayload',
             )
-            ->from(Measurement::class, "measurement")
-            ->join(Connection::class, "connection", Join::WITH, "connection.id = measurement.connectionId")
-            ->where("measurement.id = :id")
-            ->setParameter("id", $id, "measurement_id")
+            ->from(Measurement::class, 'measurement')
+            ->join(Connection::class, 'connection', Join::WITH, 'connection.id = measurement.connectionId')
+            ->where('measurement.id = :id')
+            ->setParameter('id', $id, 'measurement_id')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
@@ -144,9 +145,9 @@ final readonly class SqlMeasurementDetailRepository implements MeasurementDetail
      */
     private function failReason(array $rawPayload): ?string
     {
-        $reason = $rawPayload["error"] ?? $rawPayload["message"] ?? null;
+        $reason = $rawPayload['error'] ?? $rawPayload['message'] ?? null;
 
-        if (is_string($reason) && $reason !== "") {
+        if (is_string($reason) && $reason !== '') {
             return $reason;
         }
 

@@ -43,17 +43,17 @@ final readonly class SqlLastMeasurementRepository implements LastMeasurementRepo
         $rows = $this->entityManager
             ->createQueryBuilder()
             ->select(
-                "measurement.connectionId AS connectionId",
-                "measurement.completedAt AS completedAt",
-                "measurement.serverId AS serverId",
-                "measurement.status AS status",
-                "measurement.healthy AS healthy",
+                'measurement.connectionId AS connectionId',
+                'measurement.completedAt AS completedAt',
+                'measurement.serverId AS serverId',
+                'measurement.status AS status',
+                'measurement.healthy AS healthy',
             )
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.probeId = :probeId")
-            ->setParameter("probeId", $probeId, "probe_id")
-            ->orderBy("measurement.connectionId", "ASC")
-            ->addOrderBy("measurement.completedAt", "DESC")
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.probeId = :probeId')
+            ->setParameter('probeId', $probeId, 'probe_id')
+            ->orderBy('measurement.connectionId', 'ASC')
+            ->addOrderBy('measurement.completedAt', 'DESC')
             ->getQuery()
             ->getResult();
 
@@ -82,12 +82,12 @@ final readonly class SqlLastMeasurementRepository implements LastMeasurementRepo
         $samples = [];
 
         foreach ($rows as $row) {
-            $key = $row["connectionId"]->toString();
+            $key = $row['connectionId']->toString();
 
             if (!array_key_exists($key, $latestAt)) {
-                $latestAt[$key] = $row["completedAt"];
-                $latestServer[$key] = $row["serverId"];
-                $connectionId[$key] = $row["connectionId"];
+                $latestAt[$key] = $row['completedAt'];
+                $latestServer[$key] = $row['serverId'];
+                $connectionId[$key] = $row['connectionId'];
                 $samples[$key] = [];
             }
 
@@ -95,7 +95,7 @@ final readonly class SqlLastMeasurementRepository implements LastMeasurementRepo
                 continue;
             }
 
-            $samples[$key][] = $this->toSample($row["completedAt"], $row["status"], $row["healthy"]);
+            $samples[$key][] = $this->toSample($row['completedAt'], $row['status'], $row['healthy']);
         }
 
         $result = [];

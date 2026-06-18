@@ -6,6 +6,4 @@ namespace App\Probe\Domain\Exception;
 
 use App\Shared\Domain\DomainException;
 
-final class InvalidProbeToken extends DomainException
-{
-}
+final class InvalidProbeToken extends DomainException {}

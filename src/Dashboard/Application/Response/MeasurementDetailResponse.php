@@ -25,12 +25,16 @@ final readonly class MeasurementDetailResponse
 
     public static function from(MeasurementDetail $detail): self
     {
-        $utc = new DateTimeZone("UTC");
+        $utc = new DateTimeZone('UTC');
 
         return new self(
             $detail,
-            (new DateTimeImmutable("@" . $detail->completedAtUnix))->setTimezone($utc)->format(DateTimeImmutable::ATOM),
-            (new DateTimeImmutable("@" . $detail->startedAtUnix))->setTimezone($utc)->format(DateTimeImmutable::ATOM),
+            new DateTimeImmutable('@' . $detail->completedAtUnix)
+                ->setTimezone($utc)
+                ->format(DateTimeImmutable::ATOM),
+            new DateTimeImmutable('@' . $detail->startedAtUnix)
+                ->setTimezone($utc)
+                ->format(DateTimeImmutable::ATOM),
             $detail->rawPayload,
         );
     }
@@ -43,51 +47,51 @@ final readonly class MeasurementDetailResponse
         $detail = $this->detail;
 
         return [
-            "id" => $detail->id->toString(),
+            'id' => $detail->id->toString(),
 
-            "completedAtUnix" => $detail->completedAtUnix,
-            "startedAtUnix" => $detail->startedAtUnix,
-            "completedAt" => $this->completedAtIso,
-            "startedAt" => $this->startedAtIso,
+            'completedAtUnix' => $detail->completedAtUnix,
+            'startedAtUnix' => $detail->startedAtUnix,
+            'completedAt' => $this->completedAtIso,
+            'startedAt' => $this->startedAtIso,
 
-            "connection" => $detail->connectionName,
-            "color" => $detail->connectionColor->value,
-            "isp" => $detail->isp,
-            "serverId" => $detail->serverId,
-            "serverName" => $detail->serverName,
-            "serverLocation" => $detail->serverLocation,
-            "serverHost" => $detail->serverHost,
+            'connection' => $detail->connectionName,
+            'color' => $detail->connectionColor->value,
+            'isp' => $detail->isp,
+            'serverId' => $detail->serverId,
+            'serverName' => $detail->serverName,
+            'serverLocation' => $detail->serverLocation,
+            'serverHost' => $detail->serverHost,
 
-            "status" => $detail->status->value,
-            "statusLabel" => ucfirst($detail->status->value),
-            "failReason" => $detail->failReason,
-            "scheduled" => $detail->scheduled,
-            "healthy" => $detail->healthy,
-            "resultUrl" => $detail->resultUrl,
+            'status' => $detail->status->value,
+            'statusLabel' => ucfirst($detail->status->value),
+            'failReason' => $detail->failReason,
+            'scheduled' => $detail->scheduled,
+            'healthy' => $detail->healthy,
+            'resultUrl' => $detail->resultUrl,
 
-            "downloadBits" => $detail->downloadBits,
-            "uploadBits" => $detail->uploadBits,
-            "pingSeconds" => $detail->pingSeconds,
-            "pingLowSeconds" => $detail->pingLowSeconds,
-            "pingHighSeconds" => $detail->pingHighSeconds,
-            "jitterSeconds" => $detail->jitterSeconds,
-            "downloadLatencyIqmSeconds" => $detail->downloadLatencyIqmSeconds,
-            "uploadLatencyIqmSeconds" => $detail->uploadLatencyIqmSeconds,
-            "packetLossRatio" => $detail->packetLossRatio,
-            "dataUsedDownload" => $detail->dataUsedDownload,
-            "dataUsedUpload" => $detail->dataUsedUpload,
+            'downloadBits' => $detail->downloadBits,
+            'uploadBits' => $detail->uploadBits,
+            'pingSeconds' => $detail->pingSeconds,
+            'pingLowSeconds' => $detail->pingLowSeconds,
+            'pingHighSeconds' => $detail->pingHighSeconds,
+            'jitterSeconds' => $detail->jitterSeconds,
+            'downloadLatencyIqmSeconds' => $detail->downloadLatencyIqmSeconds,
+            'uploadLatencyIqmSeconds' => $detail->uploadLatencyIqmSeconds,
+            'packetLossRatio' => $detail->packetLossRatio,
+            'dataUsedDownload' => $detail->dataUsedDownload,
+            'dataUsedUpload' => $detail->dataUsedUpload,
 
-            "downloadLabel" => UnitFormatter::bitsPerSecond($detail->downloadBits),
-            "uploadLabel" => UnitFormatter::bitsPerSecond($detail->uploadBits),
-            "pingLabel" => UnitFormatter::seconds($detail->pingSeconds),
-            "pingLowLabel" => UnitFormatter::seconds($detail->pingLowSeconds),
-            "pingHighLabel" => UnitFormatter::seconds($detail->pingHighSeconds),
-            "jitterLabel" => UnitFormatter::seconds($detail->jitterSeconds),
-            "downloadLatencyIqmLabel" => UnitFormatter::seconds($detail->downloadLatencyIqmSeconds),
-            "uploadLatencyIqmLabel" => UnitFormatter::seconds($detail->uploadLatencyIqmSeconds),
-            "lossLabel" => UnitFormatter::ratio($detail->packetLossRatio),
+            'downloadLabel' => UnitFormatter::bitsPerSecond($detail->downloadBits),
+            'uploadLabel' => UnitFormatter::bitsPerSecond($detail->uploadBits),
+            'pingLabel' => UnitFormatter::seconds($detail->pingSeconds),
+            'pingLowLabel' => UnitFormatter::seconds($detail->pingLowSeconds),
+            'pingHighLabel' => UnitFormatter::seconds($detail->pingHighSeconds),
+            'jitterLabel' => UnitFormatter::seconds($detail->jitterSeconds),
+            'downloadLatencyIqmLabel' => UnitFormatter::seconds($detail->downloadLatencyIqmSeconds),
+            'uploadLatencyIqmLabel' => UnitFormatter::seconds($detail->uploadLatencyIqmSeconds),
+            'lossLabel' => UnitFormatter::ratio($detail->packetLossRatio),
 
-            "rawPayload" => $this->rawPayload,
+            'rawPayload' => $this->rawPayload,
         ];
     }
 }

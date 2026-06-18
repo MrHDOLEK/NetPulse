@@ -13,12 +13,12 @@ final class EnableSqliteWalMiddlewareTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $connection = self::getContainer()->get("doctrine.dbal.default_connection");
+        $connection = self::getContainer()->get('doctrine.dbal.default_connection');
         self::assertInstanceOf(Connection::class, $connection);
 
-        $journalMode = $connection->executeQuery("PRAGMA journal_mode")->fetchOne();
+        $journalMode = $connection->executeQuery('PRAGMA journal_mode')->fetchOne();
 
         self::assertIsString($journalMode);
-        self::assertSame("wal", strtolower($journalMode));
+        self::assertSame('wal', strtolower($journalMode));
     }
 }

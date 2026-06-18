@@ -26,39 +26,39 @@ final readonly class AppSettings implements SettingsReader, SettingsWriter
     public function __construct(
         private AppSettingRepository $repository,
         private SettingsSecretEncryptor $encryptor,
-        #[Autowire("%env(string:NETPULSE_SITE_NAME)%")]
+        #[Autowire('%env(string:NETPULSE_SITE_NAME)%')]
         string $siteName,
-        #[Autowire("%env(string:NETPULSE_TIMEZONE)%")]
+        #[Autowire('%env(string:NETPULSE_TIMEZONE)%')]
         string $timezone,
-        #[Autowire("%env(string:OIDC_NAME)%")]
+        #[Autowire('%env(string:OIDC_NAME)%')]
         string $oidcName,
-        #[Autowire("%env(string:OIDC_CLIENT_ID)%")]
+        #[Autowire('%env(string:OIDC_CLIENT_ID)%')]
         string $oidcClientId,
-        #[Autowire("%env(string:OIDC_CLIENT_SECRET)%")]
+        #[Autowire('%env(string:OIDC_CLIENT_SECRET)%')]
         string $oidcClientSecret,
-        #[Autowire("%env(string:OIDC_AUTHORIZATION_URL)%")]
+        #[Autowire('%env(string:OIDC_AUTHORIZATION_URL)%')]
         string $oidcAuthorizationUrl,
-        #[Autowire("%env(string:OIDC_TOKEN_URL)%")]
+        #[Autowire('%env(string:OIDC_TOKEN_URL)%')]
         string $oidcTokenUrl,
-        #[Autowire("%env(string:OIDC_USERINFO_URL)%")]
+        #[Autowire('%env(string:OIDC_USERINFO_URL)%')]
         string $oidcUserInfoUrl,
-        #[Autowire("%env(string:OIDC_REDIRECT_URL)%")]
+        #[Autowire('%env(string:OIDC_REDIRECT_URL)%')]
         string $oidcRedirectUrl,
-        #[Autowire("%env(string:OIDC_SCOPES)%")]
+        #[Autowire('%env(string:OIDC_SCOPES)%')]
         string $oidcScopes,
-        #[Autowire("%env(string:NOTIFY_ENABLED)%")]
+        #[Autowire('%env(string:NOTIFY_ENABLED)%')]
         string $notifyEnabled,
-        #[Autowire("%env(string:NOTIFY_CONSECUTIVE_THRESHOLD)%")]
+        #[Autowire('%env(string:NOTIFY_CONSECUTIVE_THRESHOLD)%')]
         string $notifyThreshold,
-        #[Autowire("%env(string:NOTIFY_CHANNELS)%")]
+        #[Autowire('%env(string:NOTIFY_CHANNELS)%')]
         string $notifyChannels,
-        #[Autowire("%env(string:NOTIFY_EMAIL_TO)%")]
+        #[Autowire('%env(string:NOTIFY_EMAIL_TO)%')]
         string $notifyEmailTo,
-        #[Autowire("%env(string:MAILER_DSN)%")]
+        #[Autowire('%env(string:MAILER_DSN)%')]
         string $notifyEmailDsn,
-        #[Autowire("%env(string:NOTIFY_CHAT_DSN)%")]
+        #[Autowire('%env(string:NOTIFY_CHAT_DSN)%')]
         string $notifyChatDsn,
-        #[Autowire("%env(string:NOTIFY_WEBHOOK_URL)%")]
+        #[Autowire('%env(string:NOTIFY_WEBHOOK_URL)%')]
         string $notifyWebhookUrl,
     ) {
         $this->envFallbacks = [
@@ -99,14 +99,14 @@ final readonly class AppSettings implements SettingsReader, SettingsWriter
 
     public function getString(SettingKey $key): string
     {
-        return $this->get($key) ?? "";
+        return $this->get($key) ?? '';
     }
 
     public function getBool(SettingKey $key): bool
     {
         $value = $this->rawBool($key);
 
-        return in_array(strtolower(trim($value)), ["1", "true", "yes", "on"], true);
+        return in_array(strtolower(trim($value)), ['1', 'true', 'yes', 'on'], true);
     }
 
     public function set(SettingKey $key, ?string $value): void
@@ -116,8 +116,8 @@ final readonly class AppSettings implements SettingsReader, SettingsWriter
                 return;
             }
 
-            if ($value === "") {
-                $this->store($key, "", false);
+            if ($value === '') {
+                $this->store($key, '', false);
 
                 return;
             }
@@ -131,7 +131,7 @@ final readonly class AppSettings implements SettingsReader, SettingsWriter
             return;
         }
 
-        $this->store($key, $value === null ? "" : trim($value), false);
+        $this->store($key, $value === null ? '' : trim($value), false);
     }
 
     private function store(SettingKey $key, string $value, bool $isEncrypted): void
@@ -157,6 +157,6 @@ final readonly class AppSettings implements SettingsReader, SettingsWriter
             return $stored->value();
         }
 
-        return $this->envFallbacks[$key->value] ?? "";
+        return $this->envFallbacks[$key->value] ?? '';
     }
 }

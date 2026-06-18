@@ -35,19 +35,21 @@ final readonly class FirstRunSetupListener
             return;
         }
 
-        $event->setResponse(new RedirectResponse("/setup"));
+        $event->setResponse(new RedirectResponse('/setup'));
     }
 
     private function isExempt(string $path): bool
     {
-        return str_starts_with($path, "/api")
-            || $path === "/metrics"
-            || str_starts_with($path, "/assets")
-            || str_starts_with($path, "/r/")
-            || str_starts_with($path, "/2fa")
-            || $path === "/setup"
-            || $path === "/login"
-            || str_starts_with($path, "/login/oidc")
-            || $path === "/logout";
+        return (
+            str_starts_with($path, '/api')
+            || $path === '/metrics'
+            || str_starts_with($path, '/assets')
+            || str_starts_with($path, '/r/')
+            || str_starts_with($path, '/2fa')
+            || $path === '/setup'
+            || $path === '/login'
+            || str_starts_with($path, '/login/oidc')
+            || $path === '/logout'
+        );
     }
 }

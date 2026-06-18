@@ -21,8 +21,8 @@ use function max;
 use function sleep;
 
 #[AsCommand(
-    name: "app:agent:run",
-    description: "Run the probe agent: poll the server for due work, run Ookla, push results.",
+    name: 'app:agent:run',
+    description: 'Run the probe agent: poll the server for due work, run Ookla, push results.',
 )]
 final class RunAgentCommand extends Command
 {
@@ -31,7 +31,7 @@ final class RunAgentCommand extends Command
     public function __construct(
         private readonly AgentTick $tick,
         private readonly LoggerInterface $logger,
-        #[Autowire("%env(int:AGENT_POLL_INTERVAL)%")]
+        #[Autowire('%env(int:AGENT_POLL_INTERVAL)%')]
         private readonly int $fallbackPollInterval,
     ) {
         parent::__construct();
@@ -40,17 +40,17 @@ final class RunAgentCommand extends Command
     protected function configure(): void
     {
         $this->addOption(
-            "once",
+            'once',
             null,
             InputOption::VALUE_NONE,
-            "Run exactly one poll cycle and exit (instead of looping as a daemon).",
+            'Run exactly one poll cycle and exit (instead of looping as a daemon).',
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $once = (bool)$input->getOption("once");
+        $once = $input->getOption('once') === true;
 
         if ($once) {
             $this->runTick($io);
@@ -59,23 +59,23 @@ final class RunAgentCommand extends Command
         }
 
         $this->registerSignalHandlers();
-        $io->title("NetPulse agent started" . ($this->canHandleSignals() ? " (SIGTERM/SIGINT-aware)" : ""));
-        $this->logger->info("agent loop started", [
-            "fallbackPollInterval" => $this->fallbackPollInterval,
-            "signalAware" => $this->canHandleSignals(),
+        $io->title('NetPulse agent started' . ($this->canHandleSignals() ? ' (SIGTERM/SIGINT-aware)' : ''));
+        $this->logger->info('agent loop started', [
+            'fallbackPollInterval' => $this->fallbackPollInterval,
+            'signalAware' => $this->canHandleSignals(),
         ]);
 
         while (!$this->shouldStop) {
             $summary = $this->runTick($io);
             $sleepFor = $this->pollSeconds($summary);
 
-            $this->logger->info("agent loop sleeping", ["pollAfterSeconds" => $sleepFor]);
+            $this->logger->info('agent loop sleeping', ['pollAfterSeconds' => $sleepFor]);
 
             $this->sleep($sleepFor);
         }
 
-        $io->writeln("Agent stopped cleanly.");
-        $this->logger->info("agent loop stopped cleanly");
+        $io->writeln('Agent stopped cleanly.');
+        $this->logger->info('agent loop stopped cleanly');
 
         return Command::SUCCESS;
     }
@@ -85,14 +85,14 @@ final class RunAgentCommand extends Command
         try {
             $summary = $this->tick->run();
         } catch (Throwable $exception) {
-            $io->warning("Agent tick failed: " . $exception->getMessage());
-            $this->logger->error("agent cycle failed", ["error" => $exception->getMessage()]);
+            $io->warning('Agent tick failed: ' . $exception->getMessage());
+            $this->logger->error('agent cycle failed', ['error' => $exception->getMessage()]);
 
             return null;
         }
 
         $io->writeln(sprintf(
-            "tick: %d task(s) — %d ok, %d failed, %d errored (poll after %ds)",
+            'tick: %d task(s) — %d ok, %d failed, %d errored (poll after %ds)',
             $summary->tasks,
             $summary->succeeded,
             $summary->failed,
@@ -141,6 +141,6 @@ final class RunAgentCommand extends Command
 
     private function canHandleSignals(): bool
     {
-        return function_exists("pcntl_signal") && function_exists("pcntl_signal_dispatch");
+        return function_exists('pcntl_signal') && function_exists('pcntl_signal_dispatch');
     }
 }

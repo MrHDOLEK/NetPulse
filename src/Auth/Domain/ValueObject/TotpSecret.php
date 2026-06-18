@@ -12,8 +12,8 @@ final readonly class TotpSecret implements Stringable
     public function __construct(
         private string $value,
     ) {
-        if ($value === "") {
-            throw new InvalidArgumentException("TOTP secret must not be empty.");
+        if ($value === '') {
+            throw new InvalidArgumentException('TOTP secret must not be empty.');
         }
     }
 

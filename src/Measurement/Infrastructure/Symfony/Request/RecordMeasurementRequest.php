@@ -10,11 +10,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class RecordMeasurementRequest implements DeserializesRawBody
 {
-    #[Assert\NotBlank(message: "VALIDATION.CONNECTION_ID_REQUIRED")]
-    #[Assert\Uuid(message: "VALIDATION.CONNECTION_ID_INVALID")]
-    public string $connectionId = "";
+    #[Assert\NotBlank(message: 'VALIDATION.CONNECTION_ID_REQUIRED')]
+    #[Assert\Uuid(message: 'VALIDATION.CONNECTION_ID_INVALID')]
+    public string $connectionId = '';
 
-    public bool $scheduled = false;    
+    public bool $scheduled = false;
     public OoklaResult $ookla;
 
     /** @var array<string,mixed> */
@@ -39,7 +39,7 @@ final class RecordMeasurementRequest implements DeserializesRawBody
         $this->raw = $payload;
     }
 
-    #[Assert\NotBlank(message: "VALIDATION.TYPE_REQUIRED")]
+    #[Assert\NotBlank(message: 'VALIDATION.TYPE_REQUIRED')]
     public function getOoklaType(): ?string
     {
         return $this->ookla->type;

@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 
 final class SettingsExtension extends AbstractExtension
 {
-    private const string DEFAULT_SITE_NAME = "NetPulse";
+    private const string DEFAULT_SITE_NAME = 'NetPulse';
 
     public function __construct(
         private readonly SettingsReader $settings,
@@ -23,7 +23,7 @@ final class SettingsExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction("site_name", $this->siteName(...)),
+            new TwigFunction('site_name', $this->siteName(...)),
         ];
     }
 
@@ -31,6 +31,6 @@ final class SettingsExtension extends AbstractExtension
     {
         $name = $this->settings->getString(SettingKey::SiteName);
 
-        return $name === "" ? self::DEFAULT_SITE_NAME : $name;
+        return $name === '' ? self::DEFAULT_SITE_NAME : $name;
     }
 }

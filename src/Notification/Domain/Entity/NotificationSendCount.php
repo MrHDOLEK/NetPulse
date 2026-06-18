@@ -7,9 +7,9 @@ namespace App\Notification\Domain\Entity;
 class NotificationSendCount
 {
     private int $id = 0;
-    private string $kind = "";
-    private string $channel = "";
-    private string $status = "";
+    private string $kind = '';
+    private string $channel = '';
+    private string $status = '';
     private int $total = 0;
 
     public function id(): int

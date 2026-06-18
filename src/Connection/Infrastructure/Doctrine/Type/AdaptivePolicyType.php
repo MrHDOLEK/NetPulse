@@ -21,7 +21,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class AdaptivePolicyType extends Type
 {
-    public const string NAME = "adaptive_policy";
+    public const string NAME = 'adaptive_policy';
 
     /**
      * @param array<string, mixed> $column
@@ -38,7 +38,7 @@ final class AdaptivePolicyType extends Type
         }
 
         if (!$value instanceof AdaptivePolicy) {
-            throw InvalidType::new($value, self::NAME, ["null", AdaptivePolicy::class]);
+            throw InvalidType::new($value, self::NAME, ['null', AdaptivePolicy::class]);
         }
 
         return json_encode($this->toPayload($value), JSON_THROW_ON_ERROR);
@@ -46,7 +46,7 @@ final class AdaptivePolicyType extends Type
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?AdaptivePolicy
     {
-        if ($value === null || $value === "") {
+        if ($value === null || $value === '') {
             return null;
         }
 
@@ -69,9 +69,9 @@ final class AdaptivePolicyType extends Type
         }
 
         return AdaptivePolicy::of(
-            $this->intField($value, $decoded, "adaptiveIntervalSeconds"),
-            $this->intField($value, $decoded, "recoveryHealthyCount"),
-            $this->intField($value, $decoded, "maxConsecutiveFailures"),
+            $this->intField($value, $decoded, 'adaptiveIntervalSeconds'),
+            $this->intField($value, $decoded, 'recoveryHealthyCount'),
+            $this->intField($value, $decoded, 'maxConsecutiveFailures'),
         );
     }
 
@@ -86,9 +86,9 @@ final class AdaptivePolicyType extends Type
     private function toPayload(AdaptivePolicy $policy): array
     {
         return [
-            "adaptiveIntervalSeconds" => $policy->adaptiveIntervalSeconds(),
-            "recoveryHealthyCount" => $policy->recoveryHealthyCount(),
-            "maxConsecutiveFailures" => $policy->maxConsecutiveFailures(),
+            'adaptiveIntervalSeconds' => $policy->adaptiveIntervalSeconds(),
+            'recoveryHealthyCount' => $policy->recoveryHealthyCount(),
+            'maxConsecutiveFailures' => $policy->maxConsecutiveFailures(),
         ];
     }
 

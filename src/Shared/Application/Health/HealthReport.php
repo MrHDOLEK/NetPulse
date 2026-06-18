@@ -36,8 +36,8 @@ final readonly class HealthReport
         }
 
         return [
-            "status" => $this->isHealthy() ? "healthy" : "unhealthy",
-            "checks" => $checks,
+            'status' => $this->isHealthy() ? 'healthy' : 'unhealthy',
+            'checks' => $checks,
         ];
     }
 }

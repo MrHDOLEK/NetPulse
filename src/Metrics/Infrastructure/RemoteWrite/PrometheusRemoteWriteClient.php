@@ -28,21 +28,21 @@ final class PrometheusRemoteWriteClient implements RemoteWriteClient
         $body = $this->encoder->snappy($this->encoder->encodeWriteRequest($series));
 
         $headers = [
-            "Content-Type" => "application/x-protobuf",
-            "Content-Encoding" => "snappy",
-            "X-Prometheus-Remote-Write-Version" => "0.1.0",
+            'Content-Type' => 'application/x-protobuf',
+            'Content-Encoding' => 'snappy',
+            'X-Prometheus-Remote-Write-Version' => '0.1.0',
         ];
 
         $authHeader = $this->authorizationHeader();
 
         if ($authHeader !== null) {
-            $headers["Authorization"] = $authHeader;
+            $headers['Authorization'] = $authHeader;
         }
 
         try {
-            $response = $this->httpClient->request("POST", $this->config->url, [
-                "headers" => $headers,
-                "body" => $body,
+            $response = $this->httpClient->request('POST', $this->config->url, [
+                'headers' => $headers,
+                'body' => $body,
             ]);
 
             $status = $response->getStatusCode();
@@ -59,18 +59,18 @@ final class PrometheusRemoteWriteClient implements RemoteWriteClient
     {
         $auth = $this->config->auth;
 
-        if ($auth === null || $auth === "") {
+        if ($auth === null || $auth === '') {
             return null;
         }
 
-        if (str_starts_with($auth, "bearer:")) {
-            return "Bearer " . substr($auth, strlen("bearer:"));
+        if (str_starts_with($auth, 'bearer:')) {
+            return 'Bearer ' . substr($auth, strlen('bearer:'));
         }
 
-        if (str_starts_with($auth, "basic:")) {
-            $credentials = substr($auth, strlen("basic:"));
+        if (str_starts_with($auth, 'basic:')) {
+            $credentials = substr($auth, strlen('basic:'));
 
-            return "Basic " . base64_encode($credentials);
+            return 'Basic ' . base64_encode($credentials);
         }
 
         return null;
@@ -81,7 +81,7 @@ final class PrometheusRemoteWriteClient implements RemoteWriteClient
         try {
             return substr($response->getContent(false), 0, 512);
         } catch (TransportExceptionInterface) {
-            return "";
+            return '';
         }
     }
 }

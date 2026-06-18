@@ -16,10 +16,10 @@ final class AdaptivePolicyTest extends TestCase
      */
     public static function provideInvalid(): iterable
     {
-        yield "zero interval" => [0, 3, 5];
-        yield "negative interval" => [-1, 3, 5];
-        yield "zero recovery count" => [300, 0, 5];
-        yield "zero max failures" => [300, 3, 0];
+        yield 'zero interval' => [0, 3, 5];
+        yield 'negative interval' => [-1, 3, 5];
+        yield 'zero recovery count' => [300, 0, 5];
+        yield 'zero max failures' => [300, 3, 0];
     }
 
     public function testDefaultCarriesTheApprovedValues(): void
@@ -40,7 +40,7 @@ final class AdaptivePolicyTest extends TestCase
         self::assertSame(1, $policy->maxConsecutiveFailures());
     }
 
-    #[DataProvider("provideInvalid")]
+    #[DataProvider('provideInvalid')]
     public function testRejectsInvalidValues(
         int $adaptiveIntervalSeconds,
         int $recoveryHealthyCount,

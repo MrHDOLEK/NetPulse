@@ -10,6 +10,6 @@ final class InvalidTimeSeries extends DomainException
 {
     public static function missingNameLabel(): self
     {
-        return new self("TimeSeries must contain a __name__ label.");
+        return new self('TimeSeries must contain a __name__ label.');
     }
 }

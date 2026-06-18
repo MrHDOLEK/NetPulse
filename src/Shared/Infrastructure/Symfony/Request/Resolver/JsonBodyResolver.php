@@ -19,12 +19,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 use function in_array;
 use function is_array;
-use function is_object;
 use function json_decode;
 
 final class JsonBodyResolver implements ValueResolverInterface
 {
-    private const string FORMAT = "json";
+    private const string FORMAT = 'json';
 
     public function __construct(
         private SerializerInterface $serializer,
@@ -41,17 +40,12 @@ final class JsonBodyResolver implements ValueResolverInterface
             return;
         }
 
-        $content = empty($request->getContent()) ? "{}" : $request->getContent();
+        $content = empty($request->getContent()) ? '{}' : $request->getContent();
 
         try {
-            $resolved = $this->serializer->deserialize(
-                $content,
-                $argument->getType() ?? "",
-                self::FORMAT,
-                [
-                    AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
-                ],
-            );
+            $resolved = $this->serializer->deserialize($content, $argument->getType() ?? '', self::FORMAT, [
+                AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
+            ]);
 
             if ($resolved instanceof DeserializesRawBody) {
                 $this->attachRawBody($resolved, $content);
@@ -60,25 +54,16 @@ final class JsonBodyResolver implements ValueResolverInterface
             yield $resolved;
         } catch (UnexpectedValueException|InvalidArgumentException|RuntimeException) {
             throw new ValidationError([
-                ValidationError::GENERAL => "VALIDATION.INVALID_PAYLOAD",
+                ValidationError::GENERAL => 'VALIDATION.INVALID_PAYLOAD',
             ]);
         }
     }
 
     private function attachRawBody(DeserializesRawBody $request, string $content): void
     {
-        $body = $this->serializer->deserialize(
-            $content,
-            $request::rawBodyType(),
-            self::FORMAT,
-            [
-                AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
-            ],
-        );
-
-        if (!is_object($body)) {
-            return;
-        }
+        $body = $this->serializer->deserialize($content, $request::rawBodyType(), self::FORMAT, [
+            AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
+        ]);
 
         $decoded = json_decode($content, true);
 
@@ -90,12 +75,12 @@ final class JsonBodyResolver implements ValueResolverInterface
 
     private function supports(ArgumentMetadata $argument): bool
     {
-        $type = (string)$argument->getType();
+        $type = (string) $argument->getType();
 
         if (!class_exists($type)) {
             return false;
         }
 
-        return in_array(RequestInterface::class, class_implements($type), true);
+        return in_array(RequestInterface::class, class_implements($type) ?: [], true);
     }
 }

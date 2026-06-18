@@ -11,19 +11,83 @@ Stand up NetPulse with Docker, create the first admin, wire a probe to a connect
 
 ## Install
 
-Clone the repository and bring the stack up:
+Clone the repository and bring the stack up. The task runner is [`just`](https://github.com/casey/just) (`brew install just`, or use the Nix shell which provides it):
 
 ```bash
 git clone https://github.com/MrHDOLEK/NetPulse.git && cd NetPulse
-make install   # builds the image, starts containers, runs composer install
-make start     # docker compose up -d
+just install   # builds the image, starts containers, runs composer install
+just start     # docker compose up -d
 ```
 
-`make install` does the heavy lifting once; `make start` is the day-to-day "bring it up" command. Run `make help` to list every available target.
+`just install` does the heavy lifting once; `just start` is the day-to-day "bring it up" command. Run `just` to list every recipe.
 
 ::: tip Platform notes
-- On Linux the Makefile uses `docker compose`; on macOS it uses `docker-compose`. The Makefile **auto-detects** which is present, so the same `make` commands work either way.
+- On Linux the Justfile uses `docker compose`; on macOS it uses `docker-compose`. The Justfile **auto-detects** which is present, so the same `just` commands work either way.
 - If you hit permission errors talking to the Docker daemon, prefix the command with `sudo`.
+:::
+
+## Develop with Nix (optional)
+
+Prefer to run the PHP toolchain on your **host** instead of inside Docker? A `shell.nix` (classic, no flake) provides **PHP 8.5, Composer, [Mago](https://mago.carthage.software/), the Symfony CLI and [`just`](https://github.com/casey/just)** — everything the quality gate and CLI need. The full app stack (nginx, the agent + Ookla CLI, Prometheus, Grafana) still runs in Docker Compose.
+
+**1. Install Nix** — follow the [official installer](https://nixos.org/download/). On macOS/Linux:
+
+```bash
+sh <(curl -L https://nixos.org/nix/install)
+# then restart your shell
+```
+
+**2. Enter the shell** from the project root:
+
+```bash
+nix-shell                          # PHP 8.5 + Composer + Mago + Symfony CLI + just
+nix-shell --pure                   # full isolation from the host
+nix-shell --arg php-version 8.4    # choose a PHP version (default: 8.5)
+nix-shell --arg with-xdebug true   # add Xdebug
+type php                           # show the Nix-provided PHP path (handy for IDE config)
+```
+
+**3. Inside the shell**, install dependencies and run the gate:
+
+```bash
+composer install   # also installs the Mago + Deptrac tools under tools/
+just lint          # Mago format check + lint
+just analyze       # Mago static analysis
+just deptrac       # architecture (0 violations)
+```
+
+**4. Serve the app from the host** (browser access, no Docker) with the bundled Symfony CLI:
+
+```bash
+cp .env.dist .env                  # dev env — SQLite at var/netpulse.sqlite
+php bin/console importmap:install  # fetch the import-map assets
+php bin/console tailwind:build     # compile the Tailwind CSS
+composer migrate                   # create/upgrade the dev database
+symfony server:start               # serves on https://127.0.0.1:8000
+```
+
+Open the printed URL in your browser — the first visit lands on `/setup`. Useful flags & commands:
+
+```bash
+symfony server:start -d            # run as a background daemon
+symfony server:start --no-tls      # plain HTTP instead of HTTPS
+symfony server:ca:install          # trust the local HTTPS cert (once)
+symfony server:log                 # tail the server logs
+symfony server:stop                # stop it
+```
+
+**5. Run the probe agent** as a plain host process — it's just a console command (`app:agent:run`: poll for due work → run Ookla → push results). The Nix shell already bundles the Ookla **`speedtest`** CLI (`pkgs.ookla-speedtest`), so just create a probe and run the agent against the server you started in step 4:
+
+```bash
+php bin/console app:probe:create "My probe"     # prints PROBE_ID + a one-time token
+PROBE_ID=<id> PROBE_TOKEN=<token> NETPULSE_API_URL=http://127.0.0.1:8000 \
+  php bin/console app:agent:run                  # daemon loop; add --once for a single tick
+```
+
+It reads `NETPULSE_API_URL`, `PROBE_ID`, `PROBE_TOKEN`, `OOKLA_BINARY` (default `speedtest`) and `AGENT_POLL_INTERVAL` (default `60`s) from the environment.
+
+::: tip Everything on the host (no Docker)
+`symfony server:start` (web + API) + `app:agent:run` (agent, using the shell's bundled `speedtest`) runs the whole app on the host. Docker Compose is then only the convenient way to get **Prometheus + Grafana** (`just start`).
 :::
 
 ## Build the database

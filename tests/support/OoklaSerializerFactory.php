@@ -21,21 +21,14 @@ final class OoklaSerializerFactory
         $reflectionExtractor = new ReflectionExtractor();
         $phpDocExtractor = new PhpDocExtractor();
 
-        $propertyInfo = new PropertyInfoExtractor(
-            typeExtractors: [
-                new ConstructorExtractor([$reflectionExtractor]),
-                $phpDocExtractor,
-                $reflectionExtractor,
-            ],
-        );
+        $propertyInfo = new PropertyInfoExtractor(typeExtractors: [
+            new ConstructorExtractor([$reflectionExtractor]),
+            $phpDocExtractor,
+            $reflectionExtractor,
+        ]);
 
-        $normalizer = new ObjectNormalizer(
-            propertyTypeExtractor: $propertyInfo,
-        );
+        $normalizer = new ObjectNormalizer(propertyTypeExtractor: $propertyInfo);
 
-        return new Serializer(
-            [$normalizer, new ArrayDenormalizer()],
-            [new JsonEncoder()],
-        );
+        return new Serializer([$normalizer, new ArrayDenormalizer()], [new JsonEncoder()]);
     }
 }

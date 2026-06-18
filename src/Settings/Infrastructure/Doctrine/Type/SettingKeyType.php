@@ -15,14 +15,14 @@ use function is_string;
 
 final class SettingKeyType extends Type
 {
-    private const string NAME = "setting_key";
+    private const string NAME = 'setting_key';
 
     /**
      * @param array<string, mixed> $column
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return $platform->getStringTypeDeclarationSQL(["length" => 100]);
+        return $platform->getStringTypeDeclarationSQL(['length' => 100]);
     }
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): string
@@ -35,7 +35,7 @@ final class SettingKeyType extends Type
             return $value;
         }
 
-        throw InvalidType::new($value, self::NAME, ["string", SettingKey::class]);
+        throw InvalidType::new($value, self::NAME, ['string', SettingKey::class]);
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): SettingKey

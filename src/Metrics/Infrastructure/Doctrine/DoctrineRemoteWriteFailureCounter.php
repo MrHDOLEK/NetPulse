@@ -22,25 +22,21 @@ final readonly class DoctrineRemoteWriteFailureCounter implements RemoteWriteFai
 
         $this->entityManager
             ->createQuery(
-                "UPDATE " . RemoteWriteFailureCount::class . " c "
-                . "SET c.total = c.total + 1 "
-                . "WHERE c.id = :id",
+                'UPDATE ' . RemoteWriteFailureCount::class . ' c ' . 'SET c.total = c.total + 1 ' . 'WHERE c.id = :id',
             )
-            ->setParameter("id", RemoteWriteFailureCount::SINGLETON_ID)
+            ->setParameter('id', RemoteWriteFailureCount::SINGLETON_ID)
             ->execute();
     }
 
     public function total(): int
     {
         $total = $this->entityManager
-            ->createQuery(
-                "SELECT c.total FROM " . RemoteWriteFailureCount::class . " c WHERE c.id = :id",
-            )
-            ->setParameter("id", RemoteWriteFailureCount::SINGLETON_ID)
+            ->createQuery('SELECT c.total FROM ' . RemoteWriteFailureCount::class . ' c WHERE c.id = :id')
+            ->setParameter('id', RemoteWriteFailureCount::SINGLETON_ID)
             ->getOneOrNullResult();
 
-        if (is_array($total) && isset($total["total"]) && is_int($total["total"])) {
-            return $total["total"];
+        if (is_array($total) && isset($total['total']) && is_int($total['total'])) {
+            return $total['total'];
         }
 
         return 0;
@@ -50,9 +46,8 @@ final readonly class DoctrineRemoteWriteFailureCounter implements RemoteWriteFai
     {
         $connection = $this->entityManager->getConnection();
 
-        $connection->executeStatement(
-            "INSERT OR IGNORE INTO remote_write_failures (id, total) VALUES (:id, 0)",
-            ["id" => RemoteWriteFailureCount::SINGLETON_ID],
-        );
+        $connection->executeStatement('INSERT OR IGNORE INTO remote_write_failures (id, total) VALUES (:id, 0)', [
+            'id' => RemoteWriteFailureCount::SINGLETON_ID,
+        ]);
     }
 }

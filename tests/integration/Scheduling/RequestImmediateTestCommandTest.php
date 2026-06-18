@@ -25,10 +25,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class RequestImmediateTestCommandTest extends KernelTestCase
 {
-    private const string PROBE = "cccccccc-cccc-7ccc-8ccc-cccccccccccc";
-    private const string CONNECTION = "10000000-0000-7000-8000-0000000000c1";
-    private const string CONNECTION_2 = "10000000-0000-7000-8000-0000000000c2";
-    private const string CONNECTION_DISABLED = "10000000-0000-7000-8000-0000000000c3";
+    private const string PROBE = 'cccccccc-cccc-7ccc-8ccc-cccccccccccc';
+    private const string CONNECTION = '10000000-0000-7000-8000-0000000000c1';
+    private const string CONNECTION_2 = '10000000-0000-7000-8000-0000000000c2';
+    private const string CONNECTION_DISABLED = '10000000-0000-7000-8000-0000000000c3';
 
     private MessageBusInterface $commandBus;
     private ConnectionRepository $connections;
@@ -41,21 +41,21 @@ final class RequestImmediateTestCommandTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->commandBus = $container->get("command.bus");
+        $this->commandBus = $container->get('command.bus');
         $this->connections = $container->get(ConnectionRepository::class);
         $this->markers = $container->get(DueNowMarkerRepository::class);
         $this->handler = $container->get(RequestImmediateTestHandler::class);
         $this->dbal = $container->get(DbalConnection::class);
 
-        $this->dbal->executeStatement("DELETE FROM due_now_markers");
-        $this->dbal->executeStatement("DELETE FROM connections");
+        $this->dbal->executeStatement('DELETE FROM due_now_markers');
+        $this->dbal->executeStatement('DELETE FROM connections');
     }
 
     public function testDispatchMarksAnExistingConnectionDueNow(): void
     {
         $this->connections->save($this->connection());
 
-        $this->commandBus->dispatch(new RequestImmediateTestCommand("connection", self::CONNECTION, null));
+        $this->commandBus->dispatch(new RequestImmediateTestCommand('connection', self::CONNECTION, null));
 
         $pulled = $this->markers->pullForProbe(new ProbeId(self::PROBE));
 
@@ -68,20 +68,20 @@ final class RequestImmediateTestCommandTest extends KernelTestCase
     {
         $this->connections->save($this->connection());
 
-        ($this->handler)(new RequestImmediateTestCommand("connection", self::CONNECTION, "12345"));
+        ($this->handler)(new RequestImmediateTestCommand('connection', self::CONNECTION, '12345'));
 
         $pulled = $this->markers->pullForProbe(new ProbeId(self::PROBE));
 
         self::assertCount(1, $pulled);
         self::assertSame(self::CONNECTION, $pulled->toArray()[0]->connectionId->toString());
-        self::assertSame("12345", $pulled->toArray()[0]->forcedServerId);
+        self::assertSame('12345', $pulled->toArray()[0]->forcedServerId);
     }
 
     public function testEmptyStringPinNormalisesToNull(): void
     {
         $this->connections->save($this->connection());
 
-        ($this->handler)(new RequestImmediateTestCommand("connection", self::CONNECTION, ""));
+        ($this->handler)(new RequestImmediateTestCommand('connection', self::CONNECTION, ''));
 
         $pulled = $this->markers->pullForProbe(new ProbeId(self::PROBE));
 
@@ -95,7 +95,7 @@ final class RequestImmediateTestCommandTest extends KernelTestCase
         $this->connections->save($this->connection(self::CONNECTION_2, true));
         $this->connections->save($this->connection(self::CONNECTION_DISABLED, false));
 
-        ($this->handler)(new RequestImmediateTestCommand("all", null, null));
+        ($this->handler)(new RequestImmediateTestCommand('all', null, null));
 
         $pulled = $this->markers->pullForProbe(new ProbeId(self::PROBE));
 
@@ -116,10 +116,14 @@ final class RequestImmediateTestCommandTest extends KernelTestCase
     public function testHandlingUnknownConnectionThrowsAndMarksNothing(): void
     {
         try {
-            ($this->handler)(new RequestImmediateTestCommand("connection", "10000000-0000-7000-8000-0000000000ff", null));
-            self::fail("Expected NotFoundException for an unknown connection.");
+            ($this->handler)(new RequestImmediateTestCommand(
+                'connection',
+                '10000000-0000-7000-8000-0000000000ff',
+                null,
+            ));
+            self::fail('Expected NotFoundException for an unknown connection.');
         } catch (NotFoundException) {
-            self::assertSame([], $this->dbal->fetchFirstColumn("SELECT connection_id FROM due_now_markers"));
+            self::assertSame([], $this->dbal->fetchFirstColumn('SELECT connection_id FROM due_now_markers'));
         }
     }
 
@@ -128,12 +132,12 @@ final class RequestImmediateTestCommandTest extends KernelTestCase
         return new Connection(
             new ConnectionId($id),
             new ProbeId(self::PROBE),
-            "wan",
-            "Orange",
+            'wan',
+            'Orange',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Amber,
             Labels::fromArray([]),
-            ServerPool::fromArray(["frankfurt.example.net:8080"]),
+            ServerPool::fromArray(['frankfurt.example.net:8080']),
             Schedule::even(24, 0),
             $enabled,
             Thresholds::default(),

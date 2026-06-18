@@ -19,7 +19,7 @@ final class ServerMetricsAction extends AbstractController
         private readonly ClockInterface $clock,
     ) {}
 
-    #[Route("/servers", name: "servers", methods: ["GET"])]
+    #[Route('/servers', name: 'servers', methods: ['GET'])]
     public function __invoke(): Response
     {
         $window = HeatmapWindow::Month;
@@ -29,9 +29,9 @@ final class ServerMetricsAction extends AbstractController
 
         $bootstrap = ServerMetricsResponse::from($rows, $window, $nowUnix)->toArray();
 
-        return $this->render("servers/index.html.twig", [
-            "window" => $window->value,
-            "bootstrap" => $bootstrap,
+        return $this->render('servers/index.html.twig', [
+            'window' => $window->value,
+            'bootstrap' => $bootstrap,
         ]);
     }
 }

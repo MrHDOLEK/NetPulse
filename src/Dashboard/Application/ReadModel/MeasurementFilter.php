@@ -21,7 +21,7 @@ final readonly class MeasurementFilter
         public ?bool $scheduled,
     ) {
         if ($since > $until) {
-            throw new InvalidArgumentException("MeasurementFilter window runs backwards: since must be <= until.");
+            throw new InvalidArgumentException('MeasurementFilter window runs backwards: since must be <= until.');
         }
     }
 

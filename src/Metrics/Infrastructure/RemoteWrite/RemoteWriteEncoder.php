@@ -13,7 +13,7 @@ final class RemoteWriteEncoder
 {
     public function encodeWriteRequest(TimeSeriesCollection $series): string
     {
-        $out = "";
+        $out = '';
 
         foreach ($series as $timeSeries) {
             $out .= $this->lengthDelimited(1, $this->encodeTimeSeries($timeSeries));
@@ -24,7 +24,7 @@ final class RemoteWriteEncoder
 
     public function snappy(string $payload): string
     {
-        if (function_exists("snappy_compress")) {
+        if (function_exists('snappy_compress')) {
             $compressed = snappy_compress($payload);
 
             if (is_string($compressed)) {
@@ -37,7 +37,7 @@ final class RemoteWriteEncoder
 
     private function encodeTimeSeries(TimeSeries $series): string
     {
-        $out = "";
+        $out = '';
 
         foreach ($series->labels as $label) {
             $out .= $this->lengthDelimited(1, $this->encodeLabel($label));
@@ -57,7 +57,7 @@ final class RemoteWriteEncoder
 
     private function encodeSample(Sample $sample): string
     {
-        $value = chr((1 << 3) | 1) . pack("e", $sample->value);
+        $value = chr((1 << 3) | 1) . pack('e', $sample->value);
 
         $timestamp = chr((2 << 3) | 0) . $this->varint($sample->timestampMs);
 
@@ -71,11 +71,11 @@ final class RemoteWriteEncoder
 
     private function varint(int $value): string
     {
-        $out = "";
+        $out = '';
         $remaining = $value;
 
         do {
-            $byte = $remaining&0x7F;
+            $byte = $remaining & 0x7F;
             $remaining >>= 7;
 
             if ($remaining !== 0) {
@@ -112,11 +112,11 @@ final class RemoteWriteEncoder
             return chr($n << 2);
         }
 
-        $lengthBytes = "";
+        $lengthBytes = '';
         $value = $n;
 
         do {
-            $lengthBytes .= chr($value&0xFF);
+            $lengthBytes .= chr($value & 0xFF);
             $value >>= 8;
         } while ($value !== 0);
 

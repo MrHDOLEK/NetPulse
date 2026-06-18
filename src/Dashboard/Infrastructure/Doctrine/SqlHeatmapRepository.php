@@ -32,18 +32,19 @@ final readonly class SqlHeatmapRepository implements HeatmapRepository
 
     public function grid(HeatmapQuery $query): HeatmapGrid
     {
-        $now = $this->clock->now()->setTimezone(new DateTimeZone("UTC"));
+        $now = $this->clock->now()->setTimezone(new DateTimeZone('UTC'));
         $since = $now->modify("-{$query->window->windowSeconds()} seconds");
 
-        $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.connectionId = :connectionId")
-            ->andWhere("measurement.completedAt >= :since")
-            ->andWhere("measurement.completedAt < :now")
-            ->orderBy("measurement.completedAt", "ASC")
-            ->setParameter("connectionId", $query->connectionId->toString())
-            ->setParameter("since", $since)
-            ->setParameter("now", $now);
+        $queryBuilder = $this->entityManager
+            ->createQueryBuilder()
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.connectionId = :connectionId')
+            ->andWhere('measurement.completedAt >= :since')
+            ->andWhere('measurement.completedAt < :now')
+            ->orderBy('measurement.completedAt', 'ASC')
+            ->setParameter('connectionId', $query->connectionId->toString())
+            ->setParameter('since', $since)
+            ->setParameter('now', $now);
 
         $this->selectMetric($queryBuilder, $query->metric);
 
@@ -55,13 +56,13 @@ final readonly class SqlHeatmapRepository implements HeatmapRepository
         $samples = [];
 
         foreach ($rows as $row) {
-            $rawValue = $row["value"] ?? null;
-            $rawHealthy = $row["healthy"] ?? null;
+            $rawValue = $row['value'] ?? null;
+            $rawHealthy = $row['healthy'] ?? null;
 
             $samples[] = new HeatmapSample(
-                completedAtUnix: $row["completedAt"]->getTimestamp(),
-                value: $rawValue === null ? null : (float)$rawValue,
-                healthy: $rawHealthy === null ? null : (bool)$rawHealthy,
+                completedAtUnix: $row['completedAt']->getTimestamp(),
+                value: $rawValue === null ? null : (float) $rawValue,
+                healthy: $rawHealthy === null ? null : (bool) $rawHealthy,
             );
         }
 
@@ -74,13 +75,12 @@ final readonly class SqlHeatmapRepository implements HeatmapRepository
 
     private function selectMetric(QueryBuilder $queryBuilder, HeatmapMetric $metric): void
     {
-        $queryBuilder->select("measurement.completedAt AS completedAt");
+        $queryBuilder->select('measurement.completedAt AS completedAt');
 
         match ($metric) {
-            HeatmapMetric::Download => $queryBuilder->addSelect("measurement.downloadBits AS value"),
-
-            HeatmapMetric::Ping => $queryBuilder->addSelect("(measurement.ping / 1000.0) AS value"),
-            HeatmapMetric::Health => $queryBuilder->addSelect("measurement.healthy AS healthy"),
+            HeatmapMetric::Download => $queryBuilder->addSelect('measurement.downloadBits AS value'),
+            HeatmapMetric::Ping => $queryBuilder->addSelect('(measurement.ping / 1000.0) AS value'),
+            HeatmapMetric::Health => $queryBuilder->addSelect('measurement.healthy AS healthy'),
         };
     }
 }

@@ -28,7 +28,7 @@ final class OidcAction extends AbstractController
         private readonly OidcProvider $provider,
     ) {}
 
-    #[Route("/login/oidc/start", name: "oidc_start", methods: ["GET"])]
+    #[Route('/login/oidc/start', name: 'oidc_start', methods: ['GET'])]
     public function start(Request $request): RedirectResponse
     {
         if (!$this->config->isEnabled()) {
@@ -47,14 +47,14 @@ final class OidcAction extends AbstractController
         return new RedirectResponse($this->provider->authorizationUrl($state, $codeVerifier, $nonce));
     }
 
-    #[Route("/login/oidc/callback", name: "oidc_callback", methods: ["GET"])]
+    #[Route('/login/oidc/callback', name: 'oidc_callback', methods: ['GET'])]
     public function callback(): Response
     {
-        throw new LogicException("The OIDC callback must be handled by OidcAuthenticator.");
+        throw new LogicException('The OIDC callback must be handled by OidcAuthenticator.');
     }
 
     private function base64Url(string $bytes): string
     {
-        return rtrim(strtr(base64_encode($bytes), "+/", "-_"), "=");
+        return rtrim(strtr(base64_encode($bytes), '+/', '-_'), '=');
     }
 }

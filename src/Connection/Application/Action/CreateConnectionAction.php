@@ -29,34 +29,36 @@ use ValueError;
 
 use function is_string;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class CreateConnectionAction extends AbstractController
 {
-    private const string CSRF_TOKEN_ID = "connection-create";
+    private const string CSRF_TOKEN_ID = 'connection-create';
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
         private readonly ConnectionInputMapper $inputMapper,
     ) {}
 
-    #[Route("/settings/connections", name: "settings_connections_create", methods: ["POST"])]
+    #[Route('/settings/connections', name: 'settings_connections_create', methods: ['POST'])]
     public function __invoke(Request $request, ConnectionRequest $payload): Response
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         if (!is_string($token) || !$this->isCsrfTokenValid(self::CSRF_TOKEN_ID, $token)) {
-            return $this->errorJson("Invalid CSRF token", Response::HTTP_FORBIDDEN);
+            return $this->errorJson('Invalid CSRF token', Response::HTTP_FORBIDDEN);
         }
 
         try {
             $probeId = new ProbeId($payload->probeId);
         } catch (InvalidId) {
-            return $this->errorJson("Invalid probe id", Response::HTTP_BAD_REQUEST);
+            return $this->errorJson('Invalid probe id', Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $draft = $this->inputMapper->assemble($payload);
-        } catch (ValueError | InvalidArgumentException | InvalidThresholds | InvalidAdaptivePolicy | InvalidSchedule | InvalidExpectedSpeed $exception) {
+        } catch (
+            ValueError|InvalidArgumentException|InvalidThresholds|InvalidAdaptivePolicy|InvalidSchedule|InvalidExpectedSpeed $exception
+        ) {
             return $this->errorJson($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
@@ -79,7 +81,7 @@ final class CreateConnectionAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof NotFoundException) {
-                return $this->errorJson("Probe not found", Response::HTTP_NOT_FOUND);
+                return $this->errorJson('Probe not found', Response::HTTP_NOT_FOUND);
             }
 
             throw $exception;
@@ -88,14 +90,14 @@ final class CreateConnectionAction extends AbstractController
         $result = $envelope->last(HandledStamp::class)?->getResult();
         $id = $result instanceof ConnectionCreated ? $result->connectionId->toString() : null;
 
-        $response = new JsonResponse(["id" => $id], Response::HTTP_CREATED);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response = new JsonResponse(['id' => $id], Response::HTTP_CREATED);
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function errorJson(string $message, int $status): JsonResponse
     {
-        return new JsonResponse(["error" => $message], $status);
+        return new JsonResponse(['error' => $message], $status);
     }
 }

@@ -27,8 +27,8 @@ final readonly class GenerateDigestHandler
         $digests = $this->digests->since($since);
 
         if ($digests->isEmpty()) {
-            $this->logger->info("digest skipped: no data", [
-                "period" => $command->period,
+            $this->logger->info('digest skipped: no data', [
+                'period' => $command->period,
             ]);
 
             return;
@@ -38,9 +38,9 @@ final readonly class GenerateDigestHandler
 
         $this->dispatcher->send($notification);
 
-        $this->logger->info("digest sent", [
-            "period" => $command->period,
-            "connections" => $digests->count(),
+        $this->logger->info('digest sent', [
+            'period' => $command->period,
+            'connections' => $digests->count(),
         ]);
     }
 
@@ -49,8 +49,8 @@ final readonly class GenerateDigestHandler
         $now = $this->clock->now();
 
         return match ($period) {
-            GenerateDigestPeriod::Weekly->value => $now->modify("-7 days"),
-            default => $now->modify("-1 day"),
+            GenerateDigestPeriod::Weekly->value => $now->modify('-7 days'),
+            default => $now->modify('-1 day'),
         };
     }
 }

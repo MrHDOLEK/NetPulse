@@ -39,46 +39,47 @@ final readonly class SqlDigestRepository implements DigestRepository
          *     failuresCount: numeric-string|int
          * }> $rows
          */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "probe.name AS probeName",
-                "connection.name AS connectionName",
-                "AVG(measurement.downloadBits) AS avgDownloadBits",
-                "AVG(measurement.uploadBits) AS avgUploadBits",
-                "AVG(measurement.ping) AS avgPingMs",
-                "AVG(measurement.packetLossRatio) AS avgPacketLossRatio",
-                "SUM(CASE WHEN measurement.healthy = :healthy THEN 1 ELSE 0 END) AS healthyCount",
-                "COUNT(measurement.id) AS testsCount",
-                "SUM(CASE WHEN measurement.status = :failed THEN 1 ELSE 0 END) AS failuresCount",
+                'probe.name AS probeName',
+                'connection.name AS connectionName',
+                'AVG(measurement.downloadBits) AS avgDownloadBits',
+                'AVG(measurement.uploadBits) AS avgUploadBits',
+                'AVG(measurement.ping) AS avgPingMs',
+                'AVG(measurement.packetLossRatio) AS avgPacketLossRatio',
+                'SUM(CASE WHEN measurement.healthy = :healthy THEN 1 ELSE 0 END) AS healthyCount',
+                'COUNT(measurement.id) AS testsCount',
+                'SUM(CASE WHEN measurement.status = :failed THEN 1 ELSE 0 END) AS failuresCount',
             )
-            ->from(Measurement::class, "measurement")
-            ->join(Connection::class, "connection", Join::WITH, "connection.id = measurement.connectionId")
-            ->join(Probe::class, "probe", Join::WITH, "probe.id = measurement.probeId")
-            ->where("measurement.completedAt >= :since")
-            ->groupBy("measurement.connectionId")
-            ->orderBy("connection.name", "ASC")
-            ->setParameter("since", $since, Types::DATETIME_IMMUTABLE)
-            ->setParameter("healthy", true, Types::BOOLEAN)
-            ->setParameter("failed", MeasurementStatus::Failed->value)
+            ->from(Measurement::class, 'measurement')
+            ->join(Connection::class, 'connection', Join::WITH, 'connection.id = measurement.connectionId')
+            ->join(Probe::class, 'probe', Join::WITH, 'probe.id = measurement.probeId')
+            ->where('measurement.completedAt >= :since')
+            ->groupBy('measurement.connectionId')
+            ->orderBy('connection.name', 'ASC')
+            ->setParameter('since', $since, Types::DATETIME_IMMUTABLE)
+            ->setParameter('healthy', true, Types::BOOLEAN)
+            ->setParameter('failed', MeasurementStatus::Failed->value)
             ->getQuery()
             ->getResult();
 
         $digests = [];
 
         foreach ($rows as $row) {
-            $testsCount = (int)$row["testsCount"];
-            $healthyCount = (int)$row["healthyCount"];
+            $testsCount = (int) $row['testsCount'];
+            $healthyCount = (int) $row['healthyCount'];
 
             $digests[] = new ConnectionDigest(
-                probeName: $row["probeName"],
-                connectionName: $row["connectionName"],
-                avgDownloadBits: (int)round((float)($row["avgDownloadBits"] ?? 0)),
-                avgUploadBits: (int)round((float)($row["avgUploadBits"] ?? 0)),
-                avgPingMs: (float)($row["avgPingMs"] ?? 0),
-                avgPacketLossRatio: (float)($row["avgPacketLossRatio"] ?? 0),
+                probeName: $row['probeName'],
+                connectionName: $row['connectionName'],
+                avgDownloadBits: (int) round((float) ($row['avgDownloadBits'] ?? 0)),
+                avgUploadBits: (int) round((float) ($row['avgUploadBits'] ?? 0)),
+                avgPingMs: (float) ($row['avgPingMs'] ?? 0),
+                avgPacketLossRatio: (float) ($row['avgPacketLossRatio'] ?? 0),
                 healthyRatio: $testsCount === 0 ? 0.0 : $healthyCount / $testsCount,
                 testsCount: $testsCount,
-                failuresCount: (int)$row["failuresCount"],
+                failuresCount: (int) $row['failuresCount'],
             );
         }
 

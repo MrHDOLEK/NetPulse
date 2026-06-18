@@ -13,7 +13,7 @@ use App\Shared\Application\Service\IdGeneratorInterface;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final class CreateProbeHandler
 {
     public function __construct(

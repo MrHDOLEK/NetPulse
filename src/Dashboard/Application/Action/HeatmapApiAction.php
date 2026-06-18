@@ -24,24 +24,24 @@ final class HeatmapApiAction extends AbstractController
         private readonly HeatmapRepository $heatmap,
     ) {}
 
-    #[Route("/dashboard/heatmap", name: "dashboard_heatmap", methods: ["GET"])]
+    #[Route('/dashboard/heatmap', name: 'dashboard_heatmap', methods: ['GET'])]
     public function heatmap(Request $request): Response
     {
-        $metric = HeatmapMetric::tryFrom((string)$request->query->get("metric", ""));
-        $window = HeatmapWindow::tryFrom((string)$request->query->get("window", ""));
+        $metric = HeatmapMetric::tryFrom($request->query->get('metric', ''));
+        $window = HeatmapWindow::tryFrom($request->query->get('window', ''));
 
         if ($metric === null) {
-            return $this->badRequest("Unknown or missing metric");
+            return $this->badRequest('Unknown or missing metric');
         }
 
         if ($window === null) {
-            return $this->badRequest("Unknown or missing window");
+            return $this->badRequest('Unknown or missing window');
         }
 
         try {
-            $connectionId = new ConnectionId((string)$request->query->get("connection", ""));
+            $connectionId = new ConnectionId($request->query->get('connection', ''));
         } catch (InvalidId) {
-            return $this->badRequest("Missing or invalid connection id");
+            return $this->badRequest('Missing or invalid connection id');
         }
 
         $query = new HeatmapQuery($metric, $window, $connectionId);
@@ -57,13 +57,13 @@ final class HeatmapApiAction extends AbstractController
     private function noCacheJson(array $payload): JsonResponse
     {
         $response = new JsonResponse($payload, Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function badRequest(string $message): JsonResponse
     {
-        return new JsonResponse(["error" => $message], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => $message], Response::HTTP_BAD_REQUEST);
     }
 }

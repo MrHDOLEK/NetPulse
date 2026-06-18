@@ -6,6 +6,4 @@ namespace App\Dashboard\Application\Action;
 
 use RuntimeException;
 
-final class BadFilterRequest extends RuntimeException
-{
-}
+final class BadFilterRequest extends RuntimeException {}

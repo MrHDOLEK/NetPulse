@@ -48,10 +48,10 @@ final class DoctrineConnectionRepository implements ConnectionRepository
     {
         $connection = $this->entityManager
             ->createQueryBuilder()
-            ->select("connection")
-            ->from(Connection::class, "connection")
-            ->where("connection.id = :id")
-            ->setParameter("id", $connectionId, "connection_id")
+            ->select('connection')
+            ->from(Connection::class, 'connection')
+            ->where('connection.id = :id')
+            ->setParameter('id', $connectionId, 'connection_id')
             ->getQuery()
             ->getOneOrNullResult();
 
@@ -60,7 +60,7 @@ final class DoctrineConnectionRepository implements ConnectionRepository
         }
 
         if (!$connection instanceof Connection) {
-            throw new LogicException("Expected query to return a Connection instance.");
+            throw new LogicException('Expected query to return a Connection instance.');
         }
 
         return $connection;
@@ -71,10 +71,10 @@ final class DoctrineConnectionRepository implements ConnectionRepository
         /** @var list<Connection> $connections */
         $connections = $this->entityManager
             ->createQueryBuilder()
-            ->select("connection")
-            ->from(Connection::class, "connection")
-            ->where("connection.probeId = :probeId")
-            ->setParameter("probeId", $probeId, "probe_id")
+            ->select('connection')
+            ->from(Connection::class, 'connection')
+            ->where('connection.probeId = :probeId')
+            ->setParameter('probeId', $probeId, 'probe_id')
             ->getQuery()
             ->getResult();
 
@@ -86,10 +86,10 @@ final class DoctrineConnectionRepository implements ConnectionRepository
         /** @var list<Connection> $connections */
         $connections = $this->entityManager
             ->createQueryBuilder()
-            ->select("connection")
-            ->from(Connection::class, "connection")
-            ->where("connection.enabled = :enabled")
-            ->setParameter("enabled", true)
+            ->select('connection')
+            ->from(Connection::class, 'connection')
+            ->where('connection.enabled = :enabled')
+            ->setParameter('enabled', true)
             ->getQuery()
             ->getResult();
 
@@ -101,9 +101,9 @@ final class DoctrineConnectionRepository implements ConnectionRepository
         /** @var list<Connection> $connections */
         $connections = $this->entityManager
             ->createQueryBuilder()
-            ->select("connection")
-            ->from(Connection::class, "connection")
-            ->orderBy("connection.name", "ASC")
+            ->select('connection')
+            ->from(Connection::class, 'connection')
+            ->orderBy('connection.name', 'ASC')
             ->getQuery()
             ->getResult();
 

@@ -14,10 +14,10 @@ use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class RequestImmediateTestHandler
 {
-    private const string SCOPE_ALL = "all";
+    private const string SCOPE_ALL = 'all';
 
     public function __construct(
         private ConnectionRepository $connections,
@@ -37,11 +37,9 @@ final readonly class RequestImmediateTestHandler
             return;
         }
 
-        $pin = ($command->forcedServerId === null || $command->forcedServerId === "")
-            ? null
-            : $command->forcedServerId;
+        $pin = $command->forcedServerId === null || $command->forcedServerId === '' ? null : $command->forcedServerId;
 
-        $connectionId = new ConnectionId((string)$command->connectionId);
+        $connectionId = new ConnectionId((string) $command->connectionId);
 
         $this->connections->get($connectionId);
 
@@ -49,9 +47,9 @@ final readonly class RequestImmediateTestHandler
 
         $this->runStates->upsert($connectionId, RunPhase::Queued, $now);
 
-        $this->logger->info("immediate test requested", [
-            "connection" => $connectionId->toString(),
-            "forcedServerId" => $pin,
+        $this->logger->info('immediate test requested', [
+            'connection' => $connectionId->toString(),
+            'forcedServerId' => $pin,
         ]);
     }
 
@@ -66,8 +64,8 @@ final readonly class RequestImmediateTestHandler
             ++$count;
         }
 
-        $this->logger->info("immediate test requested for all enabled connections", [
-            "count" => $count,
+        $this->logger->info('immediate test requested for all enabled connections', [
+            'count' => $count,
         ]);
     }
 }

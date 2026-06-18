@@ -24,13 +24,13 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
 final class TotpLoginTest extends KernelTestCase
 {
-    private const string LOGIN_CSRF_ID = "authenticate";
-    private const string LOGIN_CSRF_RAW = "phpunit-login-token";
-    private const string TWOFA_CSRF_ID = "two_factor";
-    private const string TWOFA_CSRF_RAW = "phpunit-2fa-token";
-    private const string EMAIL = "admin@example.com";
-    private const string PASSWORD = "correct-horse-battery";    
-    private const string SECRET = "JBSWY3DPEHPK3PXP";
+    private const string LOGIN_CSRF_ID = 'authenticate';
+    private const string LOGIN_CSRF_RAW = 'phpunit-login-token';
+    private const string TWOFA_CSRF_ID = 'two_factor';
+    private const string TWOFA_CSRF_RAW = 'phpunit-2fa-token';
+    private const string EMAIL = 'admin@example.com';
+    private const string PASSWORD = 'correct-horse-battery';
+    private const string SECRET = 'JBSWY3DPEHPK3PXP';
 
     private DbalConnection $db;
     private MessageBusInterface $commandBus;
@@ -43,12 +43,12 @@ final class TotpLoginTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->db = $container->get("doctrine.dbal.default_connection");
+        $this->db = $container->get('doctrine.dbal.default_connection');
         $this->commandBus = $container->get(MessageBusInterface::class);
         $this->em = $container->get(EntityManagerInterface::class);
         $this->hasherFactory = $container->get(PasswordHasherFactoryInterface::class);
 
-        $users = $container->get("test." . UserRepository::class);
+        $users = $container->get('test.' . UserRepository::class);
         self::assertInstanceOf(UserRepository::class, $users);
         $this->users = $users;
     }
@@ -62,9 +62,9 @@ final class TotpLoginTest extends KernelTestCase
 
         self::assertSame(Response::HTTP_FOUND, $loginResponse->getStatusCode());
 
-        $dashboard = $this->request($session, "/", "GET");
+        $dashboard = $this->request($session, '/', 'GET');
         self::assertSame(Response::HTTP_FOUND, $dashboard->getStatusCode());
-        self::assertStringContainsString("/2fa", (string)$dashboard->headers->get("Location"));
+        self::assertStringContainsString('/2fa', (string) $dashboard->headers->get('Location'));
     }
 
     public function testValidTotpCodeCompletesAuthentication(): void
@@ -76,13 +76,13 @@ final class TotpLoginTest extends KernelTestCase
         $check = $this->submitAuthCode($session, TOTP::createFromSecret(self::SECRET)->now());
         self::assertSame(Response::HTTP_FOUND, $check->getStatusCode());
 
-        $dashboard = $this->request($session, "/", "GET");
+        $dashboard = $this->request($session, '/', 'GET');
         self::assertSame(Response::HTTP_OK, $dashboard->getStatusCode());
     }
 
     public function testRecoveryCodeAuthenticatesAndIsSingleUse(): void
     {
-        $recoveryCode = "abc12-def34";
+        $recoveryCode = 'abc12-def34';
         $this->seedAdminWithTotp([$recoveryCode]);
 
         $session = $this->newSession();
@@ -91,14 +91,14 @@ final class TotpLoginTest extends KernelTestCase
         $check = $this->submitAuthCode($session, $recoveryCode);
         self::assertSame(Response::HTTP_FOUND, $check->getStatusCode());
 
-        $dashboard = $this->request($session, "/", "GET");
+        $dashboard = $this->request($session, '/', 'GET');
         self::assertSame(Response::HTTP_OK, $dashboard->getStatusCode());
 
         $user = $this->reloadUser();
         $hasher = $this->hasherFactory->getPasswordHasher(PasswordAuthenticatedUserInterface::class);
 
         foreach ($user->recoveryCodes() as $hash) {
-            self::assertFalse($hasher->verify($hash, $recoveryCode), "recovery code was not consumed");
+            self::assertFalse($hasher->verify($hash, $recoveryCode), 'recovery code was not consumed');
         }
 
         $session2 = $this->newSession();
@@ -106,9 +106,9 @@ final class TotpLoginTest extends KernelTestCase
         $reuse = $this->submitAuthCode($session2, $recoveryCode);
         self::assertSame(Response::HTTP_FOUND, $reuse->getStatusCode());
 
-        $dashboard2 = $this->request($session2, "/", "GET");
+        $dashboard2 = $this->request($session2, '/', 'GET');
         self::assertSame(Response::HTTP_FOUND, $dashboard2->getStatusCode());
-        self::assertStringContainsString("/2fa", (string)$dashboard2->headers->get("Location"));
+        self::assertStringContainsString('/2fa', (string) $dashboard2->headers->get('Location'));
     }
 
     public function testWrongCodeKeepsUserHalfAuthenticated(): void
@@ -117,11 +117,11 @@ final class TotpLoginTest extends KernelTestCase
         $session = $this->newSession();
         $this->login($session);
 
-        $this->submitAuthCode($session, "000000");
+        $this->submitAuthCode($session, '000000');
 
-        $dashboard = $this->request($session, "/", "GET");
+        $dashboard = $this->request($session, '/', 'GET');
         self::assertSame(Response::HTTP_FOUND, $dashboard->getStatusCode());
-        self::assertStringContainsString("/2fa", (string)$dashboard->headers->get("Location"));
+        self::assertStringContainsString('/2fa', (string) $dashboard->headers->get('Location'));
     }
 
     public function testUserWithoutTotpLogsInWithSinglePasswordFactor(): void
@@ -132,9 +132,9 @@ final class TotpLoginTest extends KernelTestCase
         $loginResponse = $this->login($session);
 
         self::assertSame(Response::HTTP_FOUND, $loginResponse->getStatusCode());
-        self::assertStringNotContainsString("/2fa", (string)$loginResponse->headers->get("Location"));
+        self::assertStringNotContainsString('/2fa', (string) $loginResponse->headers->get('Location'));
 
-        $dashboard = $this->request($session, "/", "GET");
+        $dashboard = $this->request($session, '/', 'GET');
         self::assertSame(Response::HTTP_OK, $dashboard->getStatusCode());
     }
 
@@ -142,7 +142,7 @@ final class TotpLoginTest extends KernelTestCase
     {
         $this->seedAdminWithTotp([]);
 
-        $stored = $this->db->fetchOne("SELECT totp_secret FROM users WHERE email = ?", [self::EMAIL]);
+        $stored = $this->db->fetchOne('SELECT totp_secret FROM users WHERE email = ?', [self::EMAIL]);
         self::assertIsString($stored);
         self::assertNotSame(self::SECRET, $stored);
         self::assertStringNotContainsString(self::SECRET, $stored);
@@ -185,28 +185,22 @@ final class TotpLoginTest extends KernelTestCase
 
     private function login(Session $session): Response
     {
-        $session->set(
-            SessionTokenStorage::SESSION_NAMESPACE . "/" . self::LOGIN_CSRF_ID,
-            self::LOGIN_CSRF_RAW,
-        );
+        $session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . self::LOGIN_CSRF_ID, self::LOGIN_CSRF_RAW);
 
-        return $this->request($session, "/login", "POST", [
-            "_username" => self::EMAIL,
-            "_password" => self::PASSWORD,
-            "_csrf_token" => self::LOGIN_CSRF_RAW,
+        return $this->request($session, '/login', 'POST', [
+            '_username' => self::EMAIL,
+            '_password' => self::PASSWORD,
+            '_csrf_token' => self::LOGIN_CSRF_RAW,
         ]);
     }
 
     private function submitAuthCode(Session $session, string $code): Response
     {
-        $session->set(
-            SessionTokenStorage::SESSION_NAMESPACE . "/" . self::TWOFA_CSRF_ID,
-            self::TWOFA_CSRF_RAW,
-        );
+        $session->set(SessionTokenStorage::SESSION_NAMESPACE . '/' . self::TWOFA_CSRF_ID, self::TWOFA_CSRF_RAW);
 
-        return $this->request($session, "/2fa_check", "POST", [
-            "_auth_code" => $code,
-            "_csrf_token" => self::TWOFA_CSRF_RAW,
+        return $this->request($session, '/2fa_check', 'POST', [
+            '_auth_code' => $code,
+            '_csrf_token' => self::TWOFA_CSRF_RAW,
         ]);
     }
 
@@ -219,6 +213,6 @@ final class TotpLoginTest extends KernelTestCase
         $request->setSession($session);
         $request->cookies->set($session->getName(), $session->getId());
 
-        return self::getContainer()->get("kernel")->handle($request);
+        return self::getContainer()->get('kernel')->handle($request);
     }
 }

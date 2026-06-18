@@ -15,10 +15,10 @@ final class LabelsTest extends TestCase
      */
     public static function provideGetCases(): iterable
     {
-        yield "present key" => [["site" => "home"], "site", "home"];
-        yield "missing key" => [["site" => "home"], "link", null];
-        yield "empty map" => [[], "site", null];
-        yield "empty string value" => [["site" => ""], "site", ""];
+        yield 'present key' => [['site' => 'home'], 'site', 'home'];
+        yield 'missing key' => [['site' => 'home'], 'link', null];
+        yield 'empty map' => [[], 'site', null];
+        yield 'empty string value' => [['site' => ''], 'site', ''];
     }
 
     /**
@@ -26,10 +26,10 @@ final class LabelsTest extends TestCase
      */
     public static function provideHasCases(): iterable
     {
-        yield "present key" => [["site" => "home"], "site", true];
-        yield "missing key" => [["site" => "home"], "link", false];
-        yield "empty string value still present" => [["site" => ""], "site", true];
-        yield "empty map" => [[], "site", false];
+        yield 'present key' => [['site' => 'home'], 'site', true];
+        yield 'missing key' => [['site' => 'home'], 'link', false];
+        yield 'empty string value still present' => [['site' => ''], 'site', true];
+        yield 'empty map' => [[], 'site', false];
     }
 
     public function testEmptyHasNoEntries(): void
@@ -38,22 +38,22 @@ final class LabelsTest extends TestCase
 
         self::assertTrue($labels->isEmpty());
         self::assertSame([], $labels->all());
-        self::assertNull($labels->get("site"));
-        self::assertFalse($labels->has("site"));
+        self::assertNull($labels->get('site'));
+        self::assertFalse($labels->has('site'));
     }
 
     public function testFromArrayPreservesKeysAndValues(): void
     {
-        $labels = Labels::fromArray(["site" => "home", "link" => "wan1"]);
+        $labels = Labels::fromArray(['site' => 'home', 'link' => 'wan1']);
 
         self::assertFalse($labels->isEmpty());
-        self::assertSame(["site" => "home", "link" => "wan1"], $labels->all());
+        self::assertSame(['site' => 'home', 'link' => 'wan1'], $labels->all());
     }
 
     /**
      * @param array<string, string> $input
      */
-    #[DataProvider("provideGetCases")]
+    #[DataProvider('provideGetCases')]
     public function testGetReturnsValueOrNull(array $input, string $key, ?string $expected): void
     {
         self::assertSame($expected, Labels::fromArray($input)->get($key));
@@ -62,7 +62,7 @@ final class LabelsTest extends TestCase
     /**
      * @param array<string, string> $input
      */
-    #[DataProvider("provideHasCases")]
+    #[DataProvider('provideHasCases')]
     public function testHasReportsPresence(array $input, string $key, bool $expected): void
     {
         self::assertSame($expected, Labels::fromArray($input)->has($key));

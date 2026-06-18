@@ -9,7 +9,7 @@ use App\Probe\Domain\ProbeTokenHasher;
 use App\Probe\Domain\ValueObject\ProbeToken;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(bus: "command.bus")]
+#[AsMessageHandler(bus: 'command.bus')]
 final readonly class RotateProbeTokenHandler
 {
     public function __construct(

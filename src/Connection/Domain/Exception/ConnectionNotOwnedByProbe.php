@@ -6,6 +6,4 @@ namespace App\Connection\Domain\Exception;
 
 use App\Shared\Domain\DomainException;
 
-final class ConnectionNotOwnedByProbe extends DomainException
-{
-}
+final class ConnectionNotOwnedByProbe extends DomainException {}

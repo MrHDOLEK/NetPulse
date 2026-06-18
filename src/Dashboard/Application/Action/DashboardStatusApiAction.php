@@ -24,38 +24,35 @@ final class DashboardStatusApiAction extends AbstractController
         private readonly ProbeLivenessRepository $probeLiveness,
     ) {}
 
-    #[Route("/dashboard/run-status", name: "dashboard_run_status", methods: ["GET"])]
+    #[Route('/dashboard/run-status', name: 'dashboard_run_status', methods: ['GET'])]
     public function runStatus(Request $request): Response
     {
         try {
-            $connectionId = new ConnectionId((string)$request->query->get("connectionId", ""));
+            $connectionId = new ConnectionId($request->query->get('connectionId', ''));
         } catch (InvalidId) {
-            return $this->badRequest("Missing or invalid connection id");
+            return $this->badRequest('Missing or invalid connection id');
         }
 
         $status = $this->runStatus->forConnection($connectionId);
 
         return $this->noCacheJson([
-            "state" => $status->state,
-            "startedAtUnix" => $status->startedAtUnix,
+            'state' => $status->state,
+            'startedAtUnix' => $status->startedAtUnix,
         ]);
     }
 
-    #[Route("/dashboard/probes-liveness", name: "dashboard_probes_liveness", methods: ["GET"])]
+    #[Route('/dashboard/probes-liveness', name: 'dashboard_probes_liveness', methods: ['GET'])]
     public function probesLiveness(): Response
     {
-        $probes = array_map(
-            static fn(ProbeLiveness $probe): array => [
-                "probeId" => $probe->probeId,
-                "name" => $probe->name,
-                "isOnline" => $probe->isOnline,
-                "lastPollAtUnix" => $probe->lastPollAtUnix,
-                "minutesSincePoll" => $probe->minutesSincePoll,
-            ],
-            $this->probeLiveness->all(),
-        );
+        $probes = array_map(static fn(ProbeLiveness $probe): array => [
+            'probeId' => $probe->probeId,
+            'name' => $probe->name,
+            'isOnline' => $probe->isOnline,
+            'lastPollAtUnix' => $probe->lastPollAtUnix,
+            'minutesSincePoll' => $probe->minutesSincePoll,
+        ], $this->probeLiveness->all());
 
-        return $this->noCacheJson(["probes" => $probes]);
+        return $this->noCacheJson(['probes' => $probes]);
     }
 
     /**
@@ -64,13 +61,13 @@ final class DashboardStatusApiAction extends AbstractController
     private function noCacheJson(array $payload): JsonResponse
     {
         $response = new JsonResponse($payload, Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function badRequest(string $message): JsonResponse
     {
-        return new JsonResponse(["error" => $message], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => $message], Response::HTTP_BAD_REQUEST);
     }
 }

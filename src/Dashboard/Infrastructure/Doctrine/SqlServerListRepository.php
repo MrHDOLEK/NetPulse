@@ -21,17 +21,18 @@ final readonly class SqlServerListRepository implements ServerListRepository
     public function all(): ServerListItemCollection
     {
         /** @var list<array{serverId: string, name: string|null, location: string|null}> $rows */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.serverId AS serverId",
-                "MAX(measurement.serverName) AS name",
-                "MAX(measurement.serverLocation) AS location",
+                'measurement.serverId AS serverId',
+                'MAX(measurement.serverName) AS name',
+                'MAX(measurement.serverLocation) AS location',
             )
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.serverId <> :empty")
-            ->setParameter("empty", "")
-            ->groupBy("measurement.serverId")
-            ->orderBy("name", "ASC")
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.serverId <> :empty')
+            ->setParameter('empty', '')
+            ->groupBy('measurement.serverId')
+            ->orderBy('name', 'ASC')
             ->getQuery()
             ->getResult();
 
@@ -39,9 +40,9 @@ final readonly class SqlServerListRepository implements ServerListRepository
 
         foreach ($rows as $row) {
             $items[] = new ServerListItem(
-                serverId: $row["serverId"],
-                name: $row["name"] ?? "",
-                location: $row["location"] ?? "",
+                serverId: $row['serverId'],
+                name: $row['name'] ?? '',
+                location: $row['location'] ?? '',
             );
         }
 

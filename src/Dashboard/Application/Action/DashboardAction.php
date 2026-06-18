@@ -25,7 +25,7 @@ final class DashboardAction extends AbstractController
         private readonly RecentHealthRepository $recentHealth,
     ) {}
 
-    #[Route("/", name: "dashboard", methods: ["GET"])]
+    #[Route('/', name: 'dashboard', methods: ['GET'])]
     public function __invoke(): Response
     {
         $range = SeriesRange::Week;
@@ -42,13 +42,13 @@ final class DashboardAction extends AbstractController
             $bootstrap = DashboardBootstrap::fromSpeedSeries($default->connectionId, $range, $series);
         }
 
-        return $this->render("dashboard/index.html.twig", [
-            "overview" => $overview,
-            "range" => $range,
-            "default" => $default,
-            "series" => $series,
-            "recent" => $recent,
-            "bootstrap" => $bootstrap?->toArray(),
+        return $this->render('dashboard/index.html.twig', [
+            'overview' => $overview,
+            'range' => $range,
+            'default' => $default,
+            'series' => $series,
+            'recent' => $recent,
+            'bootstrap' => $bootstrap?->toArray(),
         ]);
     }
 

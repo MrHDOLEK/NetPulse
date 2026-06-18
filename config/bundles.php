@@ -2,32 +2,17 @@
 
 declare(strict_types=1);
 
-use DAMA\DoctrineTestBundle\DAMADoctrineTestBundle;
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
-use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
-use Nelmio\ApiDocBundle\NelmioApiDocBundle;
-use Scheb\TwoFactorBundle\SchebTwoFactorBundle;
-use Symfony\Bundle\DebugBundle\DebugBundle;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\MonologBundle\MonologBundle;
-use Symfony\Bundle\SecurityBundle\SecurityBundle;
-use Symfony\Bundle\TwigBundle\TwigBundle;
-use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
-use Symfonycasts\TailwindBundle\SymfonycastsTailwindBundle;
-
 return [
-    FrameworkBundle::class => ["all" => true],
-    DebugBundle::class => ["dev" => true],
-    TwigBundle::class => ["all" => true],
-    WebProfilerBundle::class => ["dev" => true, "test" => true],
-    DoctrineBundle::class => ["all" => true],
-    DoctrineMigrationsBundle::class => ["all" => true],
-    FriendsOfBehatSymfonyExtensionBundle::class => ["test" => true],
-    DAMADoctrineTestBundle::class => ["test" => true],
-    NelmioApiDocBundle::class => ["all" => true],
-    MonologBundle::class => ["all" => true],
-    SecurityBundle::class => ["all" => true],
-    SymfonycastsTailwindBundle::class => ["all" => true],
-    SchebTwoFactorBundle::class => ["all" => true],
+    Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
+    Symfony\Bundle\DebugBundle\DebugBundle::class => ['dev' => true],
+    Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
+    Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
+    Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
+    Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
+    DAMA\DoctrineTestBundle\DAMADoctrineTestBundle::class => ['test' => true],
+    Nelmio\ApiDocBundle\NelmioApiDocBundle::class => ['all' => true],
+    Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
+    Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    Symfonycasts\TailwindBundle\SymfonycastsTailwindBundle::class => ['all' => true],
+    Scheb\TwoFactorBundle\SchebTwoFactorBundle::class => ['all' => true],
 ];

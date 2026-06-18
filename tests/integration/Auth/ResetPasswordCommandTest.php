@@ -19,8 +19,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 final class ResetPasswordCommandTest extends KernelTestCase
 {
-    private const string EMAIL = "admin@netpulse.test";
-    private const string ORIGINAL_PASSWORD = "originalsecret123";
+    private const string EMAIL = 'admin@netpulse.test';
+    private const string ORIGINAL_PASSWORD = 'originalsecret123';
 
     private CommandTester $tester;
     private UserRepository $users;
@@ -30,11 +30,11 @@ final class ResetPasswordCommandTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $users = $container->get("test." . UserRepository::class);
+        $users = $container->get('test.' . UserRepository::class);
         self::assertInstanceOf(UserRepository::class, $users);
         $this->users = $users;
 
-        $command = (new Application(self::$kernel))->find("app:user:reset-password");
+        $command = new Application(self::$kernel)->find('app:user:reset-password');
         $this->tester = new CommandTester($command);
     }
 
@@ -43,8 +43,8 @@ final class ResetPasswordCommandTest extends KernelTestCase
         $this->seedUser();
 
         $exitCode = $this->tester->execute([
-            "--email" => self::EMAIL,
-            "--password" => "brandnewsecret123",
+            '--email' => self::EMAIL,
+            '--password' => 'brandnewsecret123',
         ]);
 
         self::assertSame(Command::SUCCESS, $exitCode);
@@ -53,23 +53,23 @@ final class ResetPasswordCommandTest extends KernelTestCase
         self::assertInstanceOf(User::class, $user);
 
         $hasher = $this->hasher();
-        self::assertTrue($hasher->verify($user->password()->value(), "brandnewsecret123"));
+        self::assertTrue($hasher->verify($user->password()->value(), 'brandnewsecret123'));
         self::assertFalse($hasher->verify($user->password()->value(), self::ORIGINAL_PASSWORD));
     }
 
     public function testUnknownEmailFailsWithFriendlyMessage(): void
     {
         $exitCode = $this->tester->execute([
-            "--email" => "ghost@netpulse.test",
-            "--password" => "brandnewsecret123",
+            '--email' => 'ghost@netpulse.test',
+            '--password' => 'brandnewsecret123',
         ]);
 
         self::assertNotSame(Command::SUCCESS, $exitCode);
 
         $display = $this->tester->getDisplay();
-        self::assertStringContainsStringIgnoringCase("not found", $display);
-        self::assertStringNotContainsString("Stack trace", $display);
-        self::assertStringNotContainsString("HandlerFailedException", $display);
+        self::assertStringContainsStringIgnoringCase('not found', $display);
+        self::assertStringNotContainsString('Stack trace', $display);
+        self::assertStringNotContainsString('HandlerFailedException', $display);
     }
 
     public function testWeakPasswordFailsWithFriendlyMessage(): void
@@ -77,12 +77,12 @@ final class ResetPasswordCommandTest extends KernelTestCase
         $this->seedUser();
 
         $exitCode = $this->tester->execute([
-            "--email" => self::EMAIL,
-            "--password" => "short",
+            '--email' => self::EMAIL,
+            '--password' => 'short',
         ]);
 
         self::assertNotSame(Command::SUCCESS, $exitCode);
-        self::assertStringContainsString("at least 12 characters", $this->tester->getDisplay());
+        self::assertStringContainsString('at least 12 characters', $this->tester->getDisplay());
     }
 
     private function seedUser(): void

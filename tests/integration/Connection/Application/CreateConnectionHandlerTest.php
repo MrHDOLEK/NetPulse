@@ -27,7 +27,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class CreateConnectionHandlerTest extends KernelTestCase
 {
-    private const string PROBE = "cccccccc-cccc-7ccc-8ccc-cccccccccccc";
+    private const string PROBE = 'cccccccc-cccc-7ccc-8ccc-cccccccccccc';
 
     private MessageBusInterface $commandBus;
     private ConnectionRepository $connections;
@@ -40,14 +40,14 @@ final class CreateConnectionHandlerTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
 
-        $this->commandBus = $container->get("command.bus");
+        $this->commandBus = $container->get('command.bus');
         $this->connections = $container->get(ConnectionRepository::class);
         $this->probes = $container->get(ProbeRepository::class);
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->dbal = $container->get(DbalConnection::class);
 
-        $this->dbal->executeStatement("DELETE FROM connections");
-        $this->dbal->executeStatement("DELETE FROM probes");
+        $this->dbal->executeStatement('DELETE FROM connections');
+        $this->dbal->executeStatement('DELETE FROM probes');
     }
 
     public function testCreatesAConnectionForAnExistingProbe(): void
@@ -63,8 +63,8 @@ final class CreateConnectionHandlerTest extends KernelTestCase
         $this->assertCount(1, $stored);
 
         $connection = $stored->toArray()[0];
-        $this->assertSame("Home WAN1", $connection->name());
-        $this->assertSame("Orange", $connection->isp());
+        $this->assertSame('Home WAN1', $connection->name());
+        $this->assertSame('Orange', $connection->isp());
         $this->assertSame(ConnectionColor::Violet, $connection->color());
         $this->assertTrue($connection->isEnabled());
     }
@@ -73,7 +73,7 @@ final class CreateConnectionHandlerTest extends KernelTestCase
     {
         try {
             $this->commandBus->dispatch($this->command());
-            self::fail("Expected the missing probe to abort creation.");
+            self::fail('Expected the missing probe to abort creation.');
         } catch (HandlerFailedException $exception) {
             $cause = $exception->getPrevious();
             self::assertInstanceOf(ProbeNotFound::class, $cause);
@@ -88,12 +88,12 @@ final class CreateConnectionHandlerTest extends KernelTestCase
     {
         return new CreateConnectionCommand(
             new ProbeId(self::PROBE),
-            "Home WAN1",
-            "Orange",
+            'Home WAN1',
+            'Orange',
             new ExpectedSpeed(300_000_000, 50_000_000),
             ConnectionColor::Violet,
-            Labels::fromArray(["site" => "home"]),
-            ServerPool::fromArray(["frankfurt.example.net:8080"]),
+            Labels::fromArray(['site' => 'home']),
+            ServerPool::fromArray(['frankfurt.example.net:8080']),
             Schedule::even(24, 120),
             Thresholds::default(),
             AdaptivePolicy::default(),
@@ -102,13 +102,15 @@ final class CreateConnectionHandlerTest extends KernelTestCase
 
     private function persistProbe(): void
     {
-        $this->probes->save(new Probe(
-            new ProbeId(self::PROBE),
-            "edge-01",
-            Labels::empty(),
-            "hash",
-            true,
-            new DateTimeImmutable("2026-01-01T00:00:00+00:00"),
-        ));
+        $this->probes->save(
+            new Probe(
+                new ProbeId(self::PROBE),
+                'edge-01',
+                Labels::empty(),
+                'hash',
+                true,
+                new DateTimeImmutable('2026-01-01T00:00:00+00:00'),
+            ),
+        );
     }
 }

@@ -31,9 +31,9 @@ final readonly class DashboardBootstrap
 
         foreach ($series as $bucket) {
             $buckets[] = [
-                "t" => $bucket->bucketStart->getTimestamp(),
-                "dl" => $bucket->downloadBits,
-                "up" => $bucket->uploadBits,
+                't' => $bucket->bucketStart->getTimestamp(),
+                'dl' => $bucket->downloadBits,
+                'up' => $bucket->uploadBits,
             ];
         }
 
@@ -58,11 +58,11 @@ final readonly class DashboardBootstrap
     public function toArray(): array
     {
         return [
-            "connectionId" => $this->connectionId,
-            "range" => $this->range,
-            "metric" => $this->metric,
-            "buckets" => $this->buckets,
-            "trendPct" => $this->trendPct,
+            'connectionId' => $this->connectionId,
+            'range' => $this->range,
+            'metric' => $this->metric,
+            'buckets' => $this->buckets,
+            'trendPct' => $this->trendPct,
         ];
     }
 }

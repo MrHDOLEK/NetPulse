@@ -29,9 +29,9 @@ use function trim;
 
 final class DashboardApiAction extends AbstractController
 {
-    private const string RUN_TEST_TOKEN_ID = "run-test";
-    private const string SCOPE_CONNECTION = "connection";
-    private const string SCOPE_ALL = "all";
+    private const string RUN_TEST_TOKEN_ID = 'run-test';
+    private const string SCOPE_CONNECTION = 'connection';
+    private const string SCOPE_ALL = 'all';
 
     public function __construct(
         private readonly ConnectionSeriesRepository $series,
@@ -40,34 +40,32 @@ final class DashboardApiAction extends AbstractController
         private readonly MessageBusInterface $commandBus,
     ) {}
 
-    #[Route("/dashboard/series", name: "dashboard_series", methods: ["GET"])]
+    #[Route('/dashboard/series', name: 'dashboard_series', methods: ['GET'])]
     public function series(Request $request): Response
     {
-        $range = SeriesRange::tryFrom((string)$request->query->get("range", ""));
-        $metric = SeriesMetric::tryFrom((string)$request->query->get("metric", ""));
+        $range = SeriesRange::tryFrom($request->query->get('range', ''));
+        $metric = SeriesMetric::tryFrom($request->query->get('metric', ''));
 
         if ($range === null) {
-            return $this->badRequest("Unknown or missing range");
+            return $this->badRequest('Unknown or missing range');
         }
 
         if ($metric === null) {
-            return $this->badRequest("Unknown or missing metric");
+            return $this->badRequest('Unknown or missing metric');
         }
 
         try {
-            $connectionId = new ConnectionId((string)$request->query->get("connection", ""));
+            $connectionId = new ConnectionId($request->query->get('connection', ''));
         } catch (InvalidId) {
-            return $this->badRequest("Missing or invalid connection id");
+            return $this->badRequest('Missing or invalid connection id');
         }
 
         $series = $this->series->series($connectionId, $range, $metric);
 
-        return $this->noCacheJson(
-            SeriesResponse::fromCollection($connectionId, $range, $metric, $series)->toArray(),
-        );
+        return $this->noCacheJson(SeriesResponse::fromCollection($connectionId, $range, $metric, $series)->toArray());
     }
 
-    #[Route("/dashboard/snapshot", name: "dashboard_snapshot", methods: ["GET"])]
+    #[Route('/dashboard/snapshot', name: 'dashboard_snapshot', methods: ['GET'])]
     public function snapshot(): Response
     {
         $overview = $this->overview->overview(SeriesRange::Week);
@@ -75,37 +73,37 @@ final class DashboardApiAction extends AbstractController
         return $this->noCacheJson(SnapshotResponse::fromOverview($overview)->toArray());
     }
 
-    #[Route("/dashboard/cursor", name: "dashboard_cursor", methods: ["GET"])]
+    #[Route('/dashboard/cursor', name: 'dashboard_cursor', methods: ['GET'])]
     public function cursor(): Response
     {
         $cursor = $this->cursor->current();
 
         return $this->noCacheJson([
-            "latestCompletedAtUnix" => $cursor->latestCompletedAtUnix,
-            "totalMeasurementCount" => $cursor->totalCount,
+            'latestCompletedAtUnix' => $cursor->latestCompletedAtUnix,
+            'totalMeasurementCount' => $cursor->totalCount,
         ]);
     }
 
-    #[Route("/dashboard/run", name: "dashboard_run", methods: ["POST"])]
+    #[Route('/dashboard/run', name: 'dashboard_run', methods: ['POST'])]
     public function run(Request $request): Response
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         if (!is_string($token) || !$this->isCsrfTokenValid(self::RUN_TEST_TOKEN_ID, $token)) {
-            return $this->errorJson("Invalid CSRF token", Response::HTTP_FORBIDDEN);
+            return $this->errorJson('Invalid CSRF token', Response::HTTP_FORBIDDEN);
         }
 
         $body = json_decode($request->getContent(), true);
         $body = is_array($body) ? $body : [];
 
-        $scope = is_string($body["scope"] ?? null) ? $body["scope"] : "";
+        $scope = is_string($body['scope'] ?? null) ? $body['scope'] : '';
 
         if ($scope !== self::SCOPE_CONNECTION && $scope !== self::SCOPE_ALL) {
-            return $this->badRequest("Unknown or missing scope");
+            return $this->badRequest('Unknown or missing scope');
         }
 
-        $rawServerId = is_string($body["serverId"] ?? null) ? trim($body["serverId"]) : "";
-        $serverId = $rawServerId === "" ? null : $rawServerId;
+        $rawServerId = is_string($body['serverId'] ?? null) ? trim($body['serverId']) : '';
+        $serverId = $rawServerId === '' ? null : $rawServerId;
 
         if ($scope === self::SCOPE_ALL && $serverId !== null) {
             return $this->badRequest("A specific server cannot be pinned for the 'all' scope");
@@ -115,10 +113,10 @@ final class DashboardApiAction extends AbstractController
 
         if ($scope === self::SCOPE_CONNECTION) {
             try {
-                $rawConnectionId = is_string($body["connectionId"] ?? null) ? $body["connectionId"] : "";
+                $rawConnectionId = is_string($body['connectionId'] ?? null) ? $body['connectionId'] : '';
                 $connectionId = new ConnectionId($rawConnectionId)->toString();
             } catch (InvalidId) {
-                return $this->badRequest("Invalid connection id");
+                return $this->badRequest('Invalid connection id');
             }
         }
 
@@ -128,14 +126,14 @@ final class DashboardApiAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof NotFoundException) {
-                return $this->errorJson("Connection not found", Response::HTTP_NOT_FOUND);
+                return $this->errorJson('Connection not found', Response::HTTP_NOT_FOUND);
             }
 
             throw $exception;
         }
 
-        $response = new JsonResponse(["status" => "queued"], Response::HTTP_ACCEPTED);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response = new JsonResponse(['status' => 'queued'], Response::HTTP_ACCEPTED);
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
@@ -146,18 +144,18 @@ final class DashboardApiAction extends AbstractController
     private function noCacheJson(array $payload): JsonResponse
     {
         $response = new JsonResponse($payload, Response::HTTP_OK);
-        $response->headers->set("Cache-Control", "no-cache");
+        $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
     }
 
     private function badRequest(string $message): JsonResponse
     {
-        return new JsonResponse(["error" => $message], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['error' => $message], Response::HTTP_BAD_REQUEST);
     }
 
     private function errorJson(string $message, int $status): JsonResponse
     {
-        return new JsonResponse(["error" => $message], $status);
+        return new JsonResponse(['error' => $message], $status);
     }
 }

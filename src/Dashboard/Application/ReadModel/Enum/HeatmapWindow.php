@@ -8,8 +8,8 @@ use InvalidArgumentException;
 
 enum HeatmapWindow: string
 {
-    case Month = "30d";
-    case Quarter = "90d";
+    case Month = '30d';
+    case Quarter = '90d';
 
     public static function fromParam(string $param): self
     {

@@ -25,10 +25,10 @@ use function is_string;
 use function json_decode;
 use function trim;
 
-#[IsGranted("ROLE_ADMIN")]
+#[IsGranted('ROLE_ADMIN')]
 final class SsoSettingsAction extends AbstractController
 {
-    private const string CSRF_TOKEN_ID = "settings-sso";
+    private const string CSRF_TOKEN_ID = 'settings-sso';
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
@@ -37,44 +37,44 @@ final class SsoSettingsAction extends AbstractController
         private readonly OidcDiscoveryProbe $discoveryProbe,
     ) {}
 
-    #[Route("/settings/sso", name: "settings_sso", methods: ["GET"])]
+    #[Route('/settings/sso', name: 'settings_sso', methods: ['GET'])]
     public function index(): Response
     {
         $secret = $this->settings->getString(SettingKey::OidcClientSecret);
 
-        return $this->render("settings/sso/index.html.twig", [
-            "enabled" => $this->settings->getBool(SettingKey::OidcEnabled),
-            "name" => $this->settings->getString(SettingKey::OidcName),
-            "clientId" => $this->settings->getString(SettingKey::OidcClientId),
-            "authorizationUrl" => $this->settings->getString(SettingKey::OidcAuthorizationUrl),
-            "tokenUrl" => $this->settings->getString(SettingKey::OidcTokenUrl),
-            "userInfoUrl" => $this->settings->getString(SettingKey::OidcUserInfoUrl),
-            "redirectUrl" => $this->settings->getString(SettingKey::OidcRedirectUrl),
-            "scopes" => $this->settings->getString(SettingKey::OidcScopes),
-            "secretIsSet" => $secret !== "",
-            "canEncrypt" => $this->encryptor->canEncrypt(),
+        return $this->render('settings/sso/index.html.twig', [
+            'enabled' => $this->settings->getBool(SettingKey::OidcEnabled),
+            'name' => $this->settings->getString(SettingKey::OidcName),
+            'clientId' => $this->settings->getString(SettingKey::OidcClientId),
+            'authorizationUrl' => $this->settings->getString(SettingKey::OidcAuthorizationUrl),
+            'tokenUrl' => $this->settings->getString(SettingKey::OidcTokenUrl),
+            'userInfoUrl' => $this->settings->getString(SettingKey::OidcUserInfoUrl),
+            'redirectUrl' => $this->settings->getString(SettingKey::OidcRedirectUrl),
+            'scopes' => $this->settings->getString(SettingKey::OidcScopes),
+            'secretIsSet' => $secret !== '',
+            'canEncrypt' => $this->encryptor->canEncrypt(),
         ]);
     }
 
-    #[Route("/settings/sso", name: "settings_sso_save", methods: ["POST"])]
+    #[Route('/settings/sso', name: 'settings_sso_save', methods: ['POST'])]
     public function save(Request $request): Response
     {
         if (!$this->csrfValid($request)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         $body = json_decode($request->getContent(), true);
         $body = is_array($body) ? $body : [];
 
         $values = [
-            SettingKey::OidcEnabled->value => $this->bool($body, "enabled") ? "1" : "0",
-            SettingKey::OidcName->value => $this->str($body, "name"),
-            SettingKey::OidcClientId->value => $this->str($body, "clientId"),
-            SettingKey::OidcAuthorizationUrl->value => $this->str($body, "authorizationUrl"),
-            SettingKey::OidcTokenUrl->value => $this->str($body, "tokenUrl"),
-            SettingKey::OidcUserInfoUrl->value => $this->str($body, "userInfoUrl"),
-            SettingKey::OidcRedirectUrl->value => $this->str($body, "redirectUrl"),
-            SettingKey::OidcScopes->value => $this->str($body, "scopes"),
+            SettingKey::OidcEnabled->value => $this->bool($body, 'enabled') ? '1' : '0',
+            SettingKey::OidcName->value => $this->str($body, 'name'),
+            SettingKey::OidcClientId->value => $this->str($body, 'clientId'),
+            SettingKey::OidcAuthorizationUrl->value => $this->str($body, 'authorizationUrl'),
+            SettingKey::OidcTokenUrl->value => $this->str($body, 'tokenUrl'),
+            SettingKey::OidcUserInfoUrl->value => $this->str($body, 'userInfoUrl'),
+            SettingKey::OidcRedirectUrl->value => $this->str($body, 'redirectUrl'),
+            SettingKey::OidcScopes->value => $this->str($body, 'scopes'),
 
             SettingKey::OidcClientSecret->value => $this->secret($body),
         ];
@@ -85,42 +85,42 @@ final class SsoSettingsAction extends AbstractController
             $cause = $exception->getPrevious() ?? $exception;
 
             if ($cause instanceof SettingsException) {
-                return new JsonResponse(["error" => $cause->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
+                return new JsonResponse(['error' => $cause->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             throw $exception;
         }
 
         return new JsonResponse([
-            "saved" => true,
-            "secretIsSet" => $this->settings->getString(SettingKey::OidcClientSecret) !== "",
+            'saved' => true,
+            'secretIsSet' => $this->settings->getString(SettingKey::OidcClientSecret) !== '',
         ]);
     }
 
-    #[Route("/settings/sso/test", name: "settings_sso_test", methods: ["POST"])]
+    #[Route('/settings/sso/test', name: 'settings_sso_test', methods: ['POST'])]
     public function test(Request $request): Response
     {
         if (!$this->csrfValid($request)) {
-            return new JsonResponse(["error" => "Invalid CSRF token"], Response::HTTP_FORBIDDEN);
+            return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_FORBIDDEN);
         }
 
         $body = json_decode($request->getContent(), true);
         $body = is_array($body) ? $body : [];
 
-        $candidate = $this->str($body, "discoveryUrl");
+        $candidate = $this->str($body, 'discoveryUrl');
 
-        if ($candidate === "") {
+        if ($candidate === '') {
             $candidate = $this->settings->getString(SettingKey::OidcAuthorizationUrl);
         }
 
         $result = $this->discoveryProbe->probe($candidate);
 
-        return new JsonResponse(["ok" => $result->ok, "message" => $result->message]);
+        return new JsonResponse(['ok' => $result->ok, 'message' => $result->message]);
     }
 
     private function csrfValid(Request $request): bool
     {
-        $token = $request->headers->get("X-CSRF-Token");
+        $token = $request->headers->get('X-CSRF-Token');
 
         return is_string($token) && $this->isCsrfTokenValid(self::CSRF_TOKEN_ID, $token);
     }
@@ -130,13 +130,13 @@ final class SsoSettingsAction extends AbstractController
      */
     private function secret(array $body): ?string
     {
-        if (!array_key_exists("clientSecret", $body)) {
+        if (!array_key_exists('clientSecret', $body)) {
             return null;
         }
 
-        $value = $body["clientSecret"];
+        $value = $body['clientSecret'];
 
-        if (!is_string($value) || trim($value) === "") {
+        if (!is_string($value) || trim($value) === '') {
             return null;
         }
 
@@ -150,7 +150,7 @@ final class SsoSettingsAction extends AbstractController
     {
         $value = $body[$key] ?? null;
 
-        return is_string($value) ? trim($value) : "";
+        return is_string($value) ? trim($value) : '';
     }
 
     /**

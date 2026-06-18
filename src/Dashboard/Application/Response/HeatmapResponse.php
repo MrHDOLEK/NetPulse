@@ -19,13 +19,13 @@ use const STR_PAD_LEFT;
 final readonly class HeatmapResponse
 {
     private const array WEEKDAYS = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
     ];
 
     /**
@@ -95,16 +95,16 @@ final readonly class HeatmapResponse
     public function toArray(): array
     {
         return [
-            "metric" => $this->metric,
-            "window" => $this->window,
-            "connectionId" => $this->connectionId,
-            "unit" => $this->unit,
-            "scale" => [
-                "min" => $this->scaleMin,
-                "max" => $this->scaleMax,
+            'metric' => $this->metric,
+            'window' => $this->window,
+            'connectionId' => $this->connectionId,
+            'unit' => $this->unit,
+            'scale' => [
+                'min' => $this->scaleMin,
+                'max' => $this->scaleMax,
             ],
-            "legend" => $this->legend,
-            "cells" => $this->cells,
+            'legend' => $this->legend,
+            'cells' => $this->cells,
         ];
     }
 
@@ -125,21 +125,21 @@ final readonly class HeatmapResponse
         $valueLabel = self::valueLabel($metric, $cell->value);
 
         return [
-            "dow" => $cell->dow,
-            "hour" => $cell->hour,
-            "value" => $cell->value,
-            "valueLabel" => $valueLabel,
-            "samples" => $cell->samples,
-            "attempts" => $cell->attempts,
-            "bgStyle" => $scale->bgStyle($cell->value),
-            "aria" => self::aria($cell, $valueLabel),
+            'dow' => $cell->dow,
+            'hour' => $cell->hour,
+            'value' => $cell->value,
+            'valueLabel' => $valueLabel,
+            'samples' => $cell->samples,
+            'attempts' => $cell->attempts,
+            'bgStyle' => $scale->bgStyle($cell->value),
+            'aria' => self::aria($cell, $valueLabel),
         ];
     }
 
     private static function valueLabel(HeatmapMetric $metric, ?float $value): string
     {
         return match ($metric) {
-            HeatmapMetric::Download => UnitFormatter::bitsPerSecond($value === null ? null : (int)$value),
+            HeatmapMetric::Download => UnitFormatter::bitsPerSecond($value === null ? null : (int) $value),
             HeatmapMetric::Ping => UnitFormatter::seconds($value),
             HeatmapMetric::Health => UnitFormatter::ratio($value),
         };
@@ -148,9 +148,9 @@ final readonly class HeatmapResponse
     private static function aria(HeatmapCell $cell, string $valueLabel): string
     {
         $weekday = self::WEEKDAYS[$cell->dow];
-        $hour = str_pad((string)$cell->hour, 2, "0", STR_PAD_LEFT);
-        $reading = $cell->value === null ? "no data" : $valueLabel;
+        $hour = str_pad((string) $cell->hour, 2, '0', STR_PAD_LEFT);
+        $reading = $cell->value === null ? 'no data' : $valueLabel;
 
-        return sprintf("%s %s:00 — %s, %d samples", $weekday, $hour, $reading, $cell->samples);
+        return sprintf('%s %s:00 — %s, %d samples', $weekday, $hour, $reading, $cell->samples);
     }
 }

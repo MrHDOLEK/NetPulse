@@ -31,17 +31,17 @@ final class SeedCommandTest extends KernelTestCase
         $schemaTool->createSchema($metadata);
 
         $application = new Application(self::$kernel);
-        $command = $application->find("app:dev:seed");
+        $command = $application->find('app:dev:seed');
         $commandTester = new CommandTester($command);
 
         $exitCode = $commandTester->execute([
-            "--measurements" => "12",
+            '--measurements' => '12',
         ]);
 
         $this->assertSame(0, $exitCode);
 
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString("Probe token:", $output);
+        $this->assertStringContainsString('Probe token:', $output);
         $this->assertMatchesRegularExpression("/Probe token: \S+/", $output);
 
         $probeIdMatched = [];
@@ -71,17 +71,24 @@ final class SeedCommandTest extends KernelTestCase
             $latestStatuses[] = $row->status;
             $latestHealth[] = $row->healthy;
 
-            if ($row->status === "completed" && $row->completedAtUnix >= $now - 3600) {
+            if ($row->status === 'completed' && $row->completedAtUnix >= ($now - 3600)) {
                 $hasFreshUp = true;
             }
         }
 
-        $this->assertContains("completed", $latestStatuses);
-        $this->assertTrue($hasFreshUp, "At least one connection must have a fresh completed measurement for netpulse_up=1.");
+        $this->assertContains('completed', $latestStatuses);
+        $this->assertTrue(
+            $hasFreshUp,
+            'At least one connection must have a fresh completed measurement for netpulse_up=1.',
+        );
 
-        $this->assertNotContains(null, $latestHealth, "Every seeded connection's newest measurement must have an evaluated health verdict.");
-        $this->assertContains(true, $latestHealth, "At least one seeded connection must be healthy.");
-        $this->assertContains(false, $latestHealth, "At least one seeded connection must be unhealthy/degraded.");
+        $this->assertNotContains(
+            null,
+            $latestHealth,
+            "Every seeded connection's newest measurement must have an evaluated health verdict.",
+        );
+        $this->assertContains(true, $latestHealth, 'At least one seeded connection must be healthy.');
+        $this->assertContains(false, $latestHealth, 'At least one seeded connection must be unhealthy/degraded.');
 
         $allMeasurements = $entityManager->getRepository(Measurement::class)->findAll();
         $allStatuses = array_map(static fn(Measurement $m): MeasurementStatus => $m->status(), $allMeasurements);

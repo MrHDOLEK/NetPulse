@@ -27,21 +27,14 @@ final readonly class Bucketer
     ): SeriesBucketCollection {
         $bucketed = $this->bucket($sinceUnix, $bucketWidthSeconds, $bucketCount, $metric, $samples);
 
-        $currentSamples = $this->currentWindowSamples(
-            $sinceUnix,
-            $bucketWidthSeconds * $bucketCount,
-            $samples,
-        );
+        $currentSamples = $this->currentWindowSamples($sinceUnix, $bucketWidthSeconds * $bucketCount, $samples);
         $currentCount = count($currentSamples);
 
         if ($currentCount === 0 || $currentCount >= self::RAW_POINT_THRESHOLD) {
             return $bucketed;
         }
 
-        return SeriesBucketCollection::withTrend(
-            $this->rawPoints($metric, $currentSamples),
-            $bucketed->trendPct(),
-        );
+        return SeriesBucketCollection::withTrend($this->rawPoints($metric, $currentSamples), $bucketed->trendPct());
     }
 
     public function bucket(
@@ -85,7 +78,7 @@ final readonly class Bucketer
             $timestamp = $sample->completedAtUnix;
 
             if ($timestamp >= $sinceUnix) {
-                $index = (int)floor(($timestamp - $sinceUnix) / $bucketWidthSeconds);
+                $index = (int) floor(($timestamp - $sinceUnix) / $bucketWidthSeconds);
 
                 if ($index < 0 || $index >= $bucketCount) {
                     continue;
@@ -135,12 +128,13 @@ final readonly class Bucketer
             }
         }
 
-        $utc = new DateTimeZone("UTC");
+        $utc = new DateTimeZone('UTC');
         $buckets = [];
 
         for ($index = 0; $index < $bucketCount; $index++) {
-            $bucketStart = (new DateTimeImmutable("@" . ($sinceUnix + $index * $bucketWidthSeconds)))
-                ->setTimezone($utc);
+            $bucketStart = new DateTimeImmutable('@' . ($sinceUnix + ($index * $bucketWidthSeconds)))->setTimezone(
+                $utc,
+            );
 
             $buckets[] = match ($metric) {
                 SeriesMetric::Speed => new SeriesBucket(
@@ -171,10 +165,7 @@ final readonly class Bucketer
             SeriesMetric::Loss => $this->averageFloat($previousLoss),
         };
 
-        return SeriesBucketCollection::withTrend(
-            $buckets,
-            $this->trendPct($currentAverage, $previousAverage),
-        );
+        return SeriesBucketCollection::withTrend($buckets, $this->trendPct($currentAverage, $previousAverage));
     }
 
     private function trendPct(?float $currentAverage, ?float $previousAverage): ?float
@@ -187,7 +178,7 @@ final readonly class Bucketer
             return null;
         }
 
-        return ($currentAverage - $previousAverage) / $previousAverage * 100.0;
+        return (($currentAverage - $previousAverage) / $previousAverage) * 100.0;
     }
 
     /**
@@ -217,11 +208,11 @@ final readonly class Bucketer
      */
     private function rawPoints(SeriesMetric $metric, array $samples): array
     {
-        $utc = new DateTimeZone("UTC");
+        $utc = new DateTimeZone('UTC');
         $points = [];
 
         foreach ($samples as $sample) {
-            $at = (new DateTimeImmutable("@" . $sample->completedAtUnix))->setTimezone($utc);
+            $at = new DateTimeImmutable('@' . $sample->completedAtUnix)->setTimezone($utc);
 
             $points[] = match ($metric) {
                 SeriesMetric::Speed => new SeriesBucket(
@@ -246,7 +237,7 @@ final readonly class Bucketer
             return null;
         }
 
-        return (int)round(array_sum($values) / count($values));
+        return (int) round(array_sum($values) / count($values));
     }
 
     /**

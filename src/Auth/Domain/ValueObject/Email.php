@@ -22,7 +22,7 @@ final readonly class Email implements Stringable
     {
         $normalized = filter_var(strtolower($value), FILTER_VALIDATE_EMAIL);
 
-        if ($normalized === false) {
+        if ($normalized === false || $normalized === '') {
             throw new InvalidArgumentException(sprintf('Invalid email address: "%s".', $value));
         }
 

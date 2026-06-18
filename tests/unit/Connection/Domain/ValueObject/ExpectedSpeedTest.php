@@ -16,8 +16,8 @@ final class ExpectedSpeedTest extends TestCase
      */
     public static function provideValidSpeeds(): iterable
     {
-        yield "typical plan" => [100_000_000, 20_000_000];
-        yield "zero means unknown plan" => [0, 0];
+        yield 'typical plan' => [100_000_000, 20_000_000];
+        yield 'zero means unknown plan' => [0, 0];
     }
 
     /**
@@ -25,11 +25,11 @@ final class ExpectedSpeedTest extends TestCase
      */
     public static function provideNegativeSpeeds(): iterable
     {
-        yield "negative download" => [-1, 20_000_000];
-        yield "negative upload" => [100_000_000, -5];
+        yield 'negative download' => [-1, 20_000_000];
+        yield 'negative upload' => [100_000_000, -5];
     }
 
-    #[DataProvider("provideValidSpeeds")]
+    #[DataProvider('provideValidSpeeds')]
     public function testHoldsDownloadAndUploadBits(int $download, int $upload): void
     {
         $expected = new ExpectedSpeed($download, $upload);
@@ -38,7 +38,7 @@ final class ExpectedSpeedTest extends TestCase
         $this->assertSame($upload, $expected->expectedUploadBits);
     }
 
-    #[DataProvider("provideNegativeSpeeds")]
+    #[DataProvider('provideNegativeSpeeds')]
     public function testRejectsNegativeBits(int $download, int $upload): void
     {
         $this->expectException(InvalidExpectedSpeed::class);

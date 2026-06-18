@@ -16,9 +16,9 @@ final class UnitFormatterExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter("mbps", UnitFormatter::bitsPerSecond(...)),
-            new TwigFilter("ms", UnitFormatter::seconds(...)),
-            new TwigFilter("pct", UnitFormatter::ratio(...)),
+            new TwigFilter('mbps', UnitFormatter::bitsPerSecond(...)),
+            new TwigFilter('ms', UnitFormatter::seconds(...)),
+            new TwigFilter('pct', UnitFormatter::ratio(...)),
         ];
     }
 }

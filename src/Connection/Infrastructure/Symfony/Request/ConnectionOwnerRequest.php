@@ -8,5 +8,5 @@ use App\Shared\Infrastructure\Utils\Request\RequestInterface;
 
 final class ConnectionOwnerRequest implements RequestInterface
 {
-    public string $probeId = "";
+    public string $probeId = '';
 }

@@ -14,7 +14,7 @@ use function is_string;
 
 final class UserIdType extends GuidType
 {
-    private const string NAME = "user_id";
+    private const string NAME = 'user_id';
 
     public function getName(): string
     {
@@ -28,7 +28,7 @@ final class UserIdType extends GuidType
         }
 
         if (!$value instanceof UserId) {
-            throw InvalidType::new($value, self::NAME, [UserId::class, "null"]);
+            throw InvalidType::new($value, self::NAME, [UserId::class, 'null']);
         }
 
         return $value->toString();

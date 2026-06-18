@@ -26,7 +26,7 @@ final readonly class SqlServerMetricsRepository implements ServerMetricsReposito
 
     public function all(HeatmapWindow $window): ServerMetricsRowCollection
     {
-        $now = $this->clock->now()->setTimezone(new DateTimeZone("UTC"));
+        $now = $this->clock->now()->setTimezone(new DateTimeZone('UTC'));
         $since = $now->modify("-{$window->windowSeconds()} seconds");
 
         /**
@@ -43,27 +43,28 @@ final readonly class SqlServerMetricsRepository implements ServerMetricsReposito
          *     lastSeen: string
          * }> $rows
          */
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select(
-                "measurement.serverId AS serverId",
-                "MAX(measurement.serverName) AS name",
-                "MAX(measurement.serverLocation) AS location",
-                "AVG(measurement.downloadBits) AS avgDl",
-                "AVG(measurement.uploadBits) AS avgUp",
-                "AVG(measurement.ping) AS avgPingMs",
-                "AVG(measurement.packetLossRatio) AS avgLoss",
-                "COUNT(measurement.id) AS tests",
-                "SUM(CASE WHEN measurement.healthy = :healthy THEN 1 ELSE 0 END) AS healthy",
-                "MAX(measurement.completedAt) AS lastSeen",
+                'measurement.serverId AS serverId',
+                'MAX(measurement.serverName) AS name',
+                'MAX(measurement.serverLocation) AS location',
+                'AVG(measurement.downloadBits) AS avgDl',
+                'AVG(measurement.uploadBits) AS avgUp',
+                'AVG(measurement.ping) AS avgPingMs',
+                'AVG(measurement.packetLossRatio) AS avgLoss',
+                'COUNT(measurement.id) AS tests',
+                'SUM(CASE WHEN measurement.healthy = :healthy THEN 1 ELSE 0 END) AS healthy',
+                'MAX(measurement.completedAt) AS lastSeen',
             )
-            ->from(Measurement::class, "measurement")
-            ->where("measurement.serverId <> :empty")
-            ->andWhere("measurement.completedAt >= :since")
-            ->groupBy("measurement.serverId")
-            ->orderBy("name", "ASC")
-            ->setParameter("healthy", true, Types::BOOLEAN)
-            ->setParameter("empty", "")
-            ->setParameter("since", $since, Types::DATETIME_IMMUTABLE)
+            ->from(Measurement::class, 'measurement')
+            ->where('measurement.serverId <> :empty')
+            ->andWhere('measurement.completedAt >= :since')
+            ->groupBy('measurement.serverId')
+            ->orderBy('name', 'ASC')
+            ->setParameter('healthy', true, Types::BOOLEAN)
+            ->setParameter('empty', '')
+            ->setParameter('since', $since, Types::DATETIME_IMMUTABLE)
             ->getQuery()
             ->getResult();
 
@@ -71,16 +72,16 @@ final readonly class SqlServerMetricsRepository implements ServerMetricsReposito
 
         foreach ($rows as $row) {
             $items[] = new ServerMetricsRow(
-                serverId: $row["serverId"],
-                name: $row["name"] ?? "",
-                location: $row["location"] ?? "",
-                avgDownloadBits: $row["avgDl"] === null ? null : (float)$row["avgDl"],
-                avgUploadBits: $row["avgUp"] === null ? null : (float)$row["avgUp"],
-                avgPingSeconds: $row["avgPingMs"] === null ? null : ((float)$row["avgPingMs"]) / 1000.0,
-                avgLossRatio: $row["avgLoss"] === null ? null : (float)$row["avgLoss"],
-                testCount: (int)$row["tests"],
-                healthyCount: (int)$row["healthy"],
-                lastSeenUnix: new DateTimeImmutable($row["lastSeen"], new DateTimeZone("UTC"))->getTimestamp(),
+                serverId: $row['serverId'],
+                name: $row['name'] ?? '',
+                location: $row['location'] ?? '',
+                avgDownloadBits: $row['avgDl'] === null ? null : (float) $row['avgDl'],
+                avgUploadBits: $row['avgUp'] === null ? null : (float) $row['avgUp'],
+                avgPingSeconds: $row['avgPingMs'] === null ? null : (float) $row['avgPingMs'] / 1000.0,
+                avgLossRatio: $row['avgLoss'] === null ? null : (float) $row['avgLoss'],
+                testCount: (int) $row['tests'],
+                healthyCount: (int) $row['healthy'],
+                lastSeenUnix: new DateTimeImmutable($row['lastSeen'], new DateTimeZone('UTC'))->getTimestamp(),
             );
         }
 

@@ -27,7 +27,7 @@ final class ConnectionInputMapperTest extends TestCase
 
             public function isValid(string $expression): bool
             {
-                return !str_starts_with($expression, "bad");
+                return !str_starts_with($expression, 'bad');
             }
         };
 
@@ -36,30 +36,24 @@ final class ConnectionInputMapperTest extends TestCase
 
     public function testParseLabelsSplitsPairs(): void
     {
-        $this->assertSame(
-            ["site" => "home", "link" => "wan1"],
-            $this->mapper->parseLabels("site=home, link=wan1"),
-        );
+        $this->assertSame(['site' => 'home', 'link' => 'wan1'], $this->mapper->parseLabels('site=home, link=wan1'));
     }
 
     public function testParseLabelsDropsMalformedPairs(): void
     {
-        $this->assertSame(
-            ["a" => "1"],
-            $this->mapper->parseLabels("a=1,nopair,=novalue"),
-        );
+        $this->assertSame(['a' => '1'], $this->mapper->parseLabels('a=1,nopair,=novalue'));
     }
 
     public function testParseLabelsOnEmptyStringIsEmpty(): void
     {
-        $this->assertSame([], $this->mapper->parseLabels(""));
+        $this->assertSame([], $this->mapper->parseLabels(''));
     }
 
     public function testParseListTrimsAndFiltersEmpties(): void
     {
         $this->assertSame(
-            ["a.example.net", "b.example.net"],
-            $this->mapper->parseList(" a.example.net , , b.example.net "),
+            ['a.example.net', 'b.example.net'],
+            $this->mapper->parseList(' a.example.net , , b.example.net '),
         );
     }
 
@@ -71,7 +65,7 @@ final class ConnectionInputMapperTest extends TestCase
 
     public function testBuildEvenSchedule(): void
     {
-        $schedule = $this->mapper->buildSchedule("even", [], 48, 30);
+        $schedule = $this->mapper->buildSchedule('even', [], 48, 30);
 
         $this->assertSame(ScheduleMode::Even, $schedule->mode());
         $this->assertSame(48, $schedule->testsPerDay());
@@ -80,10 +74,10 @@ final class ConnectionInputMapperTest extends TestCase
 
     public function testBuildCronScheduleValidatesAndKeepsExpressions(): void
     {
-        $schedule = $this->mapper->buildSchedule("cron", ["*/30 * * * *", " 0 9 * * 1 "], 0, 0);
+        $schedule = $this->mapper->buildSchedule('cron', ['*/30 * * * *', ' 0 9 * * 1 '], 0, 0);
 
         $this->assertSame(ScheduleMode::Cron, $schedule->mode());
-        $this->assertSame(["*/30 * * * *", "0 9 * * 1"], $schedule->cronExpressions());
+        $this->assertSame(['*/30 * * * *', '0 9 * * 1'], $schedule->cronExpressions());
     }
 
     public function testBuildCronScheduleRejectsInvalidExpression(): void
@@ -91,28 +85,28 @@ final class ConnectionInputMapperTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid cron expression: "bad expr".');
 
-        $this->mapper->buildSchedule("cron", ["bad expr"], 0, 0);
+        $this->mapper->buildSchedule('cron', ['bad expr'], 0, 0);
     }
 
     public function testBuildCronScheduleRejectsEmptyExpressionList(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->mapper->buildSchedule("cron", ["", "   "], 0, 0);
+        $this->mapper->buildSchedule('cron', ['', '   '], 0, 0);
     }
 
     public function testBuildEvenScheduleRejectsTooFewTests(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->mapper->buildSchedule("even", [], 0, 30);
+        $this->mapper->buildSchedule('even', [], 0, 30);
     }
 
     public function testBuildEvenScheduleRejectsNegativeJitter(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->mapper->buildSchedule("even", [], 24, -1);
+        $this->mapper->buildSchedule('even', [], 24, -1);
     }
 
     public function testBuildThresholdsFallsBackToDefaultsForNullRatios(): void
